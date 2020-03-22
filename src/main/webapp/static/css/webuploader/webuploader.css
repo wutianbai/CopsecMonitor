@@ -1,0 +1,48 @@
+.webuploader-container {
+	-webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+.webuploader-element-invisible {
+	position: absolute !important;
+	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+    clip: rect(1px,1px,1px,1px);
+}
+
+.webuploader-pick {
+	display: inline-block;
+    margin-bottom: 0;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    /*//padding: 6px 12px;*/
+    /*font-size: 13px;*/
+    line-height: 1.42857143;
+    border-radius: 0px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+	outline: none;
+    /*border: 1px solid transparent;*/
+/*    margin-bottom: 10px;*/
+    float: right !important;
+/*    color: #ffffff;
+    background-color: #68b828;
+    border-color: #68b828;*/
+    height:40px;
+}
+
+.webuploader-pick-hover {
+	background: #68b828;
+}
+
+/*.webuploader-pick-disable {
+	opacity: 0.6;
+	pointer-events:none;
+}*/
+

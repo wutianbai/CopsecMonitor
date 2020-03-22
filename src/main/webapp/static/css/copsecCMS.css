@@ -1,0 +1,462 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #07183b;
+}
+
+.page-wrap {
+  max-width: 1920px;
+  min-width: 1200px;
+  margin: 0 auto;
+  overflow-x: auto;
+}
+
+.time-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  height: 0.44rem;
+  padding-bottom: 0.04rem;
+  font-size: 0.18rem;
+  color: #e0f3ff;
+}
+
+.time-bar .btn-box {
+  padding: 0 0.35rem 0 0.43rem;
+  //background: url(img/admin-icon.png) no-repeat left 0.035rem / contain;
+  font-family: 'Microsoft YaHei';
+  color: #ffffff;
+}
+
+.time-bar .num-box {
+  padding: 0 0.23rem;
+  font-family: 'Microsoft YaHei';
+  color: #ffffff;
+}
+
+.header-box {
+  display: flex;
+  justify-content: space-between;
+  height: 1.02rem;
+  background: url(img/nav_bg.png) no-repeat top center / contain;
+}
+
+.header-box .item-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.18rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.header-box .item-box .text-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1.82rem;
+  margin-top: -0.07rem;
+}
+
+.header-box .center-box {
+  font-size: 0.48rem;
+  color: #ffffff;
+}
+
+.content_warp {
+  margin: 0 0.19rem 0.19rem;
+}
+
+.content {
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+}
+
+.content_left {
+  width: 4.06rem;
+  overflow: hidden;
+}
+
+.content_left_top {
+     height: 5.4rem;
+     background: url(img/left_bg1.png) no-repeat top center / contain;
+ }
+
+.content_right_top {
+    height: 5.4rem;
+    background: url(img/left_bg1.png) no-repeat top center / contain;
+}
+
+.content_left_text {
+  height: 1.04rem;
+  border-bottom: 0.01rem dotted rgba(28, 101, 254, 0.37);
+  font-size: 0.18rem;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.content_left_text_dl {
+  width: 100%;
+  height: 1.04rem;
+  padding-top: 0.2rem;
+  text-align: center;
+}
+
+.content_left_text_dd {
+  font-size: 0.4rem;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.content_left_text_span {
+  font-size: 0.15rem;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  color: #ffffff;
+  margin-left: 0.06rem;
+}
+
+.content_left_pie {
+  width: 3.9rem;
+  height: 1.75rem;
+  margin-top: 0.36rem;
+  margin-left: 0.1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.content_right_data1 {
+     width: 3.9rem;
+     height: 3rem;
+     margin-top: 0.16rem;
+     margin-left: 0.1rem;
+     display: flex;
+     justify-content: space-between;
+ }
+
+.content_right_data2 {
+    width: 3.9rem;
+    height: 1.8rem;
+    margin-top: 0.16rem;
+    margin-left: 0.1rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.content_left_data {
+  width: 3.9rem;
+  margin-top: 0.3rem;
+  margin-left: 0.1rem;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.13rem;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 1);
+}
+
+.content_left_data_ul {
+   width: 100%;
+   margin-left: 0.05rem;
+   margin-right: 0.05rem;
+}
+
+.content_left_data_li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 0.34rem;
+}
+
+.content_left_data_span1 {
+  width: 0.13rem;
+  height: 0.13rem;
+  background:#ffffff;
+  margin-top: 0.02rem;
+}
+
+.content_left_data_span11 {
+  background: #ac4ed3;
+}
+
+.content_left_data_span12 {
+  background: #e6af08;
+}
+
+.content_left_data_span13 {
+  background: #00af6d;
+}
+
+.content_left_data_span3 {
+  color: rgba(0, 209, 255, 1);
+}
+
+.content_left_bottom {
+  height: 3.7rem;
+  margin-top: 0.12rem;
+  background: url(img/left_bg2.png) no-repeat top center / contain;
+}
+
+.content_right_bottom {
+    height: 3.7rem;
+    margin-top: 0.12rem;
+    background: url(img/left_bg2.png) no-repeat top center / contain;
+}
+
+.content_left_bototm_par {
+  width: 3.88rem;
+  margin: 0.16rem 0.11rem 0;
+}
+
+.content_center {
+  width: 10.32rem;
+  overflow: hidden;
+}
+
+.content_center_top{
+    height: 7rem;
+    background: url(img/center_bg.png) no-repeat top center;
+
+}
+.content_center_bottom{
+    height: 2.1rem;
+    margin-top: 0.12rem;
+    background: url(img/center_bg.png) no-repeat top center;
+}
+
+.content_center_bottom_top{
+
+    height:0.8rem;
+    display: flex;
+    justify-content: space-between;
+}
+.content_center_bottom_bottom{
+
+    height:1.1rem;
+    display: flex;
+    justify-content: space-between;
+}
+.content_center_bottom_left{
+
+    width: 5%;
+    height:1rem;
+    margin-left: 0.3rem;
+    margin-top: 0.2rem;
+    text-align: center;
+    display: flex;
+    justify-content: flex-start;
+}
+.content_center_bottom_right{
+
+    width: 95%;
+    height:1rem;
+    display: flex;
+    margin-top: 0.1rem;
+    margin-right: 0.3rem;
+    justify-content: space-around;
+}
+.content_bottom_hr{
+
+    height:1px;
+    border:none;
+    border-top:1px solid rgba(85, 90, 255, 0.93);
+}
+.content_right_warning{
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.content_warning_text{
+
+    width:100%;
+    height: 0.3rem;
+    background: rgba(19, 32, 169, 0.57);
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #fe5705;
+    margin-top: 0.1rem;
+}
+
+.content_center_title {
+  height: 0.4rem;
+  font-size: 0.18rem;
+  font-family: Noto Sans S Chinese;
+  font-weight: bold;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content_center_pic {
+  height: 8.82rem;
+}
+
+.content_right {
+    width: 4.06rem;
+    overflow: hidden;
+}
+
+.content_right_title {
+  height: 0.48rem;
+  line-height: 0.48rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.16rem;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  color: rgba(0, 209, 255, 1);
+}
+
+.content_right_title1 {
+  width: 2.51rem;
+  height: 0.44rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-right: 0.01rem solid rgba(0, 234, 255, 0.2);
+}
+
+.content_right_title2 {
+  width: 1.56rem;
+  height: 0.44rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content_right_text {
+  height: 0.43rem;
+  line-height: 0.43rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 0.01rem solid rgba(0, 234, 255, 0.2);
+  font-size: 0.12rem;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.content_right_text1 {
+  width: 2.51rem;
+  height: 0.48rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-right: 0.01rem solid rgba(0, 234, 255, 0.2);
+}
+
+.content_right_text2 {
+  width: 1.56rem;
+  height: 0.48rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content_title {
+  display: flex;
+  align-items: center;
+  height: 0.36rem;
+  font-size: 0.18rem;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.content_title_icon {
+  width: 0.08rem;
+  height: 0.18rem;
+  background: #ffffff;
+  margin: 0 0.1rem 0 0.2rem;
+}
+
+.content_rigth_title_left{
+    width: 12%;
+    height: 2.2rem;
+    text-align: center;
+}
+.content_rigth_title_right{
+    width: 88%;
+    height: 2.2rem;
+    margin-top: 0.1rem;
+    margin-right: 0.1rem;
+    text-align: center;
+}
+.content_right_data_li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 0.5rem;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    color: #ffffff;
+
+}
+.content_right_data_span1 {
+    width: 0.23rem;
+    height: 0.23rem;
+    background: rgba(189, 23, 233, 0.3);
+    font-size: 0.15rem;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    color: #ffffff;
+}
+.processor_right{
+    width:2rem;
+    margin-top: 0.1rem;
+}
+.content_right_title_top{
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    color: #ffffff;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content_right_data_span2 {
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #ffffff;
+}
+.progress-first-success {
+    background-color: #FD6035;
+    background-image: linear-gradient(to right, #fdce6a, #FD7A33, #FD6035);
+ }
+
+.progress-second-success {
+    background-color: #82C730;
+    background-image: linear-gradient(to right, #bcc77e, #a4c72b, #82C730);
+}
+
+.progress-third-success {
+    background-color: #FACE2F;
+    background-image: linear-gradient(to right, #e6fa7b, #fae934, #FACE2F);
+ }
+
+.progress-four-success {
+    background-color: #36B6DD;
+    background-image: linear-gradient(to right, #a0ddc3, #34ddbe, #36B6DD);
+}
+
+.span_device_name{
+    display: flex;
+    font-size: 0.09rem;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: rgb(255,255,255,0.9);
+    align-items:flex-start;
+}
+
+
