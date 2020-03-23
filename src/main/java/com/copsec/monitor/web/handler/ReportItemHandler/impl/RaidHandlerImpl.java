@@ -1,233 +1,108 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
+import com.copsec.monitor.SpringContext;
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
+import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Status;
+import com.copsec.monitor.web.beans.warning.ReportItem;
+import com.copsec.monitor.web.beans.warning.VmInfoBean;
+import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.handler.ReportHandlerPools;
+import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
+import com.copsec.monitor.web.service.WarningService;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.PostConstruct;
-
-import com.copsec.railway.rms.beans.MonitorItem;
-import com.copsec.railway.rms.beans.ReportItem;
-import com.copsec.railway.rms.beans.vmInfo.ControllerInfo;
-import com.copsec.railway.rms.beans.vmInfo.DiskInfo;
-import com.copsec.railway.rms.beans.vmInfo.DomainInfo;
-import com.copsec.railway.rms.beans.vmInfo.VmInfoBean;
-import com.copsec.railway.rms.beans.vmInfo.VolumeInfo;
-import com.copsec.railway.rms.common.CopsecResult;
-import com.copsec.railway.rms.configurations.CommandsResources;
-import com.copsec.railway.rms.configurations.CopsecConfigurations;
-import com.copsec.railway.rms.configurations.StatisResources;
-import com.copsec.railway.rms.enums.MonitorItemEnum;
-import com.copsec.railway.rms.enums.MonitorTypeEnum;
-import com.copsec.railway.rms.handler.MonitorHandler;
-import com.copsec.railway.rms.processorUtils.ProcessorUtils;
-import com.copsec.railway.rms.reflectionUtils.CopsecReflectionUtils;
-import com.copsec.railway.rms.sigontanPools.MonitorHandlerPools;
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class RaidHandlerImpl implements MonitorHandler {
+public class RaidHandlerImpl implements ReportHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(RaidHandlerImpl.class);
+    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-	@Autowired
-	private CopsecConfigurations config;
+    public Status handle(WarningItemBean warningItem, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+        Status monitorItemType = new Status();
+        ConcurrentHashMap<String, Status> RAIDMap = new ConcurrentHashMap<>();
+        VmInfoBean vmInfo = (VmInfoBean) reportItem.getResult();
 
-	@Override
-	public ReportItem handler(MonitorItem monitorItem) {
+        ConcurrentHashMap<String, Status> diskInfoMap = new ConcurrentHashMap<>();
+        Status diskInfoStatusBean = new Status();
+        vmInfo.getDiskInfos().stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(diskInfo -> {
+            Status diskInfoStatus = new Status();
+            if (Integer.parseInt(diskInfo.getStatus()) == 0) {
+                warningEvent.setEventDetail("虚拟机[" + diskInfo.getId() + "]磁盘异常");
+                warningEvent.setId(null);
+                warningService.insertWarningEvent(warningEvent);
 
-		ReportItem reportItem = new ReportItem();
-		reportItem.setMonitorId(monitorItem.getMonitorId());
-		reportItem.setMonitorType(monitorItem.getMonitorType());
-		reportItem.setMonitorItemType(monitorItem.getMonitorItemType());
-		reportItem.setItem(monitorItem.getItem());
+                monitorType.setStatus(0);
+                monitorItemType.setStatus(0);
+                diskInfoStatusBean.setStatus(0);
+                diskInfoStatus.setStatus(0);
+                diskInfoStatus.setMessage(warningEvent.getEventDetail());
+            } else {
+                diskInfoStatus.setMessage("虚拟机[" + diskInfo.getId() + "]磁盘正常");
+            }
+            diskInfoMap.putIfAbsent(diskInfo.getId(), diskInfoStatus);
+        });
+        diskInfoStatusBean.setMessage(diskInfoMap);
+        RAIDMap.putIfAbsent("diskInfos", diskInfoStatusBean);
 
-		if(config.getSystemType().equalsIgnoreCase(StatisResources.system_type_solaris)){
+        ConcurrentHashMap<String, Status> domainInfoMap = new ConcurrentHashMap<>();
+        Status domainInfoStatusBean = new Status();
+        vmInfo.getDomainInfos().stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(domainInfo -> {
+            Status domainInfoStatus = new Status();
+            if (Integer.parseInt(domainInfo.getState()) == 0) {
+                warningEvent.setEventDetail("虚拟机[" + domainInfo.getName() + "]域异常");
+                warningEvent.setId(null);
+                warningService.insertWarningEvent(warningEvent);
 
-			VmInfoBean vmInfoBean = new VmInfoBean();
+                monitorType.setStatus(0);
+                monitorItemType.setStatus(0);
+                domainInfoStatusBean.setStatus(0);
+                domainInfoStatus.setStatus(0);
+                domainInfoStatus.setMessage(warningEvent.getEventDetail());
+            } else {
+                domainInfoStatus.setMessage("虚拟机[" + domainInfo.getName() + "]域正常");
+            }
+            domainInfoMap.putIfAbsent(domainInfo.getName(), domainInfoStatus);
+        });
+        domainInfoStatusBean.setMessage(domainInfoMap);
+        RAIDMap.putIfAbsent("domainInfos", domainInfoStatusBean);
 
-			CopsecResult ldmResult = ProcessorUtils.executeCommand(CommandsResources.ldm_cmd,str -> {
+        ConcurrentHashMap<String, Status> volumeInfoMap = new ConcurrentHashMap<>();
+        Status volumeInfoStatusBean = new Status();
+        vmInfo.getVolumeInfos().stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(volumeInfo -> {
+            Status volumeInfoStatus = new Status();
+            if (Integer.parseInt(volumeInfo.getStatus()) == 0) {
+                warningEvent.setEventDetail("虚拟机[" + volumeInfo.getName() + "]卷异常");
+                warningEvent.setId(null);
+                warningService.insertWarningEvent(warningEvent);
 
-				List<String> strs = Arrays.asList(str.split(StatisResources.line_spliter));
+                monitorType.setStatus(0);
+                monitorItemType.setStatus(0);
+                volumeInfoStatusBean.setStatus(0);
+                volumeInfoStatus.setStatus(0);
+                volumeInfoStatus.setMessage(warningEvent.getEventDetail());
+            } else {
+                volumeInfoStatus.setMessage("虚拟机[" + volumeInfo.getName() + "]卷正常");
+            }
+            volumeInfoMap.putIfAbsent(volumeInfo.getId(), volumeInfoStatus);
+        });
+        volumeInfoStatusBean.setMessage(volumeInfoMap);
+        RAIDMap.putIfAbsent("volumeInfos", volumeInfoStatusBean);
 
-				List<DomainInfo> domainInfos = Lists.newArrayList();
-				strs.stream().filter(d -> {
+        Status controllerInfoStatusBean = new Status();
+        controllerInfoStatusBean.setMessage(vmInfo.getControllerInfos());
+        RAIDMap.putIfAbsent("controllerInfos", controllerInfoStatusBean);
 
-					if(d.startsWith("DOMAIN")){
-						return true;
-					}
-					return false;
-				}).forEach(s -> {
+        monitorItemType.setMessage(RAIDMap);
 
-					DomainInfo domainInfo = new DomainInfo();
-					List<String> attrs = Arrays.asList(s.split("\\|"));
-					attrs.stream().filter(d -> {
+        return monitorItemType;
+    }
 
-						if(d.split("=").length == 2){
-							return true;
-						}
-						return false;
-					}).forEach(attr -> {
-
-						String[] keyValus = attr.split("=");
-						String key = "set"+ (new StringBuilder()).append(Character.toUpperCase(keyValus[0].charAt(0)))
-								.append(keyValus[0].substring(1)).toString();
-						CopsecReflectionUtils.setInvoke(domainInfo,key,keyValus[1]);
-					});
-					domainInfos.add(domainInfo);
-				});
-
-				return CopsecResult.success(domainInfos);
-			});
-
-			if(ldmResult.getCode() == CopsecResult.SUCCESS_CODE){
-
-				vmInfoBean.setDomainInfos((List<DomainInfo>)ldmResult.getData());
-			}
-
-			CopsecResult raidConfigResult = ProcessorUtils.executeCommand(CommandsResources.raidconfig_cmd, string -> {
-
-				List<String> strs = Arrays.asList(string.split(StatisResources.line_spliter));
-				Vector<String> v = new Vector<>();
-				strs.stream().forEach(s -> {
-
-					v.add(s);
-				});
-				return CopsecResult.success(v);
- 			});
-
-			if(raidConfigResult.getCode() == CopsecResult.SUCCESS_CODE){
-
-				getRaidconfig((Vector<String>)raidConfigResult.getData(),0,vmInfoBean);
-			}
-
-			reportItem.setResult(vmInfoBean);
-			reportItem.setStatus(StatisResources.status_normal);
-		}
-
-		return reportItem;
-	}
-
-	private static void getRaidconfig(Vector<String> raidvector,
-			int index,VmInfoBean vmInfoBean) {
-
-		List<ControllerInfo> controllerInfos = vmInfoBean.getControllerInfos();
-
-		List<VolumeInfo> volumeInfos = vmInfoBean.getVolumeInfos();
-
-		List<DiskInfo> diskInfos = vmInfoBean.getDiskInfos();
-
-		try {
-			String line = raidvector.get(index);
-			String tmp;
-			if (line.startsWith("CONTROLLER")) {
-
-				tmp = line.substring(line.indexOf(" ")+1);
-				for (int i = index + 4; i < raidvector.size(); i++) {
-					line = raidvector.get(i);
-
-					if (line.startsWith("RAID Volumes") || line.startsWith("DISKS")
-							|| line.startsWith("CONTROLLER")) {
-						getRaidconfig(raidvector, i, vmInfoBean);
-						break;
-					}
-					String[] params = line.split("[ ]+"); //regex: at least onespace
-
-					int len = params.length;
-					ControllerInfo controllerInfo = new ControllerInfo();
-					if (len == 5) {
-						controllerInfo.setManufacturer(params[0]+tmp);
-						controllerInfo.setModel(params[1]);
-						controllerInfo.setVersion(params[2]);
-						controllerInfo.setVolumes(params[3]);
-						controllerInfo.setDisks(params[4]);
-					} else if (len > 5) {
-						// there is space inside The first domain
-						String manufacturer = "";
-						for (int j = 0; j < len - 4; j++) {
-							manufacturer =manufacturer+ params[j] + " ";
-						}
-						controllerInfo.setManufacturer(manufacturer.trim()+tmp);
-						controllerInfo.setModel(params[len - 4]);
-						controllerInfo.setVersion(params[len - 3]);
-						controllerInfo.setVolumes(params[len - 2]);
-						controllerInfo.setDisks(params[len - 1]);
-					}
-					controllerInfos.add(controllerInfo);
-					vmInfoBean.setControllerInfos(controllerInfos);
-				}
-			} else if (line.startsWith("RAID Volumes")) {
-				for (int i = index + 4; i < raidvector.size(); i++) {
-					line = raidvector.get(i);
-					if (line.startsWith("RAID Volumes") || line.startsWith("DISKS")
-							|| line.startsWith("CONTROLLER")) {
-						getRaidconfig(raidvector, i, vmInfoBean);
-						break;
-					}
-
-					String[] params = line.split("[ ]+");// regex: at least one space
-
-					VolumeInfo volumeInfo = new VolumeInfo();
-
-					if (params.length == 7) {
-
-						volumeInfo.setId(params[0]);
-						volumeInfo.setName(params[1]);
-						volumeInfo.setDevice(params[2]);
-						volumeInfo.setStatus(params[3]);
-						volumeInfo.setNumDisks(params[4]);
-						volumeInfo.setLevel(params[5]);
-						volumeInfo.setStatus(params[6]);
-
-						volumeInfos.add(volumeInfo);
-						vmInfoBean.setVolumeInfos(volumeInfos);
-					}
-				}
-
-			} else if (line.startsWith("DISKS")) {
-
-				for (int i = index + 4; i < raidvector.size(); i++) {
-					line = raidvector.get(i);
-
-					if (line.startsWith("RAID Volumes") || line.startsWith("DISKS")
-							|| line.startsWith("CONTROLLER")) {
-						getRaidconfig(raidvector, i, vmInfoBean);
-						break;
-					}
-
-					String[] params = line.split("[ ]+");// regex: at least one space
-					DiskInfo diskInfo = new DiskInfo();
-					if (params.length == 9) {
-
-						diskInfo.setId( params[0]);
-						diskInfo.setChassis(params[1]);
-						diskInfo.setSlot(params[2]);
-						diskInfo.setRaidId(params[3]);
-						diskInfo.setStatus(params[4]);
-						diskInfo.setType(params[5]);
-						diskInfo.setMedia(params[6]);
-						diskInfo.setSpare(params[7]);
-						diskInfo.setSize(params[8]);
-
-						diskInfos.add(diskInfo);
-						vmInfoBean.setDiskInfos(diskInfos);
-					}
-				}
-			}
-		} catch (Exception e) {
-
-			logger.error(e.getMessage(),e);
-		}
-	}
-
-	@PostConstruct
-	public void inti(){
-
-		MonitorHandlerPools.getInstance().registerHandler(MonitorItemEnum.RAID,this);
-	}
+    @PostConstruct
+    public void init() {
+        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.RAID, this);
+    }
 }

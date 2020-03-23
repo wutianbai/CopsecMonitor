@@ -206,12 +206,10 @@ public class WarningServiceImpl implements WarningService {
     @Override
     public synchronized void receiveWarningEvent(Report report) {
 //        Report r = new Report();
-////        r.setId(UUID.randomUUID().toString());
-//        r.setDeviceId("820F60A1-742F-4AB4-A95D-6E5D353CB233");
+//        r.setDeviceId("ztxax86ea");
 //        r.setReportTime(new Date());
 //
 //        List<ReportItem> list = new ArrayList<>();
-////        for (Device device: DevicePools.getInstance().getAll()) {
 //
 //        ReportItem reportItem = new ReportItem();
 //        reportItem.setItem("CPU使用率");
@@ -227,20 +225,12 @@ public class WarningServiceImpl implements WarningService {
 //        reportItem1.setMonitorItemType(MonitorItemEnum.valueOf("DISK"));
 //        reportItem1.setMonitorType(MonitorTypeEnum.valueOf("SYSTEM"));
 //        reportItem1.setStatus(1);
-//        reportItem1.setResult(JSONArray.parse("[{'disk':'/usr','used':'50'},{'disk':'/var','used':'40'}]"));
+//        reportItem1.setResult(JSONArray.parse("[{'total':'/usr','used':'50'},{'total':'/var','used':'40'}]"));
 //
-////        }
 //        list.add(reportItem);
 //        list.add(reportItem1);
 //        r.setReportItems(list);
 
         LocalCache.putValue(report.getDeviceId(), report, -1);
-//        if (LocalCache.putValue(report.getDeviceId(), report, -1)) {
-////            LogUtils.sendSuccessLog(userInfo.getId(), ip, "接收告警事件", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_WARNING);
-//
-////            new Thread(new ReceiveWarningEventThread()).start();
-//        } else {
-////            LogUtils.sendFailLog(userInfo.getId(), ip, "接收告警事件", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_WARNING);
-//        }
     }
 }

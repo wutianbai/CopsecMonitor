@@ -48,7 +48,7 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
     }
 
     @Override
-    public List<WarningEvent> findWarningEventByCondition(WarningEventBean condition) {
+    public synchronized List<WarningEvent> findWarningEventByCondition(WarningEventBean condition) {
         Query query = new Query();
         Sort sort = new Sort(Sort.Direction.DESC, "eventTime");
         Criteria criteria = new Criteria();
@@ -105,7 +105,7 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
 
     @Override
     public boolean deleteWarningEvent(WarningEvent bean) {
-        Query query=new Query(Criteria.where("id").is(bean.getId()));
+        Query query = new Query(Criteria.where("id").is(bean.getId()));
         DeleteResult deleteResult = this.mongoTemplate.remove(query, WarningEvent.class);
         return deleteResult.wasAcknowledged();
     }

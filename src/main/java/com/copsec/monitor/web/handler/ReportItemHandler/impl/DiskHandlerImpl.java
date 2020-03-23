@@ -1,103 +1,57 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import java.util.Arrays;
-import java.util.List;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.copsec.monitor.SpringContext;
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
+import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Status;
+import com.copsec.monitor.web.beans.warning.ReportItem;
+import com.copsec.monitor.web.config.Resources;
+import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.handler.ReportHandlerPools;
+import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
+import com.copsec.monitor.web.service.WarningService;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-
-import com.copsec.railway.rms.beans.DiskUseBean;
-import com.copsec.railway.rms.beans.MonitorItem;
-import com.copsec.railway.rms.beans.ReportItem;
-import com.copsec.railway.rms.common.CopsecResult;
-import com.copsec.railway.rms.configurations.CommandsResources;
-import com.copsec.railway.rms.configurations.CopsecConfigurations;
-import com.copsec.railway.rms.configurations.StatisResources;
-import com.copsec.railway.rms.enums.MonitorItemEnum;
-import com.copsec.railway.rms.enums.MonitorTypeEnum;
-import com.copsec.railway.rms.handler.MonitorHandler;
-import com.copsec.railway.rms.processorUtils.ProcessorUtils;
-import com.copsec.railway.rms.sigontanPools.MonitorHandlerPools;
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class DiskHandlerImpl implements MonitorHandler {
+public class DiskHandlerImpl implements ReportHandler {
+    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-	private static final Logger logger = LoggerFactory.getLogger(DiskHandlerImpl.class);
+    public Status handle(WarningItemBean warningItem, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+        Status monitorItemType = new Status();
+        ConcurrentHashMap<String, Status> DISKMap = new ConcurrentHashMap<>();
 
-	@Autowired
-	private CopsecConfigurations config;
+        JSONArray jSONArray = JSON.parseArray(reportItem.getResult().toString());
+        for (Iterator<Object> iterator = jSONArray.iterator(); iterator.hasNext(); ) {
+            Status statusBean = new Status();
+            JSONObject next = (JSONObject) iterator.next();
+            if (warningItem.getThreadHold() < Integer.parseInt(next.getString("used"))) {
+                warningEvent.setEventDetail("[" + next.getString("total") + "]" + reportItem.getItem() + "[" + next.getString("used") + Resources.PERCENTAGE + "]" + "超出阈值[" + warningItem.getThreadHold() + Resources.PERCENTAGE + "]");
+                warningEvent.setId(null);
+                warningService.insertWarningEvent(warningEvent);
 
-	@Override
-	public ReportItem handler(MonitorItem monitorItem) {
+                monitorType.setStatus(0);
+                monitorItemType.setStatus(0);
+                statusBean.setStatus(0);
+                statusBean.setMessage(warningEvent.getEventDetail());
+            } else {
+                statusBean.setMessage("[" + next.getString("total") + "]" + reportItem.getItem() + "[" + next.getString("used") + Resources.PERCENTAGE + "]");
+            }
+            DISKMap.put(next.getString("total"), statusBean);
+        }
+        monitorItemType.setMessage(DISKMap);
 
-		ReportItem reportItem = new ReportItem();
-		reportItem.setMonitorItemType(monitorItem.getMonitorItemType());
-		reportItem.setMonitorId(monitorItem.getMonitorId());
-		reportItem.setItem(monitorItem.getItem());
-		reportItem.setMonitorType(monitorItem.getMonitorType());
+        return monitorItemType;
+    }
 
-		CopsecResult result = null;
-		if(config.getSystemType().equalsIgnoreCase(StatisResources.system_type_solaris)){
-
-			result = ProcessorUtils.executeCommand(CommandsResources.solaris_disk_cmd,string -> {
-
-				List<DiskUseBean> list = Lists.newArrayList();
-				Arrays.stream(string.split(" ")).forEach(str -> {
-
-					String[] attr = str.split(StatisResources.line_spliter,2);
-					DiskUseBean bean = new DiskUseBean();
-					bean.setDisk(attr[1]);
-					bean.setUsed(attr[0].replaceAll("%",""));
-					list.add(bean);
-				});
-				return CopsecResult.success(CopsecResult.SUCCESS,list);
-			});
-
-		}else{
-
-			result = ProcessorUtils.executeCommand(CommandsResources.linux_disk_cmd,string -> {
-
-				List<DiskUseBean> list = Lists.newArrayList();
-				Arrays.stream(string.split(StatisResources.line_spliter)).forEach(str -> {
-
-					String[] attrs = str.split(" ");
-					DiskUseBean bean = new DiskUseBean();
-					if(attrs.length == 2){
-
-						bean.setDisk(attrs[1]);
-						bean.setUsed(attrs[0].replaceAll("%",""));
-					}else if(attrs.length == 3){
-
-						bean.setTotal(attrs[0]);
-						bean.setDisk(attrs[2]);
-						bean.setUsed(attrs[1]);
-					}
-					list.add(bean);
-				});
-				return CopsecResult.success(CopsecResult.SUCCESS,list);
-			});
-		}
-		if(!ObjectUtils.isEmpty(result) && result.getCode() == CopsecResult.SUCCESS_CODE){
-
-			reportItem.setStatus(StatisResources.status_normal);
-			reportItem.setResult(result.getData());
-		}else{
-
-			reportItem.setStatus(StatisResources.status_error);
-			reportItem.setResult(result.getData());
-		}
-		return reportItem;
-	}
-
-	@PostConstruct
-	public void init(){
-
-		MonitorHandlerPools.getInstance().registerHandler(MonitorItemEnum.DISK,this);
-	}
+    @PostConstruct
+    public void init() {
+        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.DISK, this);
+    }
 }

@@ -56,12 +56,10 @@ public class DeviceController {
      */
     @GetMapping("/get")
     @ResponseBody
-//    public CopsecResult getData(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
     public CopsecResult getData() {
         if (logger.isDebugEnabled()) {
             logger.debug("get all date");
         }
-//        warningService.receiveWarningEvent(userInfo, request.getRemoteHost(), new Report());
         return deviceService.getData();
     }
 

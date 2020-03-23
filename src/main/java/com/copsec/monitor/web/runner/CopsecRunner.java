@@ -42,6 +42,9 @@ public class CopsecRunner implements CommandLineRunner {
     private UserFileReader userReader;
 
     @Autowired
+    private UserInfoReader userInfoReader;
+
+    @Autowired
     private MonitorItemReader monitorItemReader;
 
     @Autowired
@@ -120,7 +123,7 @@ public class CopsecRunner implements CommandLineRunner {
         flumeBeanReader.writeDate(FlumeBeanPool.getInstances().getAll(),
                 systemConfig.getBasePath() + systemConfig.getFlumeConfigPath());
 
-
+        userInfoReader.getData(systemConfig.getBasePath() + systemConfig.getUserInfoPath());
         monitorItemReader.getData(systemConfig.getBasePath() + systemConfig.getMonitorItemPath());
         warningItemReader.getData(systemConfig.getBasePath() + systemConfig.getWarningItemPath());
         monitorGroupReader.getData(systemConfig.getBasePath() + systemConfig.getMonitorGroupPath());

@@ -1210,11 +1210,13 @@ jQuery(function () {
                                 updateNode(cy.$id(k), WARNING_STATUS);
                                 updateEdeges(cy.$id(k), "highlightedError");
                             }
-                        } else if (v.status === 2) {
-                            toastr.error(cy.$id(k).data('deviceHostname') + " 设备上报超时!", "系统提示", opts);
-                            updateStatus(cy.$id(k), ERROR_COLOR, _text);
-                            updateNode(cy.$id(k), ERROR_STATUS);
-                            updateEdeges(cy.$id(k), "highlightedWarning");
+                        } else if (v.status === WARNING_STATUS) {
+                            if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
+                                toastr.error(cy.$id(k).data('deviceHostname') + " 设备上报超时!", "系统提示", opts);
+                                updateStatus(cy.$id(k), ERROR_COLOR, _text);
+                                updateNode(cy.$id(k), ERROR_STATUS);
+                                updateEdeges(cy.$id(k), "highlightedWarning");
+                            }
                         } else {
                             updateStatus(cy.$id(k), NORMAL_COLOR, _text);
                             updateNode(cy.$id(k), NORMAL_STATUS);
@@ -1236,7 +1238,6 @@ jQuery(function () {
         let str = '<div><table class="table table-condensed">';
         str += "<tr><td>ID:</td><td>" + status.deviceId + "</td></tr>";
         if (!isEmpty(status.message)) {
-
             $.each(status.message, function (index, value) {
                 let s = '';
                 if (!isEmpty(value.message)) {
@@ -1257,7 +1258,6 @@ jQuery(function () {
             let message = $(this).parent().attr("type");
             $("#message").find(".modal-title").text(title);
             let str = '<table  class="table table-bordered table-striped" >';
-            console.log(message);
             str += showTable(str, $.parseJSON(message));
             str += "</table>";
             $("#message").find(".modal-body").html(str);
@@ -1408,26 +1408,34 @@ jQuery(function () {
 });
 
 function addOne(str, index, value) {
-    if (!isEmpty(value.message)) {
-        str += '<tr><td>' + index + '</td>';
-        if (value.status === 0) {
-            str += '<td style="color: red">' + value.message + '</td>';
-        } else {
-            str += '<td>' + value.message + '</td>';
-        }
+    if (value.length > 0) {
+        str += '<tr><td colspan="' + value.length + '">' + index + '</td>';
+        $.each(value, function (index, value) {
+            if (!isEmpty(value.message)) {
+                if (value.status === 0) {
+                    str += '<td style="color: red">' + value.message + '</td>';
+                } else {
+                    str += '<td>' + value.message + '</td>';
+                }
+            }
+        });
         str += '</tr>';
     }
     return str;
 }
 
 function addTwo(str, index, value) {
-    if (!isEmpty(value.message)) {
-        str += '<tr><td rowspan="' + getLength(value.message) + '">' + index + '</td>';
-        $.each(value.message, function (index, value) {
-            if (value.status === 0) {
-                str += '<td style="color: red">' + value.message + '</td>';
-            } else {
-                str += '<td>' + value.message + '</td>';
+    if (value.length > 0) {
+        str += '<tr><td colspan="' + value.length + '">' + index + '</td>';
+        $.each(value, function (index, value) {
+            if (!isEmpty(value.message)) {
+                $.each(value.message, function (index, value) {
+                    if (value.status === 0) {
+                        str += '<td style="color: red">' + value.message + '</td>';
+                    } else {
+                        str += '<td>' + value.message + '</td>';
+                    }
+                });
             }
         });
         str += '</tr>';
@@ -1436,12 +1444,16 @@ function addTwo(str, index, value) {
 }
 
 function addThree(str, index, value) {
-    if (!isEmpty(value.message)) {
-        str += '<tr><td rowspan="' + value.message.length + '">' + index + '</td>';
-        $.each(value.message, function (index, value) {
-            let s = '';
-            s += addTwo(s, index, value);
-            str += s;
+    if (value.length > 0) {
+        str += '<tr><td colspan="' + value.length + '">' + index + '</td>';
+        $.each(value, function (index, value) {
+            if (!isEmpty(value.message)) {
+                $.each(value.message, function (index, value) {
+                    let s = '';
+                    s += addOne(str, index, value);
+                    str += s;
+                });
+            }
         });
         str += '</tr>';
     }

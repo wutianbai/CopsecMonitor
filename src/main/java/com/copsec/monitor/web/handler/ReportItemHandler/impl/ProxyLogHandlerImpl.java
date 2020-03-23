@@ -1,75 +1,43 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import com.copsec.monitor.SpringContext;
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
+import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Status;
+import com.copsec.monitor.web.beans.warning.ReportItem;
+import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.handler.ReportHandlerPools;
+import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
+import com.copsec.monitor.web.service.WarningService;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-
-import com.copsec.railway.rms.beans.MonitorItem;
-import com.copsec.railway.rms.beans.ReportItem;
-import com.copsec.railway.rms.configurations.CopsecConfigurations;
-import com.copsec.railway.rms.enums.MonitorItemEnum;
-import com.copsec.railway.rms.handler.MonitorHandler;
-import com.copsec.railway.rms.sigontanPools.MonitorHandlerPools;
-import com.copsec.railway.rms.syslogReports.LogParseUtils;
-import com.copsec.railway.rms.syslogUtils.SyslogReportUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * 监控Web70实例下日志
  */
 @Component
-public class ProxyLogHandlerImpl extends BaseLogHandler {
+public class ProxyLogHandlerImpl implements ReportHandler {
+    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-	private static final Logger logger = LoggerFactory.getLogger(ProxyLogHandlerImpl.class);
+    public Status handle(WarningItemBean warningItem, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+        Status monitorItemType = new Status();
+        if (warningItem.getThreadHold() < Integer.parseInt(reportItem.getResult().toString())) {
+            warningEvent.setEventDetail(reportItem.getItem() + "异常数[" + reportItem.getResult() + "]" + "超出阈值[" + warningItem.getThreadHold() + "]");
+            warningService.insertWarningEvent(warningEvent);
 
-	@Autowired
-	private CopsecConfigurations config;
-	/**
-	 * 需要根据proxy log解析
-	 * @param destFile
-	 * @param  current
-	 */
-	@Override
-	public void parseAccessLogs(File destFile,ConcurrentHashMap<String, AtomicLong> current){
+            monitorType.setStatus(0);
+            monitorItemType.setStatus(0);
+            monitorItemType.setMessage(warningEvent.getEventDetail());
+        } else {
+            monitorItemType.setMessage(reportItem.getItem() + "异常数[" + reportItem.getResult() + "]");
+        }
 
-		try(BufferedReader reader = new BufferedReader(new FileReader(destFile))){
+        return monitorItemType;
+    }
 
-			reader.lines().forEach(line -> {
-
-				if(config.isEnableReportForProxy()){
-
-					String message = LogParseUtils.parseProxyLogs(line,config);
-					if(message.length() != 0){
-
-						SyslogReportUtils.sendLog(message,config.getSyslogIp(),config.getSyslogPort());
-					}
-				}
-				String[] attrs = line.split(SPLIT_STRING);
-				if(attrs.length == 11){
-
-					if(!attrs[7].contains(WHITE_STRING) && ( attrs[9].startsWith("5") ||  attrs[9].startsWith("4"))){
-
-						updateUrlMaps(attrs[7],current);
-					}
-				}
-			});
-		}catch (Throwable t){
-
-			logger.error(t.getMessage(),t);
-		}
-	}
-
-	@PostConstruct
-	public void inti(){
-
-		MonitorHandlerPools.getInstance().registerHandler(MonitorItemEnum.PROXYLOG,this);
-	}
+    @PostConstruct
+    public void init() {
+        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.PROXYLOG, this);
+    }
 }

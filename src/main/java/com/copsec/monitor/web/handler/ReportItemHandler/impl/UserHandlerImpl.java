@@ -19,19 +19,19 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class Instance40HandlerImpl implements ReportHandler {
+public class UserHandlerImpl implements ReportHandler {
     private WarningService warningService = SpringContext.getBean(WarningService.class);
 
     public Status handle(WarningItemBean warningItem, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
-        ConcurrentHashMap<String, Status> WEB70Map = new ConcurrentHashMap<>();
-        JSONArray jSONArray = JSON.parseArray(reportItem.getResult().toString());
+        ConcurrentHashMap<String, Status> USERMap = new ConcurrentHashMap<>();
 
+        JSONArray jSONArray = JSON.parseArray(reportItem.getResult().toString());
         for (Iterator<Object> iterator = jSONArray.iterator(); iterator.hasNext(); ) {
             Status statusBean = new Status();
             JSONObject next = (JSONObject) iterator.next();
-            if (next.getString("message").equalsIgnoreCase("实例已停止")) {
-                warningEvent.setEventDetail("实例_WEBPROXY40[" + next.getString("ports") + "]已停止");
+            if (Integer.parseInt(next.getString("status")) == 0) {
+                warningEvent.setEventDetail("用户[" + next.getString("userId") + "]过期");
                 warningEvent.setId(null);
                 warningService.insertWarningEvent(warningEvent);
 
@@ -40,17 +40,17 @@ public class Instance40HandlerImpl implements ReportHandler {
                 statusBean.setStatus(0);
                 statusBean.setMessage(warningEvent.getEventDetail());
             } else {
-                statusBean.setMessage("实例_WEBPROXY40[" + next.getString("ports") + "]正常");
+                statusBean.setMessage("用户[" + next.getString("userId") + "]正常");
             }
-            WEB70Map.putIfAbsent(next.getString("ports"), statusBean);
+            USERMap.putIfAbsent(next.getString("userId"), statusBean);
         }
-        monitorItemType.setMessage(WEB70Map);
+        monitorItemType.setMessage(USERMap);
 
         return monitorItemType;
     }
 
     @PostConstruct
     public void init() {
-        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.INSTANCES_WEBPROXY40, this);
+        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.USER, this);
     }
 }

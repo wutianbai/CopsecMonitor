@@ -3,10 +3,9 @@ package com.copsec.monitor.web.utils;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.copsec.monitor.web.config.Resources;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.Random;
 
 public class CommonUtils {
 
@@ -64,6 +63,7 @@ public class CommonUtils {
 
     /**
      * 暴力解析:Alibaba fastjson
+     *
      * @param test
      * @return
      */
@@ -80,13 +80,17 @@ public class CommonUtils {
         return true;
     }
 
-    public final static boolean isJSONValid2(String jsonInString ) {
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.readTree(jsonInString);
-            return true;
-        } catch (IOException e) {
-            return false;
+    private static final String allChar = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String letterChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String numberChar = "0123456789";
+
+    public static String generateString(int length) //参数为返回随机数的长度
+    {
+        StringBuffer sb = new StringBuffer();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            sb.append(allChar.charAt(random.nextInt(allChar.length())));
         }
+        return sb.toString();
     }
 }

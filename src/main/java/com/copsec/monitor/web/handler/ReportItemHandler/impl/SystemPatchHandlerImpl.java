@@ -1,26 +1,28 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import javax.annotation.PostConstruct;
-
-import com.copsec.railway.rms.beans.MonitorItem;
-import com.copsec.railway.rms.beans.ReportItem;
-import com.copsec.railway.rms.enums.MonitorItemEnum;
-import com.copsec.railway.rms.handler.MonitorHandler;
-import com.copsec.railway.rms.sigontanPools.MonitorHandlerPools;
-
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
+import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Status;
+import com.copsec.monitor.web.beans.warning.ReportItem;
+import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.handler.ReportHandlerPools;
+import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 @Component
-public class SystemPatchHandlerImpl implements MonitorHandler {
+public class SystemPatchHandlerImpl implements ReportHandler {
+    public Status handle(WarningItemBean warningItem, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+        Status monitorItemType = new Status();
+        monitorItemType.setMessage(reportItem.getResult());
 
-	@Override
-	public ReportItem handler(MonitorItem monitorItem) {
-		return null;
-	}
+        return monitorItemType;
+    }
 
-	@PostConstruct
-	public void inti(){
-
-		MonitorHandlerPools.getInstance().registerHandler(MonitorItemEnum.SYSTEMPATCH,this);
-	}
+    @PostConstruct
+    public void init() {
+        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.SYSTEMPATCH, this);
+    }
 }
+

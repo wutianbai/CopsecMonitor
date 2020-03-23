@@ -1,120 +1,55 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
-import javax.annotation.PostConstruct;
-
-import com.copsec.railway.rms.beans.InstancesListenerBean;
-import com.copsec.railway.rms.beans.MonitorItem;
-import com.copsec.railway.rms.beans.ReportItem;
-import com.copsec.railway.rms.common.CopsecResult;
-import com.copsec.railway.rms.configurations.CommandsResources;
-import com.copsec.railway.rms.configurations.StatisResources;
-import com.copsec.railway.rms.enums.MonitorItemEnum;
-import com.copsec.railway.rms.enums.MonitorTypeEnum;
-import com.copsec.railway.rms.fileUtils.FileReaderUtils;
-import com.copsec.railway.rms.handler.MonitorHandler;
-import com.copsec.railway.rms.processorUtils.ProcessorUtils;
-import com.copsec.railway.rms.sigontanPools.MonitorHandlerPools;
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.copsec.monitor.SpringContext;
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
+import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Status;
+import com.copsec.monitor.web.beans.warning.ReportItem;
+import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.handler.ReportHandlerPools;
+import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
+import com.copsec.monitor.web.service.WarningService;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Component
-public class InstancesConfigHandlerImpl implements MonitorHandler {
+public class InstancesConfigHandlerImpl implements ReportHandler {
+    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-	private static final Logger logger = LoggerFactory.getLogger(InstancesConfigHandlerImpl.class);
+    public Status handle(WarningItemBean warningItem, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+        Status monitorItemType = new Status();
+        ConcurrentHashMap<String, Status> WEB70Map = new ConcurrentHashMap<>();
+        JSONArray jSONArray = JSON.parseArray(reportItem.getResult().toString());
+        for (Iterator<Object> iterator = jSONArray.iterator(); iterator.hasNext(); ) {
+            Status statusBean = new Status();
+            JSONObject next = (JSONObject) iterator.next();
+            if (next.getString("message").equalsIgnoreCase("实例已停止")) {
+                warningEvent.setEventDetail("实例_配置[" + next.getString("ports") + "]已停止");
+                warningEvent.setId(null);
+                warningService.insertWarningEvent(warningEvent);
 
-	@Override
-	public ReportItem handler(MonitorItem monitorItem) {
+                monitorType.setStatus(0);
+                monitorItemType.setStatus(0);
+                statusBean.setStatus(0);
+                statusBean.setMessage(warningEvent.getEventDetail());
+            } else {
+                statusBean.setMessage("实例_配置[" + next.getString("ports") + "]正常");
+            }
+            WEB70Map.putIfAbsent(next.getString("ports"), statusBean);
+        }
+        monitorItemType.setMessage(WEB70Map);
 
-		ReportItem reportItem = new ReportItem();
-		reportItem.setMonitorItemType(monitorItem.getMonitorItemType());
-		reportItem.setMonitorId(monitorItem.getMonitorId());
-		reportItem.setItem(monitorItem.getItem());
-		reportItem.setMonitorType(monitorItem.getMonitorType());
+        return monitorItemType;
+    }
 
-		String instanceDir = monitorItem.getItem() + File.separator + "OUD/config/config.ldif";
-		File file = new File(instanceDir);
-		if(!file.exists()){
-
-			reportItem.setStatus(StatisResources.status_error);
-			reportItem.setResult("ConfigDS实例["+instanceDir + "]下配置文件不存在");
-			return reportItem;
-		}
-		List<Integer> ports = Lists.newArrayList();
-		InstancesListenerBean listenerBean = new InstancesListenerBean();
-		try {
-
-			try(BufferedReader reader = new BufferedReader(new FileReader(new File(instanceDir)))){
-
-				String line = null;
-				while( (line = reader.readLine()) != null){
-
-					if(line.matches("^ds-cfg-listen-port:\\s*\\d+") || line.matches("^ds-cfg-replication-port:\\s*\\d+")){
-
-						if (line.endsWith("444") || line.endsWith("390") ||
-								line.endsWith("690") || line.endsWith("999") ||
-								line.endsWith("1389") || line.endsWith("393") || line.endsWith("636")) {
-							String[] strs = line.split(":");
-
-							if(strs.length ==2){
-
-								ports.add(Integer.valueOf(strs[1].trim()));
-							}
-						}
-					}
-				}
-				listenerBean.setPorts(ports);
-			}catch (IOException e){
-
-				logger.error(e.getMessage(),e);
-			}
-			String pidPath = monitorItem.getItem() + File.separator + "OUD/logs/server.pid";
-
-			Optional<String> optionalS = FileReaderUtils.readerContent(pidPath);
-
-			if(optionalS.isPresent()){
-
-				String cmd = CommandsResources.prcessorBuilder(optionalS.get());
-
-				CopsecResult cmdResult = ProcessorUtils.processorIsRunning(cmd);
-
-				if(cmdResult.getData().equals(true)){
-
-					reportItem.setStatus(StatisResources.status_normal);
-				}else{
-
-					reportItem.setStatus(StatisResources.status_error);
-				}
-				listenerBean.setMessage(cmdResult.getMessage());
-			}else{
-
-				listenerBean.setMessage("实例已停止");
-			}
-			reportItem.setResult(listenerBean);
-		}
-		catch (Exception e) {
-
-			logger.error(e.getMessage(),e);
-		}
-		if(logger.isDebugEnabled()){
-
-			logger.debug("instance -> {} and report -> {}",monitorItem.getItem(),listenerBean);
-		}
-		return reportItem;
-	}
-
-	@PostConstruct
-	public void inti(){
-
-		MonitorHandlerPools.getInstance().registerHandler(MonitorItemEnum.INSTANCES_CONFIG,this);
-	}
+    @PostConstruct
+    public void init() {
+        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.INSTANCES_CONFIG, this);
+    }
 }

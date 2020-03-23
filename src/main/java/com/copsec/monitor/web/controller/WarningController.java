@@ -112,7 +112,6 @@ public class WarningController {
     @PostMapping(value = "/event/receive")
     @ResponseBody
     public CopsecResult receiveWarningEvent(String report) {
-        System.err.println("receive warningEvent by {}" + report);
         Report reports = JSON.parseObject(report, Report.class);
         if (logger.isDebugEnabled()) {
             logger.debug("receive warningEvent by {}", report);

@@ -1,65 +1,55 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
-import javax.annotation.PostConstruct;
-
-import com.copsec.railway.rms.beans.MonitorItem;
-import com.copsec.railway.rms.beans.ProcessorStatusBean;
-import com.copsec.railway.rms.beans.ReportItem;
-import com.copsec.railway.rms.common.CopsecResult;
-import com.copsec.railway.rms.configurations.CommandsResources;
-import com.copsec.railway.rms.configurations.StatisResources;
-import com.copsec.railway.rms.enums.MonitorItemEnum;
-import com.copsec.railway.rms.enums.MonitorTypeEnum;
-import com.copsec.railway.rms.handler.MonitorHandler;
-import com.copsec.railway.rms.processorUtils.ProcessorUtils;
-import com.copsec.railway.rms.sigontanPools.MonitorHandlerPools;
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.copsec.monitor.SpringContext;
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
+import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Status;
+import com.copsec.monitor.web.beans.warning.ReportItem;
+import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.handler.ReportHandlerPools;
+import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
+import com.copsec.monitor.web.service.WarningService;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Component
-public class ImServiceHandlerImpl implements MonitorHandler {
+public class ImServiceHandlerImpl implements ReportHandler {
+    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-	private static final Logger logger = LoggerFactory.getLogger(ImServiceHandlerImpl.class);
+    public Status handle(WarningItemBean warningItem, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+        Status monitorItemType = new Status();
+        ConcurrentHashMap<String, Status> IMMap = new ConcurrentHashMap<>();
+        JSONArray jSONArray = JSON.parseArray(reportItem.getResult().toString());
+        for (Iterator<Object> iterator = jSONArray.iterator(); iterator.hasNext(); ) {
+            Status statusBean = new Status();
+            JSONObject next = (JSONObject) iterator.next();
+            if (next.getString("message").equalsIgnoreCase("已停止")) {
+                warningEvent.setEventDetail("IM进程[" + next.getString("processorName") + "]已停止");
+                warningEvent.setId(null);
+                warningService.insertWarningEvent(warningEvent);
 
-	@Override
-	public ReportItem handler(MonitorItem monitorItem)
-	{
-		ReportItem reportItem = new ReportItem();
-		reportItem.setItem(monitorItem.getItem());
-		reportItem.setMonitorType(monitorItem.getMonitorType());
-		reportItem.setMonitorItemType(monitorItem.getMonitorItemType());
-		reportItem.setItem(monitorItem.getItem());
+                monitorType.setStatus(0);
+                monitorItemType.setStatus(0);
+                statusBean.setStatus(0);
+                statusBean.setMessage(warningEvent.getEventDetail());
+            } else {
+                statusBean.setMessage("IM进程[" + next.getString("processorName") + "]正在运行");
+            }
+            IMMap.putIfAbsent(next.getString("processorName"), statusBean);
+        }
+        monitorItemType.setMessage(IMMap);
 
-		List<String> dNames = Arrays.asList(monitorItem.getItem().split(","));
-		List<ProcessorStatusBean> statusBeanList = Lists.newArrayList();
-		dNames.stream().forEach(name -> {
+        return monitorItemType;
+    }
 
-			ProcessorStatusBean status = new ProcessorStatusBean();
-			status.setProcessorName(name);
-			CopsecResult result = ProcessorUtils.processorIsRunning(CommandsResources.getProcessCmd(name));
-			status.setMessage(result.getMessage());
-			statusBeanList.add(status);
-		});
-
-		reportItem.setStatus(StatisResources.status_normal);
-		reportItem.setResult(statusBeanList);
-		if(logger.isDebugEnabled()){
-
-			logger.debug("IM processor -> {}", Objects.toString(statusBeanList));
-		}
-		return reportItem;
-	}
-
-	@PostConstruct
-	public void inti(){
-
-		MonitorHandlerPools.getInstance().registerHandler(MonitorItemEnum.IMSERVICE,this);
-	}
+    @PostConstruct
+    public void init() {
+        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.IMSERVICE, this);
+    }
 }

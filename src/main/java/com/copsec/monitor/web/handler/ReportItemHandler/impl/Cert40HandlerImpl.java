@@ -1,51 +1,53 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import javax.annotation.PostConstruct;
-
-import com.copsec.railway.rms.configurations.CopsecConfigurations;
-import com.copsec.railway.rms.enums.MonitorItemEnum;
-import com.copsec.railway.rms.fileUtils.FileReaderUtils;
-import com.copsec.railway.rms.sigontanPools.CertDBPathPools;
-import com.copsec.railway.rms.sigontanPools.MonitorHandlerPools;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.copsec.monitor.SpringContext;
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
+import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Status;
+import com.copsec.monitor.web.beans.warning.CertInfoBean;
+import com.copsec.monitor.web.beans.warning.ReportItem;
+import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.handler.ReportHandlerPools;
+import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
+import com.copsec.monitor.web.service.WarningService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.PostConstruct;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Component
-public class Cert40HandlerImpl extends BaseCertHandler {
+public class Cert40HandlerImpl implements ReportHandler {
+    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-	private static final Logger logger = LoggerFactory.getLogger(Cert40HandlerImpl.class);
+    public Status handle(WarningItemBean warningItem, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+        Status monitorItemType = new Status();
+        ConcurrentHashMap<String, Status> CERT40Map = new ConcurrentHashMap<>();
+        List<CertInfoBean> list = (List<CertInfoBean>) reportItem.getResult();
+        list.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(certInfo -> {
+            Status statusBean = new Status();
+            if (certInfo.getStatus() == 0) {
+                warningEvent.setEventDetail("证书40[" + certInfo.getNickname() + "]异常");
+                warningEvent.setId(null);
+                warningService.insertWarningEvent(warningEvent);
 
-	@Autowired
-	private CopsecConfigurations config;
-	/**
-	 * 从alise文件夹拷贝证书到指定证书存储库下
-	 * @param instanceName
-	 * @return
-	 */
-	@Override
-	public String newCertDBPath(String instanceName){
+                monitorType.setStatus(0);
+                monitorItemType.setStatus(0);
+                statusBean.setStatus(0);
+                statusBean.setMessage(warningEvent.getEventDetail());
+            } else {
+                statusBean.setMessage("证书40[" + certInfo.getNickname() + "]正常");
+            }
+            CERT40Map.putIfAbsent(certInfo.getNickname(), statusBean);
+        });
+        monitorItemType.setMessage(CERT40Map);
 
-		String path = CertDBPathPools.getInstances().getPath(instanceName);
-		if(ObjectUtils.isEmpty(path)){
-			/**
-			 * 拷贝db文件到指定目录，方法返回证书临时目录
-			 */
-			path = FileReaderUtils.copyCertFiles(config.getDeviceId(),config.getWebProxy40CertPath(),instanceName);
-			if(logger.isDebugEnabled()){
+        return monitorItemType;
+    }
 
-				logger.debug("copy instance cert -> {} to -> {} success",instanceName,path);
-			}
-		}
-		return path;
-	}
-
-	@PostConstruct
-	public void init(){
-
-		MonitorHandlerPools.getInstance().registerHandler(MonitorItemEnum.CERT40,this);
-	}
+    @PostConstruct
+    public void init() {
+        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.CERT40, this);
+    }
 }
