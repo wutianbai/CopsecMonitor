@@ -9,7 +9,7 @@ public enum MonitorTypeEnum {
     INSTANCE("实例", 3),
     LOG("日志", 4),
     CERT("证书", 5),
-    PROCESSOR("处理器", 6);
+    PROCESSOR("进程", 6);
 
     private String name;
     private int number;

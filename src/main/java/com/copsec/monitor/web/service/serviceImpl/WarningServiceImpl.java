@@ -1,7 +1,12 @@
 package com.copsec.monitor.web.service.serviceImpl;
 
 import com.copsec.monitor.web.beans.UserBean;
+import com.copsec.monitor.web.beans.UserInfoBean;
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.WarningLevel;
+import com.copsec.monitor.web.beans.node.Device;
+import com.copsec.monitor.web.beans.node.Status;
 import com.copsec.monitor.web.beans.warning.Report;
+import com.copsec.monitor.web.beans.warning.ReportItem;
 import com.copsec.monitor.web.beans.warning.WarningEventBean;
 import com.copsec.monitor.web.beans.warning.WarningHistoryBean;
 import com.copsec.monitor.web.commons.CopsecResult;
@@ -9,11 +14,19 @@ import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.config.SystemConfig;
 import com.copsec.monitor.web.entity.WarningEvent;
 import com.copsec.monitor.web.entity.WarningHistory;
+import com.copsec.monitor.web.handler.ReportHandlerPools;
+import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
+import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
+import com.copsec.monitor.web.pools.DevicePools;
+import com.copsec.monitor.web.pools.UserInfoPools;
+import com.copsec.monitor.web.pools.deviceStatus.DeviceStatusPools;
+import com.copsec.monitor.web.pools.deviceStatus.MonitorItemListPools;
+import com.copsec.monitor.web.pools.deviceStatus.MonitorTypePools;
 import com.copsec.monitor.web.repository.WarningEventRepository;
 import com.copsec.monitor.web.repository.WarningHistoryRepository;
+import com.copsec.monitor.web.service.DeviceService;
 import com.copsec.monitor.web.service.WarningService;
 import com.copsec.monitor.web.utils.FormatUtils;
-import com.copsec.monitor.web.utils.LocalCache;
 import com.copsec.monitor.web.utils.logUtils.LogUtils;
 import com.google.common.collect.Lists;
 import org.bson.types.ObjectId;
@@ -24,13 +37,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class WarningServiceImpl implements WarningService {
+public class WarningServiceImpl extends ReportBaseHandler implements WarningService {
 
     private static final Logger logger = LoggerFactory.getLogger(WarningServiceImpl.class);
 
@@ -42,6 +57,9 @@ public class WarningServiceImpl implements WarningService {
 
     @Autowired
     private WarningHistoryRepository warningHistoryRepository;
+
+    @Autowired
+    private DeviceService deviceService;
 
     @Override
     public Page<WarningEventBean> searchWarningEvent(UserBean userInfo, String ip, Pageable pageable, WarningEventBean condition) {
@@ -204,7 +222,8 @@ public class WarningServiceImpl implements WarningService {
     }
 
     @Override
-    public synchronized void receiveWarningEvent(Report report) {
+    public void receiveWarningEvent(Report report) {
+//        LocalCache.putValue(report.getDeviceId(), report, -1);
 //        Report r = new Report();
 //        r.setDeviceId("ztxax86ea");
 //        r.setReportTime(new Date());
@@ -225,12 +244,77 @@ public class WarningServiceImpl implements WarningService {
 //        reportItem1.setMonitorItemType(MonitorItemEnum.valueOf("DISK"));
 //        reportItem1.setMonitorType(MonitorTypeEnum.valueOf("SYSTEM"));
 //        reportItem1.setStatus(1);
-//        reportItem1.setResult(JSONArray.parse("[{'total':'/usr','used':'50'},{'total':'/var','used':'40'}]"));
+//        reportItem1.setResult(JSONArray.parse("[{'disk':'/usr','total':'100','used':'50'},{'disk':'/var','total':'200','used':'40'}]"));
 //
 //        list.add(reportItem);
 //        list.add(reportItem1);
 //        r.setReportItems(list);
 
-        LocalCache.putValue(report.getDeviceId(), report, -1);
+//        ConcurrentMap<String, CacheEntity> cache = LocalCache.getCache();//获取本地缓存
+//        for (Iterator it = cache.entrySet().iterator(); it.hasNext(); ) {
+//            Map.Entry entry = (Map.Entry) it.next();
+//            CacheEntity cacheEntity = (CacheEntity) entry.getValue();
+//            Report report = (Report) cacheEntity.getValue();//取出上报数据
+//            LocalCache.remove(report.getDeviceId());//清除缓存
+
+        Device device = DevicePools.getInstance().getDevice(report.getDeviceId());//设备信息
+        //更新设备上报时间
+        device.getData().setReportTime(report.getReportTime());
+        DevicePools.getInstance().updateDevice(device);
+        deviceService.updateDevice(new UserBean(), "127.0.0.1", device);
+        UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());//运维用户信息
+
+//                Multimap<String, Status> monitorTypeMap = LinkedHashMultimap.create();
+        ConcurrentHashMap<String, Status> monitorTypeMap = MonitorTypePools.getInstances().getMap();
+        List<ReportItem> reportItems = report.getReportItems();//获取上报项
+        if (!ObjectUtils.isEmpty(reportItems)) {
+            reportItems.parallelStream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(reportItem -> {
+                final Status monitorType = monitorTypeMap.get(reportItem.getMonitorType().name());//主类型
+
+//                        String title = monitorType.getWarnMessage();//标题
+//                        if (ObjectUtils.isEmpty(title)) {
+//                            title = "";
+//                        }
+//                        title += "[" + reportItem.getMonitorItemType().name() + "]";
+
+                ConcurrentHashMap<String, List<Status>> monitorItemListMap = (ConcurrentHashMap<String, List<Status>>) monitorType.getMessage();
+                if (ObjectUtils.isEmpty(monitorItemListMap)) {
+                    monitorItemListMap = MonitorItemListPools.getInstances().getMap();
+                }
+                final List<Status> monitorItemList = monitorItemListMap.get(reportItem.getMonitorItemType().name());//子状态类型
+
+                final WarningEvent warningEvent = new WarningEvent();
+                warningEvent.setEventSource(reportItem.getMonitorItemType());
+                warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
+                warningEvent.setEventTime(new Date());
+                warningEvent.setDeviceId(report.getDeviceId());
+                warningEvent.setDeviceName(device.getData().getDeviceHostname());
+                warningEvent.setUserId(userInfo.getUserId());
+                warningEvent.setUserName(userInfo.getUserName());
+                warningEvent.setUserMobile(userInfo.getMobile());
+
+                if (reportItem.getStatus() == 0) {//获取信息失败告警
+//                        baseHandle(reportItem, warningEvent);
+                    warningEvent.setEventDetail(reportItem.getResult().toString());
+                    insertWarningEvent(warningEvent);
+                } else {
+                    Optional<ReportHandler> optional = ReportHandlerPools.getInstance().getHandler(reportItem.getMonitorItemType());
+                    if (optional.isPresent()) {
+                        Status status = optional.get().handle(warningEvent, reportItem, monitorType);
+                        monitorItemList.add(status);
+                    }
+                }
+
+                //根据监控类型更新
+                monitorType.setDeviceId(reportItem.getMonitorType().getName() + "状态");
+//                        monitorType.setWarnMessage(title);
+                monitorItemListMap.put(reportItem.getMonitorItemType().name(), monitorItemList);
+                monitorType.setMessage(monitorItemListMap);
+
+                monitorTypeMap.put(reportItem.getMonitorType().name(), monitorType);
+            });
+//            }
+            DeviceStatusPools.getInstances().update(report.getDeviceId(), monitorTypeMap);//更新设备状态缓存池
+        }
     }
 }

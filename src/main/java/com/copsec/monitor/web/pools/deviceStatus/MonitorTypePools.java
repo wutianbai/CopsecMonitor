@@ -5,15 +5,15 @@ import com.copsec.monitor.web.beans.node.Status;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ObjectListPools {
-    private static ObjectListPools pool;
+public class MonitorTypePools {
+    private static MonitorTypePools pool;
     private static ConcurrentHashMap<String, Status> map;
 
-    public static synchronized ObjectListPools getInstances() {
+    public static synchronized MonitorTypePools getInstances() {
         if (pool == null) {
-            synchronized (ObjectListPools.class) {
+            synchronized (MonitorTypePools.class) {
                 if (pool == null) {
-                    pool = new ObjectListPools();
+                    pool = new MonitorTypePools();
                 }
             }
         }

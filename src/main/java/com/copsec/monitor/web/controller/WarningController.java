@@ -29,9 +29,9 @@ public class WarningController {
     @PostMapping(value = "/event/search")
     @ResponseBody
     public Object searchWarningEvent(@SessionAttribute UserBean userInfo, HttpServletRequest request, WarningEventBean condition) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("search warningEvent by {}", condition);
-        }
+//        if (logger.isDebugEnabled()) {
+//            logger.debug("search warningEvent by {}", condition);
+//        }
 
         return PageUtils.returnResult(condition, warningService.searchWarningEvent(userInfo, request.getRemoteHost(), PageUtils.returnPageable(condition), condition));
     }

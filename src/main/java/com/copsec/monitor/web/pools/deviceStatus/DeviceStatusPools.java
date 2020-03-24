@@ -30,11 +30,11 @@ public class DeviceStatusPools {
     public synchronized void update(String key, ConcurrentHashMap<String, Status> value) {
         if (map.containsKey(key)) {
 
-            System.err.println("update device status info" + value);
+//            System.err.println("update device status info" + value);
             map.replace(key, value);
         } else {
 
-            System.err.println("add device status info" + value);
+//            System.err.println("add device status info" + value);
             map.put(key, value);
         }
     }

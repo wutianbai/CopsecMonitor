@@ -8,7 +8,6 @@ import com.copsec.monitor.web.beans.node.PositionBeans;
 import com.copsec.monitor.web.commons.CopsecResult;
 import com.copsec.monitor.web.config.SystemConfig;
 import com.copsec.monitor.web.service.DeviceService;
-import com.copsec.monitor.web.service.WarningService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,6 @@ public class DeviceController {
 
     @Autowired
     private DeviceService deviceService;
-
-    @Autowired
-    private WarningService warningService;
 
     @GetMapping(value = {"/{pageId}"})
     public String toPage(@SessionAttribute UserBean userInfo, @PathVariable("pageId") String pageId) {
@@ -60,6 +56,8 @@ public class DeviceController {
         if (logger.isDebugEnabled()) {
             logger.debug("get all date");
         }
+
+//        warningService.receiveWarningEvent(new Report());
         return deviceService.getData();
     }
 

@@ -91,13 +91,13 @@ function page(id, url, newId) {
                             return data.data[1][d];
                         }
                     },
-                    // {
-                    //     "mData": "monitorType",
-                    //     "sTitle": "监控项类别",
-                    //     "mRender": function (d, type, full, meta) {
-                    //         return data.data[2][d];
-                    //     }
-                    // },
+                    {
+                        "mData": "monitorType",
+                        "sTitle": "监控项类别",
+                        "mRender": function (d, type, full, meta) {
+                            return data.data[3][d];
+                        }
+                    },
                     {
                         "mData": "item",
                         "sTitle": "监控数据",
@@ -135,7 +135,7 @@ function page(id, url, newId) {
             changeItemLabel();
 
             // $("#monitorType").empty();
-            // $.each(data.data[2], function (index, value) {
+            // $.each(data.data[3], function (index, value) {
             //     $("#monitorType").append("<option value=" + index + ">" + value + "</option>");
             // });
             // reloadSelect("monitorType", "选择监控类别...");
@@ -221,12 +221,12 @@ function addData() {
         //     }
         // }
 
-        if (!isEmpty(instanceName)) {
-            if (!isLinuxPath(instanceName)) {
-                toastr.error("请填写正确的路径");
-                return false;
-            }
-        }
+        // if (!isEmpty(instanceName)) {
+        //     if (!isLinuxPath(instanceName)) {
+        //         toastr.error("请填写正确的路径");
+        //         return false;
+        //     }
+        // }
 
         $.ajax({
             url: contextPath + 'monitor/monitorItem/add',
@@ -234,7 +234,7 @@ function addData() {
                 'monitorId': monitorId,
                 'monitorName': monitorName,
                 'monitorItemType': monitorItemType,
-                // 'monitorType': monitorType,
+                // 'monitorType': "SYSTEM",
                 'item': item,
                 'certConfig.instanceName': instanceName,
                 'certConfig.nickname': nickname
@@ -306,12 +306,12 @@ function updateData(bean) {
         //     }
         // }
 
-        if (!isEmpty(instanceName)) {
-            if (!isLinuxPath(instanceName)) {
-                toastr.error("请填写正确的路径");
-                return false;
-            }
-        }
+        // if (!isEmpty(instanceName)) {
+        //     if (!isLinuxPath(instanceName)) {
+        //         toastr.error("请填写正确的路径");
+        //         return false;
+        //     }
+        // }
 
         $.ajax({
             url: contextPath + 'monitor/monitorItem/update',
@@ -319,7 +319,7 @@ function updateData(bean) {
                 'monitorId': bean.monitorId,
                 'monitorName': monitorName,
                 'monitorItemType': monitorItemType,
-                // 'monitorType': monitorType,
+                // 'monitorType': "SYSTEM",
                 'item': item,
                 'certConfig.instanceName': instanceName,
                 'certConfig.nickname': nickname

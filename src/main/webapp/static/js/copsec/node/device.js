@@ -1230,7 +1230,7 @@ jQuery(function () {
             }
         });
     };
-    setInterval(getStatus, 2000);
+    setInterval(getStatus, 5000);
 
     // getDeviceStatus();
 
@@ -1242,27 +1242,30 @@ jQuery(function () {
                 let s = '';
                 if (!isEmpty(value.message)) {
                     if (value.status === 0) {
-                        s += '<tr style="color: red"><td type=' + JSON.stringify(value.message) + '><a type=' + value.deviceId + '>' + value.deviceId + ':</a></td>';
+                        s += '<tr><td name="list" type=' + JSON.stringify(value) + '>' + value.deviceId + '</td><td style="color: red">异常</td>';
                     } else {
-                        s += '<tr><td type=' + JSON.stringify(value.message) + '><a type=' + value.deviceId + '>' + value.deviceId + ':</a></td>';
+                        s += '<tr><td name="list" type=' + JSON.stringify(value) + '>' + value.deviceId + '</td><td>正常</td>';
                     }
-                    s += '<td>' + value.warnMessage + '</td></tr>';
+                    s += '</tr>';
                 }
                 str += s;
             });
         }
+        str += '<tr><td>状态:</td><td>' + status.warnMessage + '</td></tr>';
+        str += '<tr><td>更新时间:</td><td>' + status.updateTime + '</td></tr>';
         str += '</table></div>';
         let div = $(str);
-        div.on("click", "a", function () {
-            let title = $(this).attr("type");
-            let message = $(this).parent().attr("type");
-            $("#message").find(".modal-title").text(title);
-            let str = '<table  class="table table-bordered table-striped" >';
-            str += showTable(str, $.parseJSON(message));
-            str += "</table>";
-            $("#message").find(".modal-body").html(str);
+        div.on('click', 'td[name="list"]', function () {
+            let title = $(this).text();
+            let message = $(this).attr("type");
+            $("#showTable").find(".modal-title").text(title);
+            // let str = '<table  class="table table-bordered table-striped" >';
+            // str += showTable(str, $.parseJSON(message));
+            let body = showTable($.parseJSON(message));
+            // str += "</table>";
+            $("#showTable").find(".modal-body").html(body);
 
-            $("#message").modal('show', {backdrop: 'static'});
+            $("#showTable").modal('show', {backdrop: 'static'});
         });
         return div;
     }
@@ -1409,43 +1412,131 @@ jQuery(function () {
 
 function addOne(str, index, value) {
     if (value.length > 0) {
-        str += '<tr><td colspan="' + value.length + '">' + index + '</td>';
+        str += '<table class="table table-bordered table-striped">';
+        str += '<tr style="text-align: center;"><td colspan="3">' + index + '</td></tr>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 if (value.status === 0) {
-                    str += '<td style="color: red">' + value.message + '</td>';
+                    str += '<tr style="text-align: center;color: red;"><td>' + value.message + '</td><td>' + value.result + '</td><td>异常</td></tr>';
                 } else {
-                    str += '<td>' + value.message + '</td>';
+                    str += '<tr style="text-align: center;"><td>' + value.message + '</td><td>' + value.result + '</td><td>正常</td></tr>';
                 }
             }
         });
-        str += '</tr>';
+        str += '</table>';
+    }
+    return str;
+}
+
+function addApplication(str, index, value) {
+    if (value.length > 0) {
+        str += '<table class="table table-bordered table-striped">';
+        str += '<tr style="text-align: center;"><td colspan="2">' + index + '</td></tr>';
+        $.each(value, function (index, value) {
+            if (!isEmpty(value.message)) {
+                if (value.status === 0) {
+                    str += '<tr style="text-align: center;color: red;"><td>' + value.message + '</td><td>' + value.result + '</td></tr>';
+                } else {
+                    str += '<tr style="text-align: center;"><td>' + value.message + '</td><td>' + value.result + '</td></tr>';
+                }
+            }
+        });
+        str += '</table>';
+    }
+    return str;
+}
+
+function addInstances(str, index, value) {
+    if (value.length > 0) {
+        $.each(value, function (index, value) {
+            if (!isEmpty(value.message)) {
+                if (value.status === 0) {
+                    str += '<tr style="text-align: center;color: red;"><td>' + value.message + '</td><td>' + value.result + '</td><td>已停止</td></tr>';
+                } else {
+                    str += '<tr style="text-align: center;"><td>' + value.message + '</td><td>' + value.result + '</td><td>正在运行</td></tr>';
+                }
+            }
+        });
+    }
+    return str;
+}
+
+function addSystem(str, index, value) {
+    if (value.length > 0) {
+        str += '<table class="table table-bordered table-striped">';
+        str += '<tr style="text-align: center;"><td>' + index + '</td></tr>';
+        $.each(value, function (index, value) {
+            if (!isEmpty(value.message)) {
+                str += '<tr style="text-align: center;"><td>' + value.message + '</td></tr>';
+            }
+        });
+        str += '</table>';
+    }
+    return str;
+}
+
+function addDisk(str, index, value) {
+    if (value.length > 0) {
+        str += '<table class="table table-bordered table-striped">';
+        str += '<tr style="text-align: center;"><td colspan="12">' + index + '</td></tr>';
+        $.each(value, function (index, value) {
+            if (!isEmpty(value.message)) {
+                str += '<tr style="text-align: center"><td colspan="' + Object.keys(value.message).length + '">磁盘[' + index + ']</td></tr>';
+                str += '<tr style="text-align: center"><td>盘符</td><td>总量</td><td>使用率</td></tr>';
+                $.each(value.message, function (index, value) {
+                    if (value.status === 0) {
+                        str += '<tr style="text-align: center;color: red;"><td>' + value.message + '</td>';
+                    } else {
+                        str += '<tr style="text-align: center;"><td>' + value.message + '</td>';
+                    }
+                    if (!isEmpty(value.result)) {
+                        str += '<td>' + value.result + '</td>';
+                    }
+                    if (!isEmpty(value.state)) {
+                        str += '<td>' + value.state + '</td>';
+                    }
+                    str += '</tr>';
+                });
+            }
+        });
+        str += '</table>';
     }
     return str;
 }
 
 function addTwo(str, index, value) {
     if (value.length > 0) {
-        str += '<tr><td colspan="' + value.length + '">' + index + '</td>';
+        str += '<table class="table table-bordered table-striped">';
+        str += '<tr style="text-align: center"><td colspan="12">' + index + '</td></tr>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 $.each(value.message, function (index, value) {
                     if (value.status === 0) {
-                        str += '<td style="color: red">' + value.message + '</td>';
+                        str += '<tr style="text-align: center;color: red"><td>' + value.message + '</td>';
                     } else {
-                        str += '<td>' + value.message + '</td>';
+                        str += '<tr style="text-align: center"><td>' + value.message + '</td>';
                     }
+                    if (!isEmpty(value.result)) {
+                        str += '<td>' + value.result + '</td>';
+                    }
+                    if (value.status === 0) {
+                        str += '<td>异常</td>';
+                    } else {
+                        str += '<td>正常</td>';
+                    }
+                    str += '</tr>';
                 });
             }
         });
-        str += '</tr>';
+        str += '</table>';
     }
     return str;
 }
 
 function addThree(str, index, value) {
     if (value.length > 0) {
-        str += '<tr><td colspan="' + value.length + '">' + index + '</td>';
+        str += '<table class="table table-bordered table-striped">';
+        str += '<tr style="text-align: center"><td colspan="12">' + index + '</td></tr>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 $.each(value.message, function (index, value) {
@@ -1455,21 +1546,27 @@ function addThree(str, index, value) {
                 });
             }
         });
-        str += '</tr>';
+        str += '</table>';
     }
     return str;
 }
 
-function showTable(str, message) {
-    if (!isEmpty(message)) {
-        $.each(message, function (index, value) {
+// function showTable(str, message) {
+function showTable(message) {
+    let body = '<div class="main-content"><div class="panel panel-default"><div class="panel-body">';
+    if (message.deviceId == "实例状态") {
+        body += '<table class="table table-bordered table-striped">';
+    }
+
+    if (!isEmpty(message.message)) {
+        $.each(message.message, function (index, value) {
             let s = '';
             switch (index) {
                 case "CPU":
                     s += addOne(s, index, value);
                     break;
                 case "DISK":
-                    s += addTwo(s, index, value);
+                    s += addDisk(s, index, value);
                     break;
                 case "MEMORY":
                     s += addOne(s, index, value);
@@ -1481,34 +1578,28 @@ function showTable(str, message) {
                     s += addThree(s, index, value);
                     break;
                 case "SYSTEMTYPE":
-                    if (!isEmpty(value.message)) {
-                        s += '<tr><td>SYSTEMTYPE:</td><td>' + value.message + '</td></tr>';
-                    }
+                    s += addSystem(s, index, value);
                     break;
                 case "SYSTEMVERSION":
-                    if (!isEmpty(value.message)) {
-                        s += '<tr><td>SYSTEMVERSION:</td><td>' + value.message + '</td></tr>';
-                    }
+                    s += addSystem(s, index, value);
                     break;
                 case "SYSTEMPATCH":
-                    if (!isEmpty(value.message)) {
-                        s += '<tr><td>SYSTEMPATCH:</td><td>' + value.message + '</td></tr>';
-                    }
+                    s += addSystem(s, index, value);
                     break;
                 case "APPLICATION":
-                    s += addOne(s, index, value);
+                    s += addApplication(s, index, value);
                     break;
                 case "INSTANCES_WEB70":
-                    s += addTwo(s, index, value);
+                    s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_WEBPROXY40":
-                    s += addTwo(s, index, value);
+                    s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_CONFIG":
-                    s += addTwo(s, index, value);
+                    s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_USER":
-                    s += addTwo(s, index, value);
+                    s += addInstances(s, index, value);
                     break;
                 case "NETWORK":
                     s += addOne(s, index, value);
@@ -1529,8 +1620,12 @@ function showTable(str, message) {
                     s += addTwo(s, index, value);
                     break;
             }
-            str += s;
+            body += s;
         });
+        body += '</div></div></div>';
+        if (message.deviceId == "实例状态") {
+            body += '</table>';
+        }
     }
-    return str;
+    return body;
 }

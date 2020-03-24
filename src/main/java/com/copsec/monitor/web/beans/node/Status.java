@@ -26,4 +26,8 @@ public class Status {
     private String warnMessage;
 
     private String updateTime;
+
+    private String result;
+
+    private String state;
 }

@@ -3,40 +3,42 @@ package com.copsec.monitor.web.beans.monitor.MonitorEnum;
 import java.util.concurrent.ConcurrentHashMap;
 
 public enum MonitorItemEnum {
-    CPU("中央处理机", 0, "请输入阈值"),
-    DISK("磁盘", 1, "请输入阈值"),
-    MEMORY("内存", 2, "请输入阈值"),
-    USER("用户", 3, "使用\",\"分隔的用户id标识"),
-    SYSTEMTYPE("系统类型", 4, "默认值"),
-    SYSTEMVERSION("系统版本", 5, "默认值"),
-    SYSTEMPATCH("系统补丁", 6, "默认值"),
-    APPLICATION("应用程序", 7, "请输入代理通道访问路径"),
-    INSTANCES_WEB70("实例_WEB70", 8, "(请输入实例路径"),
-    INSTANCES_WEBPROXY40("实例_WEB代理40", 9, "请输入实例路径"),
-    INSTANCES_CONFIG("实例_配置", 10, "请输入实例路径"),
-    INSTANCES_USER("实例_用户", 11, "请输入实例路径"),
-    NETWORK("网络", 12, "请输入网络IP地址"),
-    ACCESSLOG("访问日志", 13, "例{\"logPath\":\"/usr/sjes/am11/access/log\",\"threadHold\":50}"),
-    PROXYLOG("代理日志", 14, "例{\"logPath\":\"/usr/sjes/am11/access/log\",\"threadHold\":50}"),
-    CERT70("证书70", 15, ""),
-    CERT40("证书40", 16, ""),
-    IMSERVICE("IM服务", 17, "多个进程名称之间使用\",\"分隔"),
-    RAID("磁盘阵列", 18, "默认值");
+    CPU("中央处理机", 0, "请输入阈值", MonitorTypeEnum.SYSTEM),
+    DISK("磁盘", 1, "请输入阈值", MonitorTypeEnum.SYSTEM),
+    MEMORY("内存", 2, "请输入阈值", MonitorTypeEnum.SYSTEM),
+    USER("用户", 3, "使用\",\"分隔的用户id标识", MonitorTypeEnum.SYSTEM),
+    SYSTEMTYPE("系统类型", 4, "默认值", MonitorTypeEnum.SYSTEM),
+    SYSTEMVERSION("系统版本", 5, "默认值", MonitorTypeEnum.SYSTEM),
+    SYSTEMPATCH("系统补丁", 6, "默认值", MonitorTypeEnum.SYSTEM),
+    APPLICATION("应用程序", 7, "请输入代理通道访问路径", MonitorTypeEnum.APPLICATION),
+    INSTANCES_WEB70("实例_WEB70", 8, "(请输入实例路径", MonitorTypeEnum.INSTANCE),
+    INSTANCES_WEBPROXY40("实例_WEB代理40", 9, "请输入实例路径", MonitorTypeEnum.INSTANCE),
+    INSTANCES_CONFIG("实例_配置", 10, "请输入实例路径", MonitorTypeEnum.INSTANCE),
+    INSTANCES_USER("实例_用户", 11, "请输入实例路径", MonitorTypeEnum.INSTANCE),
+    NETWORK("网络", 12, "请输入网络IP地址", MonitorTypeEnum.NETWORK),
+    ACCESSLOG("授权日志", 13, "例{\"logPath\":\"/usr/sjes/am11/access/log\",\"threadHold\":50}", MonitorTypeEnum.LOG),
+    PROXYLOG("代理日志", 14, "例{\"logPath\":\"/usr/sjes/am11/access/log\",\"threadHold\":50}", MonitorTypeEnum.LOG),
+    CERT70("证书70", 15, "", MonitorTypeEnum.CERT),
+    CERT40("证书40", 16, "", MonitorTypeEnum.CERT),
+    IMSERVICE("IM服务", 17, "多个进程名称之间使用\",\"分隔", MonitorTypeEnum.PROCESSOR),
+    RAID("磁盘阵列", 18, "默认值", MonitorTypeEnum.SYSTEM);
 
     private String name;
     private int number;
     private String message;
+    private MonitorTypeEnum type;
 
-    MonitorItemEnum(String name, int number, String message) {
+    MonitorItemEnum(String name, int number, String message, MonitorTypeEnum type) {
         this.name = name;
         this.number = number;
         this.message = message;
+        this.type = type;
     }
 
     //重写toSting()
     @Override
     public String toString() {
-        return "name:" + name + " & number:" + number + " & message:" + message;
+        return "name:" + name + " & number:" + number + " & message:" + message + " & type:" + type;
     }
 
     public String getName() {
@@ -61,6 +63,14 @@ public enum MonitorItemEnum {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public MonitorTypeEnum getType() {
+        return type;
+    }
+
+    public void setType(MonitorTypeEnum type) {
+        this.type = type;
     }
 
     //在枚举列类中定义一个自定义方法，但如果要想能够被外面访问，需要定义成static类型。
@@ -88,4 +98,13 @@ public enum MonitorItemEnum {
         }
         return null;
     }
+
+//    public static MonitorTypeEnum getTypeByName(MonitorItemEnum name) {
+//        for (MonitorItemEnum m : MonitorItemEnum.values()) {
+//            if (name.name().equals(m.name)) {
+//                return MonitorTypeEnum.valueOf(m.getType());
+//            }
+//        }
+//        return null;
+//    }
 }

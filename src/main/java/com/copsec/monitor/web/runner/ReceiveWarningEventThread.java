@@ -1,41 +1,23 @@
 package com.copsec.monitor.web.runner;
 
 import com.copsec.monitor.SpringContext;
-import com.copsec.monitor.web.beans.UserBean;
-import com.copsec.monitor.web.beans.UserInfoBean;
-import com.copsec.monitor.web.beans.monitor.WarningItemBean;
-import com.copsec.monitor.web.beans.node.Device;
-import com.copsec.monitor.web.beans.node.Status;
-import com.copsec.monitor.web.beans.warning.Report;
-import com.copsec.monitor.web.beans.warning.ReportItem;
-import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.entity.CacheEntity;
-import com.copsec.monitor.web.entity.WarningEvent;
-import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
-import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
-import com.copsec.monitor.web.pools.DevicePools;
-import com.copsec.monitor.web.pools.UserInfoPools;
-import com.copsec.monitor.web.pools.WarningItemPools;
-import com.copsec.monitor.web.pools.deviceStatus.DeviceStatusPools;
-import com.copsec.monitor.web.pools.deviceStatus.MonitorItemListPools;
-import com.copsec.monitor.web.pools.deviceStatus.ObjectListPools;
 import com.copsec.monitor.web.service.DeviceService;
 import com.copsec.monitor.web.utils.LocalCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 @Component
 @Order
-public class ReceiveWarningEventThread extends ReportBaseHandler implements CommandLineRunner {
-//public class ReceiveWarningEventThread implements Runnable {
+//public class ReceiveWarningEventThread extends ReportBaseHandler implements CommandLineRunner {
+public class ReceiveWarningEventThread extends ReportBaseHandler implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(ReceiveWarningEventThread.class);
 
@@ -44,8 +26,8 @@ public class ReceiveWarningEventThread extends ReportBaseHandler implements Comm
     private DeviceService deviceService = SpringContext.getBean(DeviceService.class);
 
     @Override
-    public void run(String... args) throws Exception {
-//    public void run() {
+//    public void run(String... args) throws Exception {
+    public void run() {
         if (logger.isDebugEnabled()) {
             logger.debug("receive warningEvent thread started");
         }
@@ -53,7 +35,7 @@ public class ReceiveWarningEventThread extends ReportBaseHandler implements Comm
 //        ExecutorService executor = Executors.newCachedThreadPool();
 //            ThreadPoolExecutor executor = new ThreadPoolExecutor(5, Integer.MAX_VALUE,
 //                    60L, TimeUnit.SECONDS, new SynchronousQueue<>());
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
         while (true) {
             Task task = new Task();
             FutureTask<ConcurrentMap<String, CacheEntity>> futureTask = new FutureTask<>(task);
@@ -80,67 +62,68 @@ public class ReceiveWarningEventThread extends ReportBaseHandler implements Comm
         @Override
         public ConcurrentMap<String, CacheEntity> call() throws Exception {
             ConcurrentMap<String, CacheEntity> cache = LocalCache.getCache();//获取本地缓存
-            for (Iterator it = cache.entrySet().iterator(); it.hasNext(); ) {
-                Map.Entry entry = (Map.Entry) it.next();
-                CacheEntity cacheEntity = (CacheEntity) entry.getValue();
-                Report report = (Report) cacheEntity.getValue();//取出上报数据
-                LocalCache.remove(report.getDeviceId());//清除缓存
-                final Device device = DevicePools.getInstance().getDevice(report.getDeviceId());//设备信息
-                //更新设备上报时间
-                device.getData().setReportTime(report.getReportTime());
-                deviceService.updateDevice(new UserBean(), "127.0.0.1", device);
-                final UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());//运维用户信息
-
-                ConcurrentHashMap<String, Status> map = ObjectListPools.getInstances().getMap();//新建设备类型Map
-
-                Status monitorType = new Status();//类型中文名称
-                StringBuffer str = new StringBuffer();//页面子项提示 [CPU] [DISK]...
-//                final Multimap<String, Status> monitorTypeMap = LinkedHashMultimap.create();
-                ConcurrentHashMap<String, List<Status>> monitorTypeMap = new ConcurrentHashMap<>();
-
-                List<ReportItem> reportItems = castList(report.getReportItems(), ReportItem.class);//获取上报项
-                if (!ObjectUtils.isEmpty(reportItems)) {
-                    reportItems.parallelStream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(reportItem -> {
-
-                        final WarningEvent warningEvent = new WarningEvent();
-                        warningEvent.setEventSource(reportItem.getMonitorItemType());
-                        warningEvent.setEventTime(new Date());
-                        warningEvent.setDeviceId(report.getDeviceId());
-                        warningEvent.setDeviceName(device.getData().getDeviceHostname());
-                        warningEvent.setUserId(userInfo.getUserId());
-                        warningEvent.setUserName(userInfo.getUserName());
-                        warningEvent.setUserMobile(userInfo.getMobile());
-
-                        List<Status> monitorItemList = MonitorItemListPools.getInstances().getMap().get(reportItem.getMonitorItemType().name());//状态类型的List
-                        if (reportItem.getStatus() == 0) {//获取信息失败告警
-                            handle(reportItem, warningEvent);
-                        } else {
-                            List<WarningItemBean> warningItemList = WarningItemPools.getInstances().getAll();//所有告警项
-                            warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                                warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                                String[] monitorIds = warningItem.getMonitorIds().split(Resources.SPLITE, -1);
-                                if (new ArrayList<>(Arrays.asList(monitorIds)).contains(reportItem.getMonitorId())) {
-                                    str.append("[" + reportItem.getMonitorItemType().name() + "]");
-
-                                    Optional<ReportHandler> optional = ReportHandlerPools.getInstance().getHandler(reportItem.getMonitorItemType());
-                                    if (optional.isPresent()) {
-                                        Status status = optional.get().handle(warningItem, warningEvent, reportItem, monitorType);
-                                        monitorItemList.add(status);
-                                    }
-                                }
-                            });
-                        }
-                        //根据监控类型更新
-                        monitorType.setDeviceId(reportItem.getMonitorType().getName());
-                        monitorType.setWarnMessage(str.toString().length()==0?reportItem.getResult().toString():str.toString());
-                        monitorTypeMap.put(reportItem.getMonitorItemType().name(), monitorItemList);
-                        monitorType.setMessage(monitorTypeMap);
-                        map.put(reportItem.getMonitorType().name(), monitorType);
-                        System.err.println("map :" + Objects.toString(map));
-                        DeviceStatusPools.getInstances().update(report.getDeviceId(), map);//更新设备状态缓存池
-                    });
-                }
-            }
+//            for (Iterator it = cache.entrySet().iterator(); it.hasNext(); ) {
+//                Map.Entry entry = (Map.Entry) it.next();
+//                CacheEntity cacheEntity = (CacheEntity) entry.getValue();
+//                Report report = (Report) cacheEntity.getValue();//取出上报数据
+//                LocalCache.remove(report.getDeviceId());//清除缓存
+//
+//                Device device = DevicePools.getInstance().getDevice(report.getDeviceId());//设备信息
+//                //更新设备上报时间
+//                device.getData().setReportTime(report.getReportTime());
+//                deviceService.updateDevice(new UserBean(), "127.0.0.1", device);
+//                UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());//运维用户信息
+//
+////                Multimap<String, Status> monitorTypeMap = LinkedHashMultimap.create();
+//                ConcurrentHashMap<String, Status> monitorTypeMap = MonitorTypePools.getInstances().getMap();
+//                List<ReportItem> reportItems = report.getReportItems();//获取上报项
+//                if (!ObjectUtils.isEmpty(reportItems)) {
+//                    reportItems.parallelStream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(reportItem -> {
+//                        final Status monitorType = monitorTypeMap.get(reportItem.getMonitorType().name());//主类型
+//
+////                        String title = monitorType.getWarnMessage();//标题
+////                        if (ObjectUtils.isEmpty(title)) {
+////                            title = "";
+////                        }
+////                        title += "[" + reportItem.getMonitorItemType().name() + "]";
+//
+//                        ConcurrentHashMap<String, List<Status>> monitorItemListMap = (ConcurrentHashMap<String, List<Status>>) monitorType.getMessage();
+//                        if (ObjectUtils.isEmpty(monitorItemListMap)) {
+//                            monitorItemListMap = MonitorItemListPools.getInstances().getMap();
+//                        }
+//                        final List<Status> monitorItemList = monitorItemListMap.get(reportItem.getMonitorItemType().name());//子状态类型
+//
+//                        final WarningEvent warningEvent = new WarningEvent();
+//                        warningEvent.setEventSource(reportItem.getMonitorItemType());
+//                        warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
+//                        warningEvent.setEventTime(new Date());
+//                        warningEvent.setDeviceId(report.getDeviceId());
+//                        warningEvent.setDeviceName(device.getData().getDeviceHostname());
+//                        warningEvent.setUserId(userInfo.getUserId());
+//                        warningEvent.setUserName(userInfo.getUserName());
+//                        warningEvent.setUserMobile(userInfo.getMobile());
+//
+//                        if (reportItem.getStatus() == 0) {//获取信息失败告警
+//                            baseHandle(reportItem, warningEvent);
+//                        } else {
+//                            Optional<ReportHandler> optional = ReportHandlerPools.getInstance().getHandler(reportItem.getMonitorItemType());
+//                            if (optional.isPresent()) {
+//                                Status status = optional.get().handle(warningEvent, reportItem, monitorType);
+//                                monitorItemList.add(status);
+//                            }
+//                        }
+//
+//                        //根据监控类型更新
+//                        monitorType.setDeviceId(reportItem.getMonitorType().getName() + "状态");
+////                        monitorType.setWarnMessage(title);
+//                        monitorItemListMap.put(reportItem.getMonitorItemType().name(), monitorItemList);
+//                        monitorType.setMessage(monitorItemListMap);
+//
+//                        monitorTypeMap.put(reportItem.getMonitorType().name(), monitorType);
+//                    });
+//                }
+//                DeviceStatusPools.getInstances().update(report.getDeviceId(), monitorTypeMap);//更新设备状态缓存池
+//            }
             try {
 //                if (logger.isDebugEnabled()) {
 //                    logger.debug("receive warningEvent thread-" + Thread.currentThread().getName() + "-读取[" + cache + "]");

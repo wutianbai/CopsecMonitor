@@ -2,6 +2,7 @@ package com.copsec.monitor.web.service.serviceImpl;
 
 import com.copsec.monitor.web.beans.UserBean;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorTypeEnum;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.WarningLevel;
 import com.copsec.monitor.web.beans.monitor.MonitorGroupBean;
 import com.copsec.monitor.web.beans.monitor.MonitorItemBean;
@@ -57,7 +58,7 @@ public class MonitorServiceImpl implements MonitorService {
         list.add(MonitorItemPools.getInstances().getAll());
         list.add(MonitorItemEnum.containVal());
         list.add(MonitorItemEnum.containMessage());
-//        list.add(MonitorTypeEnum.containVal());
+        list.add(MonitorTypeEnum.containVal());
 
         return CopsecResult.success(list);
     }
@@ -73,6 +74,7 @@ public class MonitorServiceImpl implements MonitorService {
     @Override
     public CopsecResult addMonitorItem(UserBean user, String ip, MonitorItemBean bean, String filePath) {
         try {
+            bean.setMonitorType(bean.getMonitorItemType().getType());
             MonitorItemPools.getInstances().add(bean);
 
             MonitorItemReader reader = (MonitorItemReader) FileReaderFactory.getFileReader(FileReaderType.MONITORITEM);
@@ -94,6 +96,7 @@ public class MonitorServiceImpl implements MonitorService {
     public CopsecResult updateMonitorItem(UserBean user, String ip, MonitorItemBean bean, String filePath) {
         MonitorItemBean oldBean = MonitorItemPools.getInstances().get(bean.getMonitorId());
         try {
+            bean.setMonitorType(bean.getMonitorItemType().getType());
             MonitorItemPools.getInstances().update(bean);
 
             MonitorItemReader reader = (MonitorItemReader) FileReaderFactory.getFileReader(FileReaderType.MONITORITEM);

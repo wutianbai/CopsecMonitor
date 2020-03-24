@@ -319,79 +319,34 @@ public class DeviceServiceImpl implements DeviceService {
             Status statusBean = getStatusBean(entry.getKey());
 
             long errorStatus;
-            if (ObjectUtils.isEmpty(statusBean.getUpdateTime()) || statusBean.getUpdateTime().equalsIgnoreCase("N/A")) {
-                errorStatus = config.getDeviceUpdateTime() * 60000 + 1;
+//            Device device =  DevicePools.getInstance().getDevice(entry.getKey().toString());
+//            updateDevice(new UserBean(), "127.0.0.1", device);//更新后台设备上报时间
+            Date updateTime = DevicePools.getInstance().getDevice(entry.getKey().toString()).getData().getReportTime();
+            if (ObjectUtils.isEmpty(updateTime)) {
+                errorStatus = config.getDeviceUpdateTime() * 30000 + 1;
             } else {
-                errorStatus = System.currentTimeMillis() - FormatUtils.parseDate(statusBean.getUpdateTime()).getTime();
+                errorStatus = System.currentTimeMillis() - updateTime.getTime();
             }
+            statusBean.setUpdateTime(FormatUtils.getFormatDate(updateTime));
 
-            if (errorStatus > (config.getDeviceUpdateTime() * 60000)) {
+            if (errorStatus > (config.getDeviceUpdateTime() * 30000)) {
                 statusBean.setWarnMessage(Resources.ERROR_MESSAGE);
                 statusBean.setStatus(2);
             } else if (statusBean.getStatus() == 0) {
                 statusBean.setWarnMessage("故障");
                 statusBean.setStatus(0);
             } else {
-//                if (!value.getMessage().equals("网络接口正常")) {
                 statusBean.setWarnMessage("健康");
                 statusBean.setStatus(1);
-//                }
             }
 
             statusBean.setDeviceId(entry.getKey().toString());
             statusBean.setMessage(deviceStatus);
-            statusBean.setUpdateTime(FormatUtils.getFormatDate(DevicePools.getInstance().getDevice(entry.getKey().toString()).getData().getReportTime()));
 
             statusMap.replace(entry.getKey().toString(), statusBean);
         }
         return CopsecResult.success(statusMap);
     }
-
-//    @Override
-//    public CopsecResult getDeviceStatus() {
-//        List<DeviceNowStatus> list = deviceRepository.findAll();
-//        final Map<String, StatusBean> statusMap = new HashMap<>();
-//
-//        list.stream().forEach(item -> {
-//            String parentId = "";
-//            boolean isSub = false;
-//            if (item.getDeviceId().endsWith(Resources.MUTTIPlEDEVICE)) { //双主机设备
-//                parentId = item.getDeviceId().substring(0, item.getDeviceId().indexOf("-"));
-//                isSub = true;
-//            } else {
-//                parentId = item.getDeviceId();
-//            }
-//            StatusBean status = statusMap.get(parentId);
-//            if (ObjectUtils.isEmpty(status)) {
-//                status = new StatusBean();
-//                statusMap.put(parentId, status);
-//            }
-//            if (isSub) {
-//                status.setHasSub(isSub);
-//            }
-//            Status bean = DeviceIdUtils.get(item);
-//            long errorStatus = System.currentTimeMillis() - item.getUpdateTime().getTime();
-//            if (errorStatus > (config.getDeviceUpdateTime() * 60000)) {
-//                status.setStatus(Resources.ERROR);
-//                bean.setWarnMessage(Resources.ERROR_MESSAGE);
-//                bean.setDeviceStatus("故障");
-//            } else if (item.getDeviceStatus().equals("故障")) {
-//                status.setStatus(Resources.ERROR);
-//                bean.setWarnMessage(item.getWarnMessage());
-//                bean.setDeviceStatus("故障");
-//            } else {
-//                if (!item.getWarnMessage().equals("网络接口正常")) {
-//                    bean.setWarnMessage(item.getWarnMessage());
-//                    bean.setDeviceStatus("健康");
-//                }
-//            }
-//            bean.setUpdateTime(FormatUtils.getFormatDate(item.getUpdateTime()));
-//            status.getList().add(bean);
-//            statusMap.replace(parentId, status);
-//        });
-//
-//        return CopsecResult.success(statusMap);
-//    }
 
     @Override
     public CopsecResult countDeviceNowStatus(ConditionBean conditionBean) {
