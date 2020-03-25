@@ -32,12 +32,12 @@ public class TimeoutWarningEventThread implements Runnable {
             logger.debug("handle timeout warningEvent thread started");
         }
 //        while (true) {
-            try {
-                TimeUnit.MINUTES.sleep(MONITOR_DURATION);
-                checkTime();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            TimeUnit.MINUTES.sleep(MONITOR_DURATION);
+            checkTime();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 //        }
     }
 
@@ -48,7 +48,7 @@ public class TimeoutWarningEventThread implements Runnable {
      */
     private void checkTime() throws Exception {
         WarningEventBean bean = new WarningEventBean();
-        bean.setEnd(FormatUtils.getFormatDate(DateUtils.beforeDay(new Date(), 7)));
+        bean.setEnd(FormatUtils.getFormatDate(DateUtils.beforeHour(new Date(), 12)));
 
         List<WarningEvent> list = warningService.findWarningEventByCondition(bean);
         list.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningEvent -> {

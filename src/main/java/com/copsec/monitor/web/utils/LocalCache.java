@@ -35,7 +35,7 @@ public class LocalCache {
      * @param expireTime 过期时间，如果是-1 则表示永不过期
      * @return
      */
-    public static boolean putValue(String key, Object value, int expireTime) {
+    public static synchronized boolean putValue(String key, Object value, int expireTime) {
         return putCloneValue(key, value, expireTime);
     }
 
@@ -92,22 +92,22 @@ public class LocalCache {
      * @param key
      * @return
      */
-    public static Object getValue(String key) {
+    public synchronized static Object getValue(String key) {
         return cache.get(key).getValue();
     }
 
-    public static ConcurrentMap<String, CacheEntity> getCache() {
+    public synchronized static ConcurrentMap<String, CacheEntity> getCache() {
         return cache;
     }
 
     /**
      * 清空所有
      */
-    public static void clear() {
+    public synchronized static void clear() {
         cache.clear();
     }
 
-    public static void remove(String key) {
+    public synchronized static void remove(String key) {
         cache.remove(key);
     }
 

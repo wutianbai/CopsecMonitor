@@ -4,7 +4,6 @@ import com.copsec.monitor.web.beans.UserBean;
 import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.beans.node.LinkBean;
 import com.copsec.monitor.web.beans.node.PositionBeans;
-import com.copsec.monitor.web.beans.statistics.ConditionBean;
 import com.copsec.monitor.web.commons.CopsecResult;
 
 import java.util.ArrayList;
@@ -45,5 +44,4 @@ public interface DeviceService {
      */
     CopsecResult getDeviceStatus();
 
-    CopsecResult countDeviceNowStatus(ConditionBean conditionBean);
 }

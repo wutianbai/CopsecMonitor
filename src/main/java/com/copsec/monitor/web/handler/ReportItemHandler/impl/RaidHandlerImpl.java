@@ -1,6 +1,5 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import com.copsec.monitor.SpringContext;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
 import com.copsec.monitor.web.beans.node.Status;
@@ -11,6 +10,7 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,9 +25,9 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
 
     private static final Logger logger = LoggerFactory.getLogger(RaidHandlerImpl.class);
 
-    private WarningService warningService = SpringContext.getBean(WarningService.class);
+    //    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-    public Status handle(WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
         ConcurrentHashMap<String, Status> RAIDMap = new ConcurrentHashMap<>();
 
@@ -48,10 +48,13 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (Integer.parseInt(diskInfo.getStatus()) == 0) {
-                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                        warningEvent.setEventDetail("虚拟机[" + diskInfo.getId() + "]磁盘 异常");
-                        warningEvent.setId(null);
-                        warningService.insertWarningEvent(warningEvent);
+                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                            warningEvent.setEventDetail("虚拟机[" + diskInfo.getId() + "]磁盘 异常");
+
+                            warningEvent.setId(null);
+                            warningService.insertWarningEvent(warningEvent);
+                        }
 
                         monitorType.setStatus(0);
                         monitorItemType.setStatus(0);
@@ -78,10 +81,13 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (Integer.parseInt(domainInfo.getState()) == 0) {
-                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                        warningEvent.setEventDetail("虚拟机[" + domainInfo.getName() + "]域 异常");
-                        warningEvent.setId(null);
-                        warningService.insertWarningEvent(warningEvent);
+                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                            warningEvent.setEventDetail("虚拟机[" + domainInfo.getName() + "]域 异常");
+                            warningEvent.setId(new ObjectId(reportItem.getMonitorId().replace("-", "")));
+                            warningService.deleteWarningEvent(warningEvent);
+                            warningService.insertWarningEvent(warningEvent);
+                        }
 
                         monitorType.setStatus(0);
                         monitorItemType.setStatus(0);
@@ -108,10 +114,13 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (Integer.parseInt(volumeInfo.getStatus()) == 0) {
-                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                        warningEvent.setEventDetail("虚拟机[" + volumeInfo.getName() + "]卷 异常");
-                        warningEvent.setId(null);
-                        warningService.insertWarningEvent(warningEvent);
+                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                            warningEvent.setEventDetail("虚拟机[" + volumeInfo.getName() + "]卷 异常");
+                            warningEvent.setId(new ObjectId(reportItem.getMonitorId().replace("-", "")));
+                            warningService.deleteWarningEvent(warningEvent);
+                            warningService.insertWarningEvent(warningEvent);
+                        }
 
                         monitorType.setStatus(0);
                         monitorItemType.setStatus(0);

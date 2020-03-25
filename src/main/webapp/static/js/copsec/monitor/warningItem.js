@@ -68,7 +68,7 @@ function page(id, url, newId) {
                         "mData": "warningId",
                         "sTitle": "序号",
                         "sClass": "text-center",
-                        "width": "10%",
+                        "width": "5%",
                         "mRender": function (d, type, full, meta) {
                             return meta.row + 1 + meta.settings._iDisplayStart;
                         }

@@ -2,11 +2,9 @@ package com.copsec.monitor.web.service.serviceImpl;
 
 import com.copsec.monitor.web.beans.UserBean;
 import com.copsec.monitor.web.beans.node.*;
-import com.copsec.monitor.web.beans.statistics.ConditionBean;
 import com.copsec.monitor.web.commons.CopsecResult;
 import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.config.SystemConfig;
-import com.copsec.monitor.web.entity.DeviceNowStatus;
 import com.copsec.monitor.web.exception.CopsecException;
 import com.copsec.monitor.web.fileReaders.*;
 import com.copsec.monitor.web.pools.DevicePools;
@@ -14,16 +12,12 @@ import com.copsec.monitor.web.pools.LinkPools;
 import com.copsec.monitor.web.pools.UserInfoPools;
 import com.copsec.monitor.web.pools.ZonePools;
 import com.copsec.monitor.web.pools.deviceStatus.DeviceStatusPools;
-import com.copsec.monitor.web.repository.DeviceStatusRepository;
 import com.copsec.monitor.web.service.DeviceService;
 import com.copsec.monitor.web.utils.FormatUtils;
 import com.copsec.monitor.web.utils.logUtils.LogUtils;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -46,10 +40,6 @@ public class DeviceServiceImpl implements DeviceService {
     private ZoneFileReader zoneReader;
     @Autowired
     private UserInfoReader userInfoReader;
-    @Autowired
-    private SnmpDeviceReader snmpReader;
-    @Autowired
-    private DeviceStatusRepository deviceRepository;
 
     @Override
     public CopsecResult getData() {
@@ -311,7 +301,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public CopsecResult getDeviceStatus() {
-        ConcurrentHashMap<String, ConcurrentHashMap<String, Status>> deviceStatusMap = DeviceStatusPools.getInstances().getPools();
+        ConcurrentHashMap<String, ConcurrentHashMap<String, Status>> deviceStatusMap = DeviceStatusPools.getInstances().getMap();
         for (Iterator it = deviceStatusMap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
             ConcurrentHashMap<String, Status> deviceStatus = (ConcurrentHashMap<String, Status>) entry.getValue();
@@ -346,26 +336,6 @@ public class DeviceServiceImpl implements DeviceService {
             statusMap.replace(entry.getKey().toString(), statusBean);
         }
         return CopsecResult.success(statusMap);
-    }
-
-    @Override
-    public CopsecResult countDeviceNowStatus(ConditionBean conditionBean) {
-        if (conditionBean.getSortDirection() < 0) {
-            conditionBean.setDirection(Direction.DESC);
-        } else {
-            conditionBean.setDirection(Direction.ASC);
-        }
-        List<DeviceNowStatus> list = deviceRepository.countDeviceStatus(conditionBean);
-
-        List<DeviceNowStatus> _list = Lists.newArrayList();
-        list.stream().forEach(item -> {
-            DeviceNowStatus i = new DeviceNowStatus();
-            BeanUtils.copyProperties(item, i);
-//            i.setDeviceId(DeviceIdUtils.getDeviceName(item.getDeviceId()));
-            _list.add(i);
-        });
-
-        return CopsecResult.success(_list);
     }
 }
 

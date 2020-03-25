@@ -13,25 +13,7 @@ public class Resources {
 
 	public static final String LINKS = "edges";
 
-	public static final String MUTTIPlEDEVICE = "-inner";
-
 	public static final String ENABLE = "start";
-
-	public static final String DISABLED = "forbidden";
-
-	public static final String RESTART = "reboot";
-
-	public static final String SHUTDOWN = "shutdown";
-
-	public static final String SETTIME = "date -s " + "\"";
-
-	public static final String ZIPFILESUFFIX = ".zip";
-
-	public static final String UPDATEFILE = "update";
-
-	public static final String LOADCONFIGFILE = "load";
-
-	public static final String ORIGUPLOADFILE = "orig.zip";
 
 	public static final String PERCENTAGE = "%";
 
@@ -46,14 +28,6 @@ public class Resources {
 	public static final String DEFAUTL_LOCK_TIME = "30";
 
 	public static final String DEFAULT_TRY_TIME = "5";
-
-	public static final String FLUME_SOURCE = "sources";
-
-	public static final String FLUME_CHANNEL = "channels";
-
-	public static final String FLUME_SINKS = "sinks";
-
-	public static final String FLUME_SPERATOR = ".";
 
 	public static final String USERINFO_ADD= "添加运维用户";
 	public static final String USERINFO_UPDATE= "更新运维用户";

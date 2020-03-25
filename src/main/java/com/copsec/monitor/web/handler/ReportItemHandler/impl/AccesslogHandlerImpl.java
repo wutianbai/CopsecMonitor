@@ -1,6 +1,5 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import com.copsec.monitor.SpringContext;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
 import com.copsec.monitor.web.beans.node.Status;
@@ -23,9 +22,9 @@ public class AccesslogHandlerImpl extends ReportBaseHandler implements ReportHan
 
     private static final Logger logger = LoggerFactory.getLogger(AccesslogHandlerImpl.class);
 
-    private WarningService warningService = SpringContext.getBean(WarningService.class);
+    //    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-    public Status handle(WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
 
         //基本信息
@@ -36,9 +35,13 @@ public class AccesslogHandlerImpl extends ReportBaseHandler implements ReportHan
         if (warningItemList.size() > 0) {
             warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                 if (warningItem.getThreadHold() < Integer.parseInt(reportItem.getResult().toString())) {
-                    warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                    warningEvent.setEventDetail("访问日志[" + reportItem.getItem() + "]异常数[" + reportItem.getResult() + "]" + "超出阈值[" + warningItem.getThreadHold() + "]");
-                    warningService.insertWarningEvent(warningEvent);
+                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                        warningEvent.setEventDetail("访问日志[" + reportItem.getItem() + "]异常数[" + reportItem.getResult() + "]" + "超出阈值[" + warningItem.getThreadHold() + "]");
+
+                        warningEvent.setId(null);
+                        warningService.insertWarningEvent(warningEvent);
+                    }
 
                     monitorType.setStatus(0);
                     monitorItemType.setStatus(0);

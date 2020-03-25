@@ -1,10 +1,7 @@
 package com.copsec.monitor.web.utils;
 
-import com.copsec.monitor.web.beans.node.Status;
-import com.copsec.monitor.web.entity.DeviceNowStatus;
 import org.springframework.util.ObjectUtils;
 
-import java.text.DecimalFormat;
 import java.util.UUID;
 
 public class DeviceIdUtils {
@@ -36,19 +33,6 @@ public class DeviceIdUtils {
 
     public static String getUniqueId() {
         return UUID.randomUUID().toString().replace("-", "");
-    }
-
-    public static Status get(DeviceNowStatus status) {
-        DecimalFormat df = new DecimalFormat("#.00");
-        Status bean = new Status();
-        bean.setDeviceId(status.getDeviceId());
-//        bean.setCpuUseRate(status.getCpuUseRate() + Resources.PERCENTAGE);
-//        bean.setMemoryUseRate(df.format(status.getMemoryUseRate()) + Resources.PERCENTAGE);
-//        bean.setNetSpeed(FormatUtils.getFormatSpeedBS(status.getNetSpeed()));
-//        bean.setDeviceStatus(status.getDeviceStatus());
-        bean.setWarnMessage(status.getWarnMessage());
-
-        return bean;
     }
 
     private static int getHashValue(String name) {

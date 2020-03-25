@@ -1,6 +1,5 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import com.copsec.monitor.SpringContext;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
 import com.copsec.monitor.web.beans.node.Status;
@@ -10,6 +9,7 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -23,9 +23,9 @@ public class NetworkHandlerImpl extends ReportBaseHandler implements ReportHandl
 
     private static final Logger logger = LoggerFactory.getLogger(NetworkHandlerImpl.class);
 
-    private WarningService warningService = SpringContext.getBean(WarningService.class);
+//    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-    public Status handle(WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
 
         //基本信息
@@ -35,10 +35,16 @@ public class NetworkHandlerImpl extends ReportBaseHandler implements ReportHandl
         List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
         if (warningItemList.size() > 0) {
             warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                if (reportItem.getStatus() == 0) {
-                    warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                    warningEvent.setEventDetail("网络[" + reportItem.getItem() + "]" + reportItem.getResult());
-                    warningService.insertWarningEvent(warningEvent);
+//            warningItemList.forEach(warningItem -> {
+                if (!reportItem.getResult().toString().contains("正常")) {
+                    System.err.println(warningService.checkIsWarningByTime(reportItem.getMonitorId()));
+                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                        warningEvent.setEventDetail("网络[" + reportItem.getItem() + "]" + reportItem.getResult());
+
+                        warningEvent.setId(null);
+                        warningService.insertWarningEvent(warningEvent);
+                    }
 
                     monitorType.setStatus(0);
                     monitorItemType.setStatus(0);

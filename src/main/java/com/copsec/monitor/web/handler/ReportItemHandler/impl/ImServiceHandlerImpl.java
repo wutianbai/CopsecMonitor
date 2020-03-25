@@ -3,7 +3,6 @@ package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.copsec.monitor.SpringContext;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
 import com.copsec.monitor.web.beans.node.Status;
@@ -28,9 +27,9 @@ public class ImServiceHandlerImpl extends ReportBaseHandler implements ReportHan
 
     private static final Logger logger = LoggerFactory.getLogger(ImServiceHandlerImpl.class);
 
-    private WarningService warningService = SpringContext.getBean(WarningService.class);
+    //    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-    public Status handle(WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
         ConcurrentHashMap<String, Status> map = new ConcurrentHashMap<>();
 
@@ -47,10 +46,15 @@ public class ImServiceHandlerImpl extends ReportBaseHandler implements ReportHan
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (next.getString("message").equalsIgnoreCase("已停止")) {
-                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                        warningEvent.setEventDetail("IM进程[" + next.getString("processorName") + "]已停止");
-                        warningEvent.setId(null);
-                        warningService.insertWarningEvent(warningEvent);
+                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                            if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                                warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                                warningEvent.setEventDetail("IM进程[" + next.getString("processorName") + "]已停止");
+
+                                warningEvent.setId(null);
+                                warningService.insertWarningEvent(warningEvent);
+                            }
+                        }
 
                         monitorType.setStatus(0);
                         monitorItemType.setStatus(0);

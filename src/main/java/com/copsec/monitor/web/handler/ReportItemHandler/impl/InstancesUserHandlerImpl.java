@@ -2,7 +2,6 @@ package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.copsec.monitor.SpringContext;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
 import com.copsec.monitor.web.beans.node.Status;
@@ -25,9 +24,9 @@ public class InstancesUserHandlerImpl extends ReportBaseHandler implements Repor
 
     private static final Logger logger = LoggerFactory.getLogger(InstancesUserHandlerImpl.class);
 
-    private WarningService warningService = SpringContext.getBean(WarningService.class);
+    //    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-    public Status handle(WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
         JSONObject jSONObject = JSON.parseObject(reportItem.getResult().toString());
         //基本信息
@@ -38,10 +37,13 @@ public class InstancesUserHandlerImpl extends ReportBaseHandler implements Repor
         if (warningItemList.size() > 0) {
             warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                 if (Integer.parseInt(jSONObject.getString("status")) == 0) {
-                    warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                    warningEvent.setEventDetail("用户实例[" + reportItem.getItem() + "]" + jSONObject.getString("ports") + jSONObject.getString("message"));
-                    warningEvent.setId(null);
-                    warningService.insertWarningEvent(warningEvent);
+                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                        warningEvent.setEventDetail("用户实例[" + reportItem.getItem() + "]" + jSONObject.getString("ports") + jSONObject.getString("message"));
+
+                        warningEvent.setId(null);
+                        warningService.insertWarningEvent(warningEvent);
+                    }
 
                     monitorType.setStatus(0);
                     monitorItemType.setStatus(0);

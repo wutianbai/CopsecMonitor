@@ -1,5 +1,5 @@
 jQuery(function () {
-    var DEVICE_NORMARL = contextPath + "static/images/server/kebo/server-32n1.svg",
+    let DEVICE_NORMARL = contextPath + "static/images/server/kebo/server-32n1.svg",
         DEVICE_WARNING = contextPath + "static/images/server/kebo/server-32n1.svg",
         DEVICE_ERROR = contextPath + "/static/images/server/kebo/server-32e1.svg",
         START_MESSAGE = "信息未上报",
@@ -13,7 +13,7 @@ jQuery(function () {
         WARNING_COLOR = "#c4b500",
         RUNNING_COLOR = "rgb(0, 209, 255)";
 
-    var SWITCH_NORMAL = contextPath + "static/images/server/switch/switch-32-n1.svg",
+    let SWITCH_NORMAL = contextPath + "static/images/server/switch/switch-32-n1.svg",
         SWITCH_WARNING = contextPath + "static/images/server/switch/switch-32-n1.svg",
         SWITCH_ERROR = contextPath + "static/images/server/switch/switch-32-e1.svg",
         WIN_NORMAL = contextPath + "static/images/server/windows/win-32-n1.svg",
@@ -29,7 +29,7 @@ jQuery(function () {
         DX_WARNING = contextPath + "static/images/server/kebo/dx-32n.svg",
         DX_ERROR = contextPath + "static/images/server/kebo/dx-32e.svg";
 
-    var opts = {
+    let opts = {
         "closeButton": true,
         "debug": false,
         "positionClass": "toast-bottom-right",
@@ -44,7 +44,7 @@ jQuery(function () {
         "hideMethod": "fadeOut"
     };
 
-    var linkStyle = [
+    let linkStyle = [
         {
             selector: 'node[zone="no"][deviceType="kebo"]',
             style: {
@@ -384,7 +384,7 @@ jQuery(function () {
     /**
      * 初始化
      */
-    var cy = cytoscape({
+    let cy = cytoscape({
         container: document.getElementById('cy'),
         style: linkStyle,
         layout: {
@@ -406,7 +406,7 @@ jQuery(function () {
         this.v = v;
     }
 
-    var statusMap = new Array();
+    let statusMap = new Array();
     $.when($.ajax({
         url: contextPath + 'node/get',
         method: 'GET',
@@ -426,6 +426,11 @@ jQuery(function () {
             cy.nodes().each(function (ele) {
                 if (ele.data("zone") === "no") {
                     showStatus(ele, START_MESSAGE);
+
+                    //设备初始状态都标红
+                    // updateStatus(ele, ERROR_COLOR, _text);
+                    updateNode(ele, ERROR_STATUS);
+                    // updateEdeges(ele, "highlightedError");
                 }
             });
         } else {
@@ -437,7 +442,7 @@ jQuery(function () {
      * 连接选择样式设置
      */
     cy.on('click', 'edge', function (evt) {
-        var node = evt.target;
+        let node = evt.target;
         node.style("line-color", "#939002");
         node.style('target-arrow-color', '#939002');
     });
@@ -446,10 +451,10 @@ jQuery(function () {
      * 节点选择样式设置
      */
     cy.on('click', 'node', function (evt) {
-        var node = evt.target;
+        let node = evt.target;
         node.style("border-color", "#939002");
         node.style("border-width", 3);
-        var tip = getDevicePopperById(evt.target.data('id'));
+        let tip = getDevicePopperById(evt.target.data('id'));
         if (tip && !tip.state.isShown) {
             tip.show();
         }
@@ -463,7 +468,7 @@ jQuery(function () {
     cy.on('unselect', 'node', function (evt) {
         evt.target.style("border-color", "#fff");
         evt.target.style("border-width", 0);
-        var tip = getDevicePopperById(evt.target.data('id'));
+        let tip = getDevicePopperById(evt.target.data('id'));
         if (tip) {
             if (tip.state.isShown) {
                 tip.hide();
@@ -471,12 +476,12 @@ jQuery(function () {
         }
     });
 
-    var p = new Object();
+    let p = new Object();
     cy.on('grabon', 'node', function (evt) {
-        var node = evt.target;
+        let node = evt.target;
         p.x = node.position("x");
         p.y = node.position("y");
-        var tip = getDevicePopperById(node.data('id'));
+        let tip = getDevicePopperById(node.data('id'));
         if (tip) {
             if (tip.state.isShown) {
                 tip.hide();
@@ -485,7 +490,7 @@ jQuery(function () {
     });
 
     cy.on('dragfreeon', 'node', function (evt) {
-        var node = evt.target;
+        let node = evt.target;
         if ((node.position("x") < 0 || node.position("x") > cy.width()) ||
             (node.position("y") < 0 || node.position("y") > cy.height())) {
 
@@ -511,10 +516,9 @@ jQuery(function () {
         $(this).data('select2').results.addClass('overflow-hidden').perfectScrollbar();
     });
 
-    var $zones = $("#zone");
-
+    let $zones = $("#zone");
     function reloadZone() {
-        var zones = getNetworkZone();
+        let zones = getNetworkZone();
         $zones.empty();
         $zones.append("<option value=''>无</option>");
         if (zones != null) {
@@ -532,11 +536,11 @@ jQuery(function () {
         reloadZone();
         clearCondition("deviceModal");//清空数据
 
-        var $confirmButton = $("<button class='btn btn-success'>保存</button>");
+        let $confirmButton = $("<button class='btn btn-success'>保存</button>");
         addButton("deviceModal", "添加设备", $confirmButton);
         $confirmButton.on('click', '', function () {
-            // var deviceId = Math.uuidFast(),
-            var deviceId = $("#deviceId").val(),
+            // let deviceId = Math.uuidFast(),
+            let deviceId = $("#deviceId").val(),
                 deviceHostname = $("#deviceHostname").val(),
                 deviceType = $("#deviceType").val(),
                 deviceIP = $("#deviceIP").val(),
@@ -619,7 +623,7 @@ jQuery(function () {
      * 更新设备
      */
     $("#editDevice").on('click', function () {
-        var node = getNode();
+        let node = getNode();
         if (!node) {
             return false;
         }
@@ -638,10 +642,10 @@ jQuery(function () {
         $("#monitorUserId").val(node.data('monitorUserId')).trigger('change');
         $zones.val(node.data('parent')).trigger('change');
 
-        var $updateButton = $("<button class='btn btn-success'>保存</button>");
+        let $updateButton = $("<button class='btn btn-success'>保存</button>");
         addButton("deviceModal", "更新设备", $updateButton);
         $updateButton.on('click', function () {
-            var deviceHostname = $("#deviceHostname").val(),
+            let deviceHostname = $("#deviceHostname").val(),
                 deviceType = $("#deviceType").val(),
                 deviceIP = $("#deviceIP").val(),
                 monitorUserId = $("#monitorUserId").val(),
@@ -714,7 +718,7 @@ jQuery(function () {
      * 删除设备
      */
     $("#deleteDevice").on('click', function () {
-        var node = getNode();
+        let node = getNode();
         if (!node && !node.isChild()) {
             return false;
         }
@@ -724,8 +728,8 @@ jQuery(function () {
             return false;
         }
 
-        var $confirmButton = $("<button class='btn btn-success'>确认</button>");
-        var $message = $('<h2 style="text-align: center">确认删除设备[' + node.data('deviceHostname') + ']？</h2>');
+        let $confirmButton = $("<button class='btn btn-success'>确认</button>");
+        let $message = $('<h2 style="text-align: center">确认删除设备[' + node.data('deviceHostname') + ']？</h2>');
         $("#message").find(".modal-body").html($message);
         addButton("message", "系统提示", $confirmButton);
         $confirmButton.on('click', function () {
@@ -740,7 +744,7 @@ jQuery(function () {
                     if (data.code === 200) {
                         toastr.info("删除设备成功");
                         cy.remove(node);
-                        var s = getDevicePopperById(node.data('id'));
+                        let s = getDevicePopperById(node.data('id'));
                         s.destroy();
                     } else {
                         toastr.error("删除设备失败");
@@ -752,7 +756,7 @@ jQuery(function () {
         });
     });
 
-    var $start = $("#linkStart"),
+    let $start = $("#linkStart"),
         $end = $("#linkEnd"),
         $linkStyle = $("#linkStyle");
     /**
@@ -766,7 +770,7 @@ jQuery(function () {
 
         addData($start, $end, true, null);
 
-        var $confirmButton = $("<button class='btn btn-success'>保存</button>");
+        let $confirmButton = $("<button class='btn btn-success'>保存</button>");
         addButton("linkModal", "添加连接", $confirmButton);
         $confirmButton.on("click", function () {
             if (isEmpty($start.val())) {
@@ -811,7 +815,7 @@ jQuery(function () {
      * 更新连接
      */
     $("#editLink").on('click', function () {
-        var node = getNode();
+        let node = getNode();
         if (!node) {
             return false;
         }
@@ -824,7 +828,7 @@ jQuery(function () {
         addData($start, $end, false, node);
         $("#linkStyle").val(node.style('curve-style')).trigger('change');
 
-        var $confirmButton = $("<button class='btn btn-success'>保存</button>");
+        let $confirmButton = $("<button class='btn btn-success'>保存</button>");
         addButton("linkModal", "更新连接", $confirmButton);
         $confirmButton.on('click', function () {
             if (isEmpty($start.val())) {
@@ -871,7 +875,7 @@ jQuery(function () {
      * 删除连接
      */
     $("#deleteLink").on('click', function () {
-        var node = getNode();
+        let node = getNode();
         if (!node) {
             return false;
         }
@@ -881,8 +885,8 @@ jQuery(function () {
             return false;
         }
 
-        var $confirmButton = $("<button class='btn btn-success'>确认</button>");
-        var $message = $('<h2 style="text-align: center">确认删除此连接？</h2>');
+        let $confirmButton = $("<button class='btn btn-success'>确认</button>");
+        let $message = $('<h2 style="text-align: center">确认删除此连接？</h2>');
         $("#message").find(".modal-body").html($message);
         addButton("message", "系统提示", $confirmButton);
         $confirmButton.on('click', function () {
@@ -910,11 +914,11 @@ jQuery(function () {
      * 添加网络区域
      */
     $("#addZone").on('click', function () {
-        var $confirmButton = $("<button class='btn btn-success'>保存</button>");
+        let $confirmButton = $("<button class='btn btn-success'>保存</button>");
         $("#zoneModal").find("input[type=text]").val("");
         addButton("zoneModal", "添加网络区域", $confirmButton);
         $confirmButton.on('click', function () {
-            var zoneId = Math.uuidFast(),
+            let zoneId = Math.uuidFast(),
                 zoneName = $("#zoneName").val(),
                 zoneColor = $("#zoneColor").val();
             $("#zoneId").removeAttrs("disabled");
@@ -962,7 +966,7 @@ jQuery(function () {
      * 更新网络区域
      */
     $("#editZone").on('click', function () {
-        var node = getNode();
+        let node = getNode();
         if (!node) {
             return false;
         }
@@ -975,10 +979,10 @@ jQuery(function () {
         $("#zoneName").val(node.data("name"));
         $("#zoneColor").val(node.data("backgroundColor"));
 
-        var $confirmButton = $("<button class='btn btn-success'>保存</button>");
+        let $confirmButton = $("<button class='btn btn-success'>保存</button>");
         addButton("zoneModal", "更新网络区域", $confirmButton);
         $confirmButton.on('click', function () {
-            var zoneName = $("#zoneName").val(),
+            let zoneName = $("#zoneName").val(),
                 zoneColor = $("#zoneColor").val();
 
             if (isEmpty(zoneName)) {
@@ -1019,7 +1023,7 @@ jQuery(function () {
      * 删除网络区域
      */
     $("#deleteZone").on('click', function () {
-        var node = getNode();
+        let node = getNode();
         if (!node) {
             return false;
         }
@@ -1034,8 +1038,8 @@ jQuery(function () {
             return false;
         }
 
-        var $confirmButton = $("<button class='btn btn-success'>确认</button>");
-        var $message = $('<h2 style="text-align: center">确认删除网络区域[' + node.data('name') + ']？</h2>');
+        let $confirmButton = $("<button class='btn btn-success'>确认</button>");
+        let $message = $('<h2 style="text-align: center">确认删除网络区域[' + node.data('name') + ']？</h2>');
         $("#message").find(".modal-body").html($message);
         addButton("message", "系统提示", $confirmButton);
         $confirmButton.on('click', function () {
@@ -1049,7 +1053,7 @@ jQuery(function () {
                 success: function (data) {
                     if (data.code === 200) {
                         toastr.info("删除网络区域成功");
-                        var s = getDevicePopperById(node.data('id'));
+                        let s = getDevicePopperById(node.data('id'));
                         cy.remove(node);
                         if (null != s && s) {
                             s.destroy();
@@ -1067,9 +1071,9 @@ jQuery(function () {
      * 更新拓扑结构
      */
     $("#topologyUpdate").on('click', function () {
-        var positions = new Array();
+        let positions = new Array();
         cy.nodes().forEach(function (e, i) {
-            var position = new Object();
+            let position = new Object();
             position.id = e.data("id");
             position.x = e.position("x");
             position.y = e.position("y");
@@ -1102,7 +1106,7 @@ jQuery(function () {
      * @returns {*}
      */
     function getNetworkZone() {
-        var zones;
+        let zones;
         $.ajax({
             url: contextPath + "node/zone/get",
             method: 'GET',
@@ -1123,7 +1127,7 @@ jQuery(function () {
     }
 
     function getNode() {
-        var node = cy.$(":selected");
+        let node = cy.$(":selected");
         if (node.length === 0) {
             toastr.error("请选择节点", opts);
             return false;
@@ -1171,9 +1175,9 @@ jQuery(function () {
     *
     * */
     function showStatus(node, text) {
-        var tip = tippy(node.popperRef(), {
+        let tip = tippy(node.popperRef(), {
             content: function () {
-                var div = document.createElement('div');
+                let div = document.createElement('div');
                 div.innerHTML = text;
                 return div;
             },
@@ -1190,34 +1194,36 @@ jQuery(function () {
         tip.hide();
     }
 
-    // function getDeviceStatus() {
-    var getStatus = function getDeviceStatus() {
+    function getDeviceStatus() {
         $.ajax({
             url: contextPath + 'node/status/' + $.now(),
             method: 'GET',
             dataType: 'json',
             success: function (data) {
                 if (data.code === 200) {
-                    var m = data.data;//statusMap
-                    for (var k in m) {
-                        var v = m[k];//deviceStatusBean
-                        var _text = "";
+                    let m = data.data;//statusMap
+                    for (let k in m) {
+                        let v = m[k];//deviceStatusBean
+                        let _text = "";
                         _text = getStatusText(v);
                         if (v.status === ERROR_STATUS) {
                             if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
                                 toastr.error(cy.$id(k).data('deviceHostname') + " 设备状态异常!", "系统提示", opts);
-                                updateStatus(cy.$id(k), WARNING_COLOR, _text);
-                                updateNode(cy.$id(k), WARNING_STATUS);
+                                // updateStatus(cy.$id(k), WARNING_COLOR, _text);
+                                // updateNode(cy.$id(k), WARNING_STATUS);
+                                // updateEdeges(cy.$id(k), "highlightedError");
+                                updateStatus(cy.$id(k), ERROR_COLOR, _text);
+                                updateNode(cy.$id(k), ERROR_STATUS);
                                 updateEdeges(cy.$id(k), "highlightedError");
                             }
                         } else if (v.status === WARNING_STATUS) {
                             if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
                                 toastr.error(cy.$id(k).data('deviceHostname') + " 设备上报超时!", "系统提示", opts);
-                                updateStatus(cy.$id(k), ERROR_COLOR, _text);
-                                updateNode(cy.$id(k), ERROR_STATUS);
+                                updateStatus(cy.$id(k), WARNING_COLOR, _text);
+                                updateNode(cy.$id(k), WARNING_STATUS);
                                 updateEdeges(cy.$id(k), "highlightedWarning");
                             }
-                        } else {
+                        } else if (v.status === NORMAL_STATUS){
                             updateStatus(cy.$id(k), NORMAL_COLOR, _text);
                             updateNode(cy.$id(k), NORMAL_STATUS);
                             updateEdeges(cy.$id(k), "highlightedIn");
@@ -1229,10 +1235,9 @@ jQuery(function () {
                 toastr.error("请求错误或超时");
             }
         });
-    };
-    setInterval(getStatus, 5000);
-
-    // getDeviceStatus();
+    }
+    getDeviceStatus();
+    setInterval(getDeviceStatus, 5000);
 
     function getStatusText(status) {
         let str = '<div><table class="table table-condensed">';
@@ -1362,13 +1367,13 @@ jQuery(function () {
         });
     }
 
-    var movePoint = function test() {
+    function movePoint() {
         cy.edges().each(function (e, index) {
-            var sourcePosition = e.sourceEndpoint();
-            var targetPosition = e.targetEndpoint();
+            let sourcePosition = e.sourceEndpoint();
+            let targetPosition = e.targetEndpoint();
 
-            var eNode;
-            var id = e.data("id") + index;
+            let eNode;
+            let id = e.data("id") + index;
             if (cy.$("#" + id).group() !== "nodes" && e.hasClass("highlightedError")) {
                 eNode = {
                     group: 'nodes',
@@ -1406,7 +1411,8 @@ jQuery(function () {
                     }
                 });
         });
-    };
+    }
+    movePoint();
     setInterval(movePoint, 3000);
 });
 
@@ -1551,12 +1557,11 @@ function addThree(str, index, value) {
     return str;
 }
 
-// function showTable(str, message) {
 function showTable(message) {
     let body = '<div class="main-content"><div class="panel panel-default"><div class="panel-body">';
-    if (message.deviceId == "实例状态") {
-        body += '<table class="table table-bordered table-striped">';
-    }
+    // if (message.deviceId === "实例状态") {
+    //     body += '<table class="table table-bordered table-striped">';
+    // }
 
     if (!isEmpty(message.message)) {
         $.each(message.message, function (index, value) {
@@ -1590,16 +1595,20 @@ function showTable(message) {
                     s += addApplication(s, index, value);
                     break;
                 case "INSTANCES_WEB70":
-                    s += addInstances(s, index, value);
+                    s += addOne(s, index, value);
+                    // s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_WEBPROXY40":
-                    s += addInstances(s, index, value);
+                    s += addOne(s, index, value);
+                    // s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_CONFIG":
-                    s += addInstances(s, index, value);
+                    s += addOne(s, index, value);
+                    // s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_USER":
-                    s += addInstances(s, index, value);
+                    s += addOne(s, index, value);
+                    // s += addInstances(s, index, value);
                     break;
                 case "NETWORK":
                     s += addOne(s, index, value);
@@ -1622,10 +1631,10 @@ function showTable(message) {
             }
             body += s;
         });
-        body += '</div></div></div>';
-        if (message.deviceId == "实例状态") {
-            body += '</table>';
-        }
     }
+    // if (message.deviceId === "实例状态") {
+    //     body += '</table>';
+    // }
+    body += '</div></div></div>';
     return body;
 }

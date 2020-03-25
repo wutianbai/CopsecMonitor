@@ -1,6 +1,7 @@
 package com.copsec.monitor.web.fileReaders;
 
 import com.alibaba.fastjson.JSON;
+import com.copsec.monitor.web.beans.monitor.LogConfig;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorTypeEnum;
 import com.copsec.monitor.web.beans.monitor.MonitorItemBean;
@@ -31,7 +32,14 @@ public class MonitorItemReader extends BaseFileReader<MonitorItemBean> {
                         bean.setMonitorItemType(MonitorItemEnum.valueOf(dataList[2]));
                         bean.setMonitorType(MonitorTypeEnum.valueOf(dataList[3]));
                         if (CommonUtils.isJSONValid(dataList[4]) && !"".equals(dataList[4])) {
-                            bean.setItem(JSON.parseObject(dataList[4], CertConfig.class));
+                            CertConfig certConfig = JSON.parseObject(dataList[4], CertConfig.class);
+                            LogConfig logConfig = JSON.parseObject(dataList[4], LogConfig.class);
+                            if (ObjectUtils.isEmpty(certConfig) || "".equals(certConfig.getInstanceName())) {
+                                bean.setItem(logConfig);
+                            } else {
+                                bean.setItem(certConfig);
+                            }
+//                            bean.setItem(JSON.parseObject(dataList[4], CertConfig.class));
                         } else {
                             bean.setItem(dataList[4]);
                         }

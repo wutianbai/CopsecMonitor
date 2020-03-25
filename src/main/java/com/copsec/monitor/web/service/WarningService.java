@@ -29,6 +29,8 @@ public interface WarningService {
 
     void insertWarningEvent(WarningEvent bean);
 
+    boolean checkIsWarningByTime(String id);
+
     boolean deleteWarningEvent(WarningEvent bean);
 
     Page<WarningHistoryBean> searchWarningHistory(UserBean userInfo, String ip, Pageable pageable, WarningHistoryBean condition);

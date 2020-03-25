@@ -221,15 +221,30 @@ public class DateUtils {
     }
 
     /**
-     * 获取当前日期指定天数之前的日期.
+     * 获取指定时间指定小时之前的时间.
+     *
+     * @param d
+     * @param hour
+     * @return
+     */
+    public static Date beforeHour(Date d, int hour) {
+        Calendar now = Calendar.getInstance();
+        now.setTime(d);
+        now.set(Calendar.HOUR_OF_DAY, now.get(Calendar.HOUR_OF_DAY) - hour);
+        return now.getTime();
+    }
+
+    /**
+     * 获取指定日期天数之前的日期.
+     *
      * @param d
      * @param day
      * @return
      */
-    public static Date beforeDay(Date d,int day){
-        Calendar now =Calendar.getInstance();
+    public static Date beforeDay(Date d, int day) {
+        Calendar now = Calendar.getInstance();
         now.setTime(d);
-        now.set(Calendar.DATE,now.get(Calendar.DATE)-day);
+        now.set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH) - day);
         return now.getTime();
     }
 

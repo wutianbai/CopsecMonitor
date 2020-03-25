@@ -19,7 +19,7 @@ public class WarningEvent {
 
 	@Id
 	private ObjectId id;
-//	private String eventId;
+	private String monitorId;
     private MonitorItemEnum eventSource;
     private Date eventTime;
     private String eventDetail;

@@ -4,6 +4,7 @@ import com.copsec.monitor.SpringContext;
 import com.copsec.monitor.web.entity.CacheEntity;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.service.DeviceService;
+import com.copsec.monitor.web.service.WarningService;
 import com.copsec.monitor.web.utils.LocalCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,8 @@ public class ReceiveWarningEventThread extends ReportBaseHandler implements Runn
     private static int MONITOR_DURATION = 1;
 
     private DeviceService deviceService = SpringContext.getBean(DeviceService.class);
+
+    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
     @Override
 //    public void run(String... args) throws Exception {
@@ -76,10 +79,28 @@ public class ReceiveWarningEventThread extends ReportBaseHandler implements Runn
 //
 ////                Multimap<String, Status> monitorTypeMap = LinkedHashMultimap.create();
 //                ConcurrentHashMap<String, Status> monitorTypeMap = MonitorTypePools.getInstances().getMap();
+////                ConcurrentHashMap<String, List<Status>> monitorItemListMap = MonitorItemListPools.getInstances().getMap();
+////                for (MonitorItemEnum i : MonitorItemEnum.values()) {
+////                    List<Status> list = new ArrayList<>();
+////                    newMonitorItemListMap.putIfAbsent(i.name(), list);
+////                }
+////
+////                for (MonitorTypeEnum e : MonitorTypeEnum.values()) {
+////                    Status status = new Status();
+////                    status.setMessage(newMonitorItemListMap);
+////                    monitorTypeMap.put(e.name(),status);
+////                }
+//
 //                List<ReportItem> reportItems = report.getReportItems();//获取上报项
 //                if (!ObjectUtils.isEmpty(reportItems)) {
 //                    reportItems.parallelStream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(reportItem -> {
-//                        final Status monitorType = monitorTypeMap.get(reportItem.getMonitorType().name());//主类型
+////                        Status monitorType = monitorTypeMap.get(reportItem.getMonitorType().name());//主类型
+//                        Status monitorType = MonitorTypePools.getInstances().get(reportItem.getMonitorType().name());//主类型
+//                        if (ObjectUtils.isEmpty(monitorType)) {
+//                            monitorType = new Status();
+////                            monitorTypeMap.putIfAbsent(reportItem.getMonitorType().name(), monitorType);
+//                            MonitorTypePools.getInstances().add(reportItem.getMonitorType().name(), monitorType);
+//                        }
 //
 ////                        String title = monitorType.getWarnMessage();//标题
 ////                        if (ObjectUtils.isEmpty(title)) {
@@ -87,11 +108,18 @@ public class ReceiveWarningEventThread extends ReportBaseHandler implements Runn
 ////                        }
 ////                        title += "[" + reportItem.getMonitorItemType().name() + "]";
 //
+////                        final ConcurrentHashMap<String, List<Status>> monitorItemListMap = (ConcurrentHashMap<String, List<Status>>) monitorType.getMessage();
 //                        ConcurrentHashMap<String, List<Status>> monitorItemListMap = (ConcurrentHashMap<String, List<Status>>) monitorType.getMessage();
 //                        if (ObjectUtils.isEmpty(monitorItemListMap)) {
 //                            monitorItemListMap = MonitorItemListPools.getInstances().getMap();
+//                            monitorType.setMessage(monitorItemListMap);
 //                        }
-//                        final List<Status> monitorItemList = monitorItemListMap.get(reportItem.getMonitorItemType().name());//子状态类型
+//
+//                        List<Status> monitorItemList = monitorItemListMap.get(reportItem.getMonitorItemType().name());//子状态类型
+//                        if (ObjectUtils.isEmpty(monitorItemList)) {
+//                            monitorItemList = new ArrayList<>();
+//                            monitorItemListMap.putIfAbsent(reportItem.getMonitorItemType().name(), monitorItemList);
+//                        }
 //
 //                        final WarningEvent warningEvent = new WarningEvent();
 //                        warningEvent.setEventSource(reportItem.getMonitorItemType());
@@ -104,11 +132,16 @@ public class ReceiveWarningEventThread extends ReportBaseHandler implements Runn
 //                        warningEvent.setUserMobile(userInfo.getMobile());
 //
 //                        if (reportItem.getStatus() == 0) {//获取信息失败告警
-//                            baseHandle(reportItem, warningEvent);
+////                        baseHandle(reportItem, warningEvent);
+////                            if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+//                                warningEvent.setId(new ObjectId(reportItem.getMonitorId()));
+//                                warningEvent.setEventDetail(reportItem.getItem() + "[" + reportItem.getResult().toString() + "]");
+//                                warningService.insertWarningEvent(warningEvent);
+////                            }
 //                        } else {
 //                            Optional<ReportHandler> optional = ReportHandlerPools.getInstance().getHandler(reportItem.getMonitorItemType());
 //                            if (optional.isPresent()) {
-//                                Status status = optional.get().handle(warningEvent, reportItem, monitorType);
+//                                Status status = optional.get().handle(warningService, warningEvent, reportItem, monitorType);
 //                                monitorItemList.add(status);
 //                            }
 //                        }
@@ -116,10 +149,11 @@ public class ReceiveWarningEventThread extends ReportBaseHandler implements Runn
 //                        //根据监控类型更新
 //                        monitorType.setDeviceId(reportItem.getMonitorType().getName() + "状态");
 ////                        monitorType.setWarnMessage(title);
-//                        monitorItemListMap.put(reportItem.getMonitorItemType().name(), monitorItemList);
+//                        monitorItemListMap.replace(reportItem.getMonitorItemType().name(), monitorItemList);
 //                        monitorType.setMessage(monitorItemListMap);
 //
-//                        monitorTypeMap.put(reportItem.getMonitorType().name(), monitorType);
+////                        monitorTypeMap.put(reportItem.getMonitorType().name(), monitorType);
+//                        MonitorTypePools.getInstances().update(reportItem.getMonitorType().name(), monitorType);
 //                    });
 //                }
 //                DeviceStatusPools.getInstances().update(report.getDeviceId(), monitorTypeMap);//更新设备状态缓存池

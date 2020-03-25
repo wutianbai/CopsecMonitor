@@ -74,9 +74,9 @@ function getWarningStatus() {
 }
 
 function setScrollbar(data) {
-    var s = "";
+    let s = "";
     $.each(data, function (index, value) {
-        var str;
+        let str;
         switch (value.eventType) {
             case "非告警":
                 str = '<li class="active notification-info">';
@@ -90,7 +90,7 @@ function setScrollbar(data) {
             default:
                 str = '<li class="active notification-success">';
         }
-        str += '<a href="#">';
+        str += '<a href="' + contextPath + 'system/warningEvent">';
         switch (value.eventSource) {
             case "中央处理机":
                 str += '<i class="fa fa-sitemap"></i>';

@@ -1,6 +1,6 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import com.copsec.monitor.SpringContext;
+import com.alibaba.fastjson.JSON;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
 import com.copsec.monitor.web.beans.node.Status;
@@ -25,15 +25,15 @@ public class Cert70HandlerImpl extends ReportBaseHandler implements ReportHandle
 
     private static final Logger logger = LoggerFactory.getLogger(Cert70HandlerImpl.class);
 
-    private WarningService warningService = SpringContext.getBean(WarningService.class);
+    //    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-    public Status handle(WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
         ConcurrentHashMap<String, Status> CERT70Map = new ConcurrentHashMap<>();
 
         List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
 
-        List<CertInfoBean> list = (List<CertInfoBean>) reportItem.getResult();
+        List<CertInfoBean> list = JSON.parseArray(reportItem.getResult().toString(), CertInfoBean.class);
         list.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(certInfo -> {
             Status statusBean = new Status();
 
@@ -44,10 +44,13 @@ public class Cert70HandlerImpl extends ReportBaseHandler implements ReportHandle
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (certInfo.getStatus() == 0) {
-                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                        warningEvent.setEventDetail("证书70[" + certInfo.getNickname() + "]异常[" + certInfo.getMessage() + "]");
-                        warningEvent.setId(null);
-                        warningService.insertWarningEvent(warningEvent);
+                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                            warningEvent.setEventDetail("证书70[" + certInfo.getNickname() + "]异常[" + certInfo.getMessage() + "]");
+
+                            warningEvent.setId(null);
+                            warningService.insertWarningEvent(warningEvent);
+                        }
 
                         monitorType.setStatus(0);
                         monitorItemType.setStatus(0);

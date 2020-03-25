@@ -1,6 +1,5 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
-import com.copsec.monitor.SpringContext;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
 import com.copsec.monitor.web.beans.node.Status;
@@ -23,9 +22,9 @@ public class ApplicationHandlerImpl extends ReportBaseHandler implements ReportH
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationHandlerImpl.class);
 
-    private WarningService warningService = SpringContext.getBean(WarningService.class);
+//    private WarningService warningService = SpringContext.getBean(WarningService.class);
 
-    public Status handle(WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
 
         //基本信息
@@ -35,10 +34,14 @@ public class ApplicationHandlerImpl extends ReportBaseHandler implements ReportH
         List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
         if (warningItemList.size() > 0) {
             warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                if (reportItem.getStatus() == 0) {
-                    warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                    warningEvent.setEventDetail("通道[" + reportItem.getItem() + "]" + reportItem.getResult().toString());
-                    warningService.insertWarningEvent(warningEvent);
+                if ((Integer) (reportItem.getResult()) == 0) {
+                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                        warningEvent.setEventDetail("通道[" + reportItem.getItem() + "]" + reportItem.getResult().toString());
+
+                        warningEvent.setId(null);
+                        warningService.insertWarningEvent(warningEvent);
+                    }
 
                     monitorType.setStatus(0);
                     monitorItemType.setStatus(0);

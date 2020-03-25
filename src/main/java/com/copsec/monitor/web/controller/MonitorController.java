@@ -2,17 +2,13 @@ package com.copsec.monitor.web.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.copsec.monitor.web.beans.UserBean;
-import com.copsec.monitor.web.beans.monitor.*;
+import com.copsec.monitor.web.beans.monitor.MonitorGroupBean;
+import com.copsec.monitor.web.beans.monitor.MonitorItemBean;
+import com.copsec.monitor.web.beans.monitor.MonitorTaskBean;
+import com.copsec.monitor.web.beans.monitor.WarningItemBean;
 import com.copsec.monitor.web.commons.CopsecResult;
 import com.copsec.monitor.web.config.SystemConfig;
-import com.copsec.monitor.web.exception.CopsecException;
-import com.copsec.monitor.web.fileReaders.CommonFileReader;
-import com.copsec.monitor.web.fileReaders.SystemStatusReader;
-import com.copsec.monitor.web.fileReaders.fileReaderEnum.NetworkType;
-import com.copsec.monitor.web.pools.CommonPools;
-import com.copsec.monitor.web.pools.TaskNamePools;
 import com.copsec.monitor.web.service.MonitorService;
-import com.copsec.monitor.web.utils.commandUtils.CommandProcessUtils;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,99 +30,12 @@ public class MonitorController {
     private SystemConfig config;
 
     @Autowired
-    private SystemStatusReader reader;
-
-    @Autowired
-    private CommonFileReader commonFileReader;
-
-    @Autowired
     private MonitorService monitorService;
 
     @GetMapping(value = {"/{pageId}"})
     public String toPage(@SessionAttribute UserBean userInfo, @PathVariable("pageId") String pageId) {
 
         return "monitor/" + pageId;
-    }
-
-    @GetMapping("/service/get")
-    @ResponseBody
-    public CopsecResult getService(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        List<ServiceStateBean> list = CommandProcessUtils.getUtil().parseProcessList();
-        return CopsecResult.success(list);
-    }
-
-    @GetMapping("/system/get")
-    @ResponseBody
-    public CopsecResult getSystemInfo(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
-
-        String filePath = config.getSystemStatusPath();
-        try {
-            reader.getData(filePath, NetworkType.SYSTEM);
-        } catch (CopsecException e) {
-            logger.error(e.getMessage(), e);
-            return CopsecResult.failed("获取系统信息异常");
-        }
-        return CopsecResult.success(CommonPools.getInstances().getNetowkConfig(NetworkType.SYSTEM));
-    }
-
-    @GetMapping("/device/get")
-    @ResponseBody
-    public CopsecResult getDeviceInfo(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
-
-        String filePath = config.getInterfacePath4Msg();
-        List<DeviceStateBean> list = CommandProcessUtils.getUtil().getEthList(filePath);
-
-        return CopsecResult.success(list);
-    }
-
-    @GetMapping("/address/get")
-    @ResponseBody
-    public CopsecResult getAddressInfo(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
-
-        String filePath = config.getInterfacePath4Msg();
-        List<AddressInfoBean> list = CommandProcessUtils.getUtil().getAddressList(filePath);
-        return CopsecResult.success(list);
-    }
-
-    @GetMapping("/taskNames/get")
-    @ResponseBody
-    public CopsecResult getAllTaskNames(@SessionAttribute UserBean userInfo) {
-
-        return CopsecResult.success(TaskNamePools.getInstances().getMap());
-    }
-
-    @PostMapping("/taskNames/add")
-    @ResponseBody
-    public CopsecResult updateTaskNames(@SessionAttribute UserBean userInfo, String task, String name) {
-
-        TaskNamePools.getInstances().update(task, name);
-        String filePath = config.getBasePath() + config.getTaskNamesPath();
-        try {
-
-            commonFileReader.writeDate(TaskNamePools.getInstances().getAll(), filePath);
-        } catch (CopsecException e) {
-
-            TaskNamePools.getInstances().deleteTaskName(task);
-            return CopsecResult.failed("添加失败，请稍后重试");
-        }
-        return CopsecResult.success("添加成功");
-    }
-
-    @PostMapping("/taskNames/delete")
-    @ResponseBody
-    public CopsecResult deleteTaskNames(@SessionAttribute UserBean userInfo, String task) {
-
-        TaskNamePools.getInstances().deleteTaskName(task);
-        String filePath = config.getBasePath() + config.getTaskNamesPath();
-        try {
-
-            commonFileReader.writeDate(TaskNamePools.getInstances().getAll(), filePath);
-        } catch (CopsecException e) {
-
-            TaskNamePools.getInstances().deleteTaskName(task);
-            return CopsecResult.failed("删除失败，请稍后重试");
-        }
-        return CopsecResult.success("删除成功");
     }
 
     @PostMapping("/monitorItem/get")

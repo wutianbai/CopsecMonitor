@@ -65,7 +65,7 @@ function page(id, url, newId) {
                         "mData": "monitorId",//读取数组的对象中的id属性
                         "sTitle": "序号",//表头
                         "sClass": "text-center",
-                        "width": "10%",
+                        "width": "5%",
                         "mRender": function (d, type, full, meta) {//如果需要显示的内容需根据数据封装加工的就写这个属性，0
                             //回调中有4个参数，d：对应mData中的属性的值；type：对应值的类型；full：对应当前这一行的数据，meta对应dataTable的配置
                             //如果不清楚可以使用console.log();打印出来看看
@@ -104,10 +104,12 @@ function page(id, url, newId) {
                         "mRender": function (d, type, full, meta) {
                             let str = '';
                             if (!isEmpty(d)) {
-                                if (typeof d.instanceName == "undefined") {
-                                    str = d;
-                                } else {
+                                if (!isEmpty(d.instanceName) && d.instanceName !== "") {
                                     str = "路径[" + d.instanceName + "]" + "名称[" + d.nickname + "]";
+                                } else if (!isEmpty(d.logPath) && d.logPath !== "") {
+                                    str = "路径[" + d.logPath + "]" + "阈值[" + d.threadHold + "]";
+                                } else {
+                                    str = d;
                                 }
                             }
                             return str;
@@ -154,26 +156,41 @@ jQuery(function () {
     });
 });
 
-function isCert() {
-    if ($('#isCert').prop('checked')) {
-        $('#itemRow').css("display", 'none');
-        $('#certRow').css("display", 'block');
-        $("#item").val("")
-    } else {
-        $('#itemRow').css("display", 'block');
-        $('#certRow').css("display", 'none');
-        $("#instanceName").val("");
-        $("#nickname").val("");
-    }
-}
+// function isCert() {
+//     if ($('#isCert').prop('checked')) {
+//
+//     } else {
+//
+//     }
+// }
 
 function changeItemLabel() {
-    $("#itemLabel").html("");
     let m = $("#monitorItemType").val();
     if (m === "CERT70" || m === "CERT40") {
-        $("#itemLabel").html("监控数据");
+        $("#itemLabel").text("监控数据");
+        $('#itemRow').css("display", 'none');
+        $('#certRow').css("display", 'block');
+        $('#logRow').css("display", 'none');
+        $("#item").val("")
+        $("#logPath").val("");
+        $("#threadHold").val("");
+    } else if (m === "ACCESSLOG" || m === "PROXYLOG") {
+        $("#itemLabel").text("监控数据");
+        $('#itemRow').css("display", 'none');
+        $('#certRow').css("display", 'none');
+        $('#logRow').css("display", 'block');
+        $("#item").val("")
+        $("#instanceName").val("");
+        $("#nickname").val("");
     } else {
-        $("#itemLabel").html("监控数据(" + monitorItemType[m] + ")");
+        $("#itemLabel").text("监控数据(" + monitorItemType[m] + ")");
+        $('#itemRow').css("display", 'block');
+        $('#certRow').css("display", 'none');
+        $('#logRow').css("display", 'none');
+        $("#instanceName").val("");
+        $("#nickname").val("");
+        $("#logPath").val("");
+        $("#threadHold").val("");
     }
 }
 
@@ -184,8 +201,9 @@ function addData() {
     //清空数据
     let $modal = $("#monitorItemModal").find(".modal-body");
     $modal.find('input').removeAttr('disabled').val('');
-    $("#isCert").prop("checked", false);
-    isCert();
+    // $("#isCert").prop("checked", false);
+    // isCert();
+    changeItemLabel();
 
     let $confirmButton = $("<button class='btn btn-success'>保存</button>");
     addButton("monitorItemModal", "添加监控项", $confirmButton);
@@ -197,7 +215,9 @@ function addData() {
             // monitorType = $("#monitorType").val(),
             item = $("#item").val(),
             instanceName = $("#instanceName").val(),
-            nickname = $("#nickname").val();
+            nickname = $("#nickname").val(),
+            logPath = $("#logPath").val(),
+            threadHold = $("#threadHold").val();
 
         if (isEmpty(monitorName)) {
             toastr.error("请输入监控项名称");
@@ -221,12 +241,39 @@ function addData() {
         //     }
         // }
 
-        // if (!isEmpty(instanceName)) {
-        //     if (!isLinuxPath(instanceName)) {
-        //         toastr.error("请填写正确的路径");
-        //         return false;
-        //     }
-        // }
+        if (monitorItemType === "CERT70" || monitorItemType === "CERT40") {
+            // if (!isEmpty(instanceName)) {
+            //     if (!isLinuxPath(instanceName)) {
+            //         toastr.error("请填写正确的路径");
+            //         return false;
+            //     }
+            // }
+            if (isEmpty(instanceName)) {
+                toastr.error("请输入证书路径");
+                return false;
+            }
+
+            if (isEmpty(nickname)) {
+                toastr.error("请输入证书名称");
+                return false;
+            }
+        } else if (monitorItemType === "ACCESSLOG" || monitorItemType === "PROXYLOG") {
+            // if (!isEmpty(logPath)) {
+            //     if (!isLinuxPath(logPath)) {
+            //         toastr.error("请填写正确的路径");
+            //         return false;
+            //     }
+            // }
+            if (isEmpty(logPath)) {
+                toastr.error("请输入日志路径");
+                return false;
+            }
+
+            if (isEmpty(threadHold)) {
+                toastr.error("请输入日志阈值");
+                return false;
+            }
+        }
 
         $.ajax({
             url: contextPath + 'monitor/monitorItem/add',
@@ -237,7 +284,9 @@ function addData() {
                 // 'monitorType': "SYSTEM",
                 'item': item,
                 'certConfig.instanceName': instanceName,
-                'certConfig.nickname': nickname
+                'certConfig.nickname': nickname,
+                'logConfig.logPath': logPath,
+                'logConfig.threadHold': threadHold
             },
             method: 'POST',
             dataType: "json",
@@ -263,15 +312,19 @@ function updateData(bean) {
     $("#monitorItemType").val(bean.monitorItemType).trigger("change");
     // $("#monitorType").val(bean.monitorType).trigger("change");
 
-    if (isEmpty(bean.item.instanceName)) {
-        $("#isCert").prop("checked", false);
-        $("#item").val(bean.item);
-    } else {
+    if (!isEmpty(bean.item.instanceName)) {
+        // $("#isCert").prop("checked", false);
         $("#instanceName").val(bean.item.instanceName);
         $("#nickname").val(bean.item.nickname);
-        $("#isCert").prop("checked", true);
     }
-    isCert();
+    if (!isEmpty(bean.item.logPath)) {
+        $("#logPath").val(bean.item.logPath);
+        $("#threadHold").val(bean.item.threadHold);
+    } else {
+        $("#item").val(bean.item);
+        // $("#isCert").prop("checked", true);
+    }
+    // isCert();
 
     let $confirmButton = $("<button class='btn btn-success'>保存</button>");
     addButton("monitorItemModal", "更新监控项", $confirmButton);
@@ -282,7 +335,9 @@ function updateData(bean) {
             // monitorType = $("#monitorType").val(),
             item = $("#item").val(),
             instanceName = $("#instanceName").val(),
-            nickname = $("#nickname").val();
+            nickname = $("#nickname").val(),
+            logPath = $("#logPath").val(),
+            threadHold = $("#threadHold").val();
 
         if (isEmpty(monitorName)) {
             toastr.error("请输入监控项名称");
@@ -306,12 +361,39 @@ function updateData(bean) {
         //     }
         // }
 
-        // if (!isEmpty(instanceName)) {
-        //     if (!isLinuxPath(instanceName)) {
-        //         toastr.error("请填写正确的路径");
-        //         return false;
-        //     }
-        // }
+        if (monitorItemType === "CERT70" || monitorItemType === "CERT40") {
+            // if (!isEmpty(instanceName)) {
+            //     if (!isLinuxPath(instanceName)) {
+            //         toastr.error("请填写正确的路径");
+            //         return false;
+            //     }
+            // }
+            if (isEmpty(instanceName)) {
+                toastr.error("请输入证书路径");
+                return false;
+            }
+
+            if (isEmpty(nickname)) {
+                toastr.error("请输入证书名称");
+                return false;
+            }
+        } else if (monitorItemType === "ACCESSLOG" || monitorItemType === "PROXYLOG") {
+            // if (!isEmpty(logPath)) {
+            //     if (!isLinuxPath(logPath)) {
+            //         toastr.error("请填写正确的路径");
+            //         return false;
+            //     }
+            // }
+            if (isEmpty(logPath)) {
+                toastr.error("请输入日志路径");
+                return false;
+            }
+
+            if (isEmpty(threadHold)) {
+                toastr.error("请输入日志阈值");
+                return false;
+            }
+        }
 
         $.ajax({
             url: contextPath + 'monitor/monitorItem/update',
@@ -322,7 +404,9 @@ function updateData(bean) {
                 // 'monitorType': "SYSTEM",
                 'item': item,
                 'certConfig.instanceName': instanceName,
-                'certConfig.nickname': nickname
+                'certConfig.nickname': nickname,
+                'logConfig.logPath': logPath,
+                'logConfig.threadHold': threadHold
             },
             method: 'POST',
             dataType: "json",

@@ -24,7 +24,7 @@ function page(id, url) {
             "mData": "eventId",//读取数组的对象中的id属性
             "sTitle": "序号",//表头
             "sClass": "text-center",
-            "width": "10%",//设置宽度,不设置的话就是自动分配
+            "width": "5%",//设置宽度,不设置的话就是自动分配
             "mRender": function (d, type, full, meta) {//如果需要显示的内容需根据数据封装加工的就写这个属性，0
                 //回调中有4个参数，d：对应mData中的属性的值；type：对应值的类型；full：对应当前这一行的数据，meta对应dataTable的配置
                 //如果不清楚可以使用console.log();打印出来看看

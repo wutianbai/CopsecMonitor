@@ -88,14 +88,20 @@
                         <%--</div>--%>
                     <%--</div>--%>
                 <%--</div>--%>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="control-label">是否为证书</label>
-                            <input type="checkbox" class="iswitch iswitch-success" id="isCert" onclick="isCert()">
-                        </div>
-                    </div>
-                </div>
+                <%--<div class="row">--%>
+                    <%--<div class="col-md-6">--%>
+                        <%--<div class="form-group">--%>
+                            <%--<label class="control-label">是否为证书</label>--%>
+                            <%--&lt;%&ndash;<input type="checkbox" class="iswitch iswitch-success" id="isCert" onclick="isCert()">&ndash;%&gt;--%>
+                        <%--</div>--%>
+                    <%--</div>--%>
+                    <%--<div class="col-md-6">--%>
+                        <%--<div class="form-group">--%>
+                            <%--<label class="control-label">是否为日志</label>--%>
+                            <%--<input type="checkbox" class="iswitch iswitch-success" id="isLog" onclick="isLog()">--%>
+                        <%--</div>--%>
+                    <%--</div>--%>
+                <%--</div>--%>
                 <div class="row" id="itemRow">
                     <div class="col-md-12">
                         <div class="form-group">
@@ -115,6 +121,20 @@
                         <div class="form-group">
                             <label class="control-label">证书名称,多个值使用","分隔</label>
                             <input type="text" class="form-control" id="nickname">
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="display: none" id="logRow">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="control-label">日志路径</label>
+                            <input type="text" class="form-control" id="logPath">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="control-label">阈值</label>
+                            <input type="text" class="form-control" id="threadHold">
                         </div>
                     </div>
                 </div>

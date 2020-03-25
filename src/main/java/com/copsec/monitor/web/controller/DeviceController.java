@@ -56,8 +56,6 @@ public class DeviceController {
         if (logger.isDebugEnabled()) {
             logger.debug("get all date");
         }
-
-//        warningService.receiveWarningEvent(new Report());
         return deviceService.getData();
     }
 

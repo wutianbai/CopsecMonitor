@@ -1,8 +1,6 @@
 package com.copsec.monitor.web.beans;
 
-import com.copsec.monitor.web.beans.remote.RemoteSessionBean;
 import com.copsec.monitor.web.config.Resources;
-import com.google.common.collect.ArrayListMultimap;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,8 +22,6 @@ public class UserBean {
 
     private String newCode;
 
-    private ArrayListMultimap<String, RemoteSessionBean> cookieMaps = ArrayListMultimap.create();
-
     @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer();
@@ -35,13 +31,5 @@ public class UserBean {
         buffer.append(this.role + Resources.SPLITER);
         buffer.append(this.status);
         return buffer.toString();
-    }
-
-    public void addCookie(String deviceId, RemoteSessionBean cookie) {
-        cookieMaps.put(deviceId, cookie);
-    }
-
-    public boolean isLogined(String deviceId) {
-        return cookieMaps.get(deviceId).isEmpty();
     }
 }

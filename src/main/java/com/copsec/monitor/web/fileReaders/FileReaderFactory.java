@@ -31,30 +31,9 @@ public class FileReaderFactory implements ApplicationContextAware {
         } else if (type == FileReaderType.USERINFO) {
 
             return (UserInfoReader) applicationContext.getBean("userInfoReader");
-        } else if (type == FileReaderType.IPREADER) {
-
-            return (IpConfigFileReader) applicationContext.getBean("ipConfigFileReader");
-        } else if (type == FileReaderType.NETWORKTIMING) {
-
-            return (NetworkTimeReader) applicationContext.getBean("networkTimeReader");
-        } else if (type == FileReaderType.NETCONFIG) {
-
-            return (NetConfigReader) applicationContext.getBean("netConfigReader");
-        } else if (type == FileReaderType.ROUTER) {
-
-            return (RouterBeanReader) applicationContext.getBean("routerBeanReader");
-        } else if (type == FileReaderType.BONDMODE) {
-
-            return (BondModeReader) applicationContext.getBean("bondModeReader");
-        } else if (type == FileReaderType.TASKPOLICY) {
-
-            return (TaskPolicyReader) applicationContext.getBean("taskPolicyReader");
-        } else if (type == FileReaderType.MIB) {
-
-            return (SnmpMibReader) applicationContext.getBean("snmpMibReader");
-        } else if (type == FileReaderType.LOGSETTING) {
-
-            return (LogSettingBeanReader) applicationContext.getBean("logSettingBeanReader");
+//        } else if (type == FileReaderType.IPREADER) {
+//
+//            return (IpConfigFileReader) applicationContext.getBean("ipConfigFileReader");
         } else if (type == FileReaderType.MONITORITEM) {
 
             return (MonitorItemReader) applicationContext.getBean("monitorItemReader");

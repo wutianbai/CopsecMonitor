@@ -1,28 +1,22 @@
 package com.copsec.monitor.web.executers;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.copsec.monitor.web.beans.syslogParseBeans.SyslogMessageBean;
-import com.copsec.monitor.web.config.SystemConfig;
 import com.copsec.monitor.web.entity.AuditSyslogMessage;
 import com.copsec.monitor.web.entity.SyslogMessage;
 import com.copsec.monitor.web.pools.LogSettingPools;
 import com.copsec.monitor.web.pools.SyslogMessagePools;
-import com.copsec.monitor.web.pools.TaskStatusHandlerPools;
 import com.copsec.monitor.web.repository.AuditSyslogMessageRepository;
 import com.copsec.monitor.web.repository.DeviceMessageRepository;
-import com.copsec.monitor.web.repository.FileStatusRepository;
-import com.copsec.monitor.web.repository.PreFileSynHistoryStatusRepository;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 解析syslogMessage
@@ -36,16 +30,7 @@ public class LogsParseExecuters {
     private DeviceMessageRepository dMRepository;
 
     @Autowired
-    private PreFileSynHistoryStatusRepository pfsRepository;
-
-    @Autowired
-    private FileStatusRepository fileStatusRepository;
-
-    @Autowired
     private AuditSyslogMessageRepository auditSyslogMessageRepository;
-
-    @Autowired
-    private SystemConfig config;
 
     private static final String sperator = " ";
 
@@ -104,21 +89,6 @@ public class LogsParseExecuters {
                 BeanUtils.copyProperties(syslogMessage, auditMessageEntity);
                 auditSyslogMessageRepository.save(auditMessageEntity);
             }
-        }
-    }
-
-    @Async
-    @Scheduled(fixedRate = 2000)
-    public void handlerMessage() {
-
-        if (TaskStatusHandlerPools.getInstance().isEmpty()) {
-
-            return;
-        }
-        while (!SyslogMessagePools.getInstance().isEmpty()) {
-
-            SyslogMessageBean messageBean = SyslogMessagePools.getInstance().get();
-            TaskStatusHandlerPools.getInstance().handleSyslogMessage(messageBean);
         }
     }
 

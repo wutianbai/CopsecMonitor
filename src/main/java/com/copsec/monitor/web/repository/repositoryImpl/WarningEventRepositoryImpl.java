@@ -5,6 +5,7 @@ import com.copsec.monitor.web.beans.monitor.MonitorEnum.WarningLevel;
 import com.copsec.monitor.web.beans.warning.WarningEventBean;
 import com.copsec.monitor.web.entity.WarningEvent;
 import com.copsec.monitor.web.repository.BaseRepositoryImpl;
+import com.copsec.monitor.web.utils.DateUtils;
 import com.copsec.monitor.web.utils.FormatUtils;
 import com.mongodb.client.result.DeleteResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +102,21 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
     @Override
     public void insertWarningEvent(WarningEvent bean) {
         this.mongoTemplate.insert(bean);
+    }
+
+    @Override
+    public boolean checkIsWarningByTime(String id) {
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        criteria.and("monitorId").is(id);
+        criteria.and("eventTime").gte(DateUtils.beforeHour(new Date(), 1)).lte(new Date());
+        query.addCriteria(criteria);
+
+        if (this.mongoTemplate.find(query, WarningEvent.class).size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

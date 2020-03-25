@@ -1,10 +1,6 @@
 package com.copsec.monitor.web.repository;
 
 import com.copsec.monitor.web.beans.LogConditionBean;
-import com.copsec.monitor.web.beans.statistics.ConditionBean;
-import com.copsec.monitor.web.beans.statistics.DBStatisticResultBean;
-import com.copsec.monitor.web.beans.statistics.FileStatisticResultBean;
-import com.copsec.monitor.web.beans.statistics.StatisticalResultBean;
 import com.copsec.monitor.web.beans.warning.WarningEventBean;
 import com.copsec.monitor.web.beans.warning.WarningHistoryBean;
 import com.copsec.monitor.web.entity.*;
@@ -20,31 +16,6 @@ import java.util.List;
  * repository 基类
  */
 public class BaseRepositoryImpl implements BaseRepositoryCustom {
-
-    @Override
-    public List<CpuHistoryStatus> getCpuStatus(List<AggregationOperation> operationList) {
-        return null;
-    }
-
-    @Override
-    public List<NetDataHistoryStatus> getNetData(List<AggregationOperation> operationList) {
-        return null;
-    }
-
-    @Override
-    public List<ProtocolHistoryStatus> getProtocolData(List<AggregationOperation> operationList) {
-        return null;
-    }
-
-    @Override
-    public List<DBSyncHistoryStatus> getDbData(List<AggregationOperation> operationList) {
-        return null;
-    }
-
-    @Override
-    public List<FileSyncHistoryStatus> getFileData(List<AggregationOperation> operationList) {
-        return null;
-    }
 
     @Override
     public Page<OperateLog> findOperateLogByCondition(Pageable pageable, LogConditionBean condition) {
@@ -64,61 +35,12 @@ public class BaseRepositoryImpl implements BaseRepositoryCustom {
         return null;
     }
 
-    /**
-     * 计算总量
-     *
-     * @param operationList
-     * @return
-     */
-    @Override
-    public StatisticalResultBean countTotal(List<AggregationOperation> operationList) {
-        return null;
-    }
 
     @Override
     public List<SyslogMessage> findByIdAfter() {
         return null;
     }
 
-    @Override
-    public void updatePreFileSyncHisotryStatus(PreFileSynHistoryStatus preFileSynHistoryStatus) {
-
-    }
-
-    @Override
-    public void updateFileSyncHistoryStatus(FileSyncHistoryStatus status) {
-
-    }
-
-    @Override
-    public List<FileStatisticResultBean> countFileStatistic(List<AggregationOperation> operationList) {
-        return null;
-    }
-
-    /**
-     * find status equals false
-     *
-     * @return
-     */
-    @Override
-    public List<FileSyncStatus> findFileTaskByStatus() {
-        return null;
-    }
-
-    @Override
-    public Page<FileSyncStatus> findFileTaskByCondition(Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public void updateTaskStatus(FileSyncStatus status) {
-
-    }
-
-    @Override
-    public List<DeviceNowStatus> countDeviceStatus(ConditionBean conditionBean) {
-        return null;
-    }
 
     @Override
     public void deleteDeviceMessage(SyslogMessage deviceMessage) {
@@ -141,27 +63,6 @@ public class BaseRepositoryImpl implements BaseRepositoryCustom {
     }
 
     @Override
-    public void updateFileSyncHistoryStatusWithError(FileSyncHistoryStatus status) {
-
-    }
-
-    @Override
-    public void updateDBSyncHistoryStatus(DBSyncHistoryStatus status) {
-
-    }
-
-    @Override
-    public List<DBStatisticResultBean> countDatabaseStatistic(List<AggregationOperation> operationList) {
-        return null;
-    }
-
-    @Override
-    public void updateProtocolHistoryStatus(ProtocolHistoryStatus status) {
-
-    }
-
-
-    @Override
     public List<WarningEvent> findWarningEvent() {
         return null;
     }
@@ -177,7 +78,13 @@ public class BaseRepositoryImpl implements BaseRepositoryCustom {
     }
 
     @Override
-    public void insertWarningEvent(WarningEvent bean) { }
+    public void insertWarningEvent(WarningEvent bean) {
+    }
+
+    @Override
+    public boolean checkIsWarningByTime(String id) {
+        return true;
+    }
 
     @Override
     public boolean deleteWarningEvent(WarningEvent bean) {
@@ -194,5 +101,6 @@ public class BaseRepositoryImpl implements BaseRepositoryCustom {
     }
 
     @Override
-    public void insertWarningHistory(WarningHistory bean) { }
+    public void insertWarningHistory(WarningHistory bean) {
+    }
 }

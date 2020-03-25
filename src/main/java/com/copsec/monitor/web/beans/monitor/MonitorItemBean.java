@@ -17,6 +17,7 @@ public class MonitorItemBean {
     private MonitorTypeEnum monitorType;//监控项类别
     private Object item = "N/A";//monitorItemType不同类型对应不同值，默认值为“N/A”
     private CertConfig certConfig;
+    private LogConfig logConfig;
 
     @Override
     public String toString() {
@@ -31,6 +32,8 @@ public class MonitorItemBean {
         }
         if (!ObjectUtils.isEmpty(this.certConfig) && !"".equals(this.certConfig.getInstanceName())) {
             builder.append(this.certConfig.toString());
+        } else if (!ObjectUtils.isEmpty(this.logConfig) && !"".equals(this.logConfig.getLogPath())) {
+            builder.append(this.logConfig.toString());
         } else {
             builder.append(this.item);
         }

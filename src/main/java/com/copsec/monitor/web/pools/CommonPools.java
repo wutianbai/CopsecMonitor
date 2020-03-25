@@ -1,6 +1,5 @@
 package com.copsec.monitor.web.pools;
 
-import com.copsec.monitor.web.beans.network.AllowedIpBean;
 import com.copsec.monitor.web.fileReaders.fileReaderEnum.NetworkType;
 import org.springframework.util.ObjectUtils;
 
@@ -19,7 +18,7 @@ public class CommonPools {
 //    private static final Logger logger = LoggerFactory.getLogger(CommonPools.class);
 
     private static ConcurrentHashMap<NetworkType, String> map = new ConcurrentHashMap<>();
-    private static ConcurrentHashMap<String, AllowedIpBean> ipMap = new ConcurrentHashMap<>();
+//    private static ConcurrentHashMap<String, AllowedIpBean> ipMap = new ConcurrentHashMap<>();
     private static CommonPools commonPools;
 
     private CommonPools() {
@@ -59,46 +58,40 @@ public class CommonPools {
         return list;
     }
 
-    public synchronized Map get() {
-        if (ipMap.entrySet().size() > 0) {
-            update(NetworkType.ALLOWEDIP, getAllIps().toString());
-        }
-        return map;
-    }
+//    public synchronized Map get() {
+//        if (ipMap.entrySet().size() > 0) {
+//            update(NetworkType.ALLOWEDIP, getAllIps().toString());
+//        }
+//        return map;
+//    }
 
-    public synchronized void add(AllowedIpBean ip) {
-        ipMap.putIfAbsent(ip.getId(), ip);
-    }
+//    public synchronized void add(AllowedIpBean ip) {
+//        ipMap.putIfAbsent(ip.getId(), ip);
+//    }
+//
+//    public synchronized void updateAllowedIp(AllowedIpBean ip) {
+//        if (ipMap.containsKey(ip.getId())) {
+//            ipMap.replace(ip.getId(), ip);
+//        } else {
+//            ipMap.put(ip.getId(), ip);
+//        }
+//    }
 
-    public synchronized void updateAllowedIp(AllowedIpBean ip) {
-        if (ipMap.containsKey(ip.getId())) {
-            ipMap.replace(ip.getId(), ip);
-        } else {
-            ipMap.put(ip.getId(), ip);
-        }
-    }
+//    public synchronized void delete(String id) {
+//        if (ipMap.containsKey(id)) {
+//            ipMap.remove(id, ipMap.get(id));
+//        }
+//    }
+//
+//    public synchronized List<AllowedIpBean> getAllIps() {
+//        List<AllowedIpBean> list = ipMap.entrySet().stream()
+//                .map(Map.Entry::getValue).collect(toList());
+//        return list;
+//    }
 
-    public synchronized void delete(String id) {
-        if (ipMap.containsKey(id)) {
-            ipMap.remove(id, ipMap.get(id));
-        }
-    }
-
-    public synchronized List<AllowedIpBean> getAllIps() {
-        List<AllowedIpBean> list = ipMap.entrySet().stream()
-                .map(Map.Entry::getValue).collect(toList());
-        return list;
-    }
-
-    public synchronized boolean ipExist(String ip) {
-        boolean result = false;
-        result = ipMap.entrySet().stream().anyMatch(d -> d.getValue().getIp().equals(ip));
-        return result;
-    }
-
-    public synchronized AllowedIpBean getIp(String id) {
-        return ipMap.get(id);
-    }
+//    public synchronized AllowedIpBean getIp(String id) {
+//        return ipMap.get(id);
+//    }
 
     public synchronized List<String> getNetowkConfig(NetworkType type) {
         List<String> list = new ArrayList<>();

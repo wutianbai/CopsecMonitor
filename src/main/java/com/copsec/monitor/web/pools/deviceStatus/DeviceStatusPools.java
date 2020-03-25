@@ -23,7 +23,7 @@ public class DeviceStatusPools {
         return pool;
     }
 
-    public ConcurrentHashMap<String, ConcurrentHashMap<String, Status>> getPools() {
+    public synchronized ConcurrentHashMap<String, ConcurrentHashMap<String, Status>> getMap() {
         return map;
     }
 
