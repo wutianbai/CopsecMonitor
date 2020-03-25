@@ -3,11 +3,8 @@ package com.copsec.monitor.web.utils.logUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,12 +62,12 @@ public class LogUtils {
                 logger.error(e.getMessage(), e);
                 return;
             }
-            try {
-                datagramSocket.send(new DatagramPacket(bytes, bytes.length, InetAddress.getByName(logHost), logPort));
+            /*try {
+                //datagramSocket.send(new DatagramPacket(bytes, bytes.length, InetAddress.getByName(logHost), logPort));
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 return;
-            }
+            }*/
         } catch (Throwable t) {
             logger.error(t.getMessage(), t);
         }
