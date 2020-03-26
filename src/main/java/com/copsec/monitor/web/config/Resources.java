@@ -24,6 +24,8 @@ public class Resources {
 	public static final String ERROR = "error";
 
 	public static final String ERROR_MESSAGE = "数据上报超时";
+	public static final String WARNING_MESSAGE = "故障";
+	public static final String NORMAL_MESSAGE = "健康";
 
 	public static final String DEFAUTL_LOCK_TIME = "30";
 

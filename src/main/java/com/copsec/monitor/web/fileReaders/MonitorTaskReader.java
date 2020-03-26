@@ -1,6 +1,5 @@
 package com.copsec.monitor.web.fileReaders;
 
-import com.alibaba.fastjson.JSONArray;
 import com.copsec.monitor.web.beans.monitor.MonitorTaskBean;
 import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.exception.CopsecException;
@@ -32,7 +31,7 @@ public class MonitorTaskReader extends BaseFileReader<MonitorTaskBean> {
                         bean.setTaskName(dataList[1]);
                         bean.setDeviceId(dataList[2]);
                         bean.setGroupId(dataList[3]);
-                        bean.setWarningItems(JSONArray.parseArray(dataList[4]));
+                        bean.setWarningItems(dataList[4]);
                         MonitorTaskPools.getInstances().update(bean);
                     });
         }

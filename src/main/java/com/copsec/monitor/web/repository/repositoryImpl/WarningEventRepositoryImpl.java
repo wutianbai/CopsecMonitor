@@ -28,16 +28,6 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<WarningEvent> findWarningEvent() {
-        Query query = new Query();
-        Criteria criteria = new Criteria();
-        criteria.andOperator(Criteria.where("status").is(1));
-        query.addCriteria(criteria).limit(100);
-
-        return this.mongoTemplate.find(query, WarningEvent.class);
-    }
-
-    @Override
     public Page<WarningEvent> findWarningEventByCondition(Pageable pageable, WarningEventBean condition) {
         Query query = createCondition(condition);
         query.with(pageable);
@@ -122,6 +112,18 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
     @Override
     public boolean deleteWarningEvent(WarningEvent bean) {
         Query query = new Query(Criteria.where("id").is(bean.getId()));
+        DeleteResult deleteResult = this.mongoTemplate.remove(query, WarningEvent.class);
+        return deleteResult.wasAcknowledged();
+    }
+
+    @Override
+    public boolean deleteDeviceOutTimeWarning(String deviceId) {
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        criteria.and("monitorId").is(deviceId);
+        query.addCriteria(criteria);
+
+//        Query query = new Query(Criteria.where("monitorId").is(deviceId));
         DeleteResult deleteResult = this.mongoTemplate.remove(query, WarningEvent.class);
         return deleteResult.wasAcknowledged();
     }

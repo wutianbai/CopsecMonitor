@@ -28,7 +28,7 @@ public class WarningItemReader extends BaseFileReader<WarningItemBean> {
                         bean.setMonitorItemType(MonitorItemEnum.valueOf(dataList[2]));
                         bean.setWarningLevel(WarningLevel.valueOf(dataList[3]));
                         bean.setThreadHold(Integer.parseInt(dataList[4]));
-                        bean.setMonitorIds(dataList[5]);
+                        bean.setMonitorIds(dataList[5].trim());
                         WarningItemPools.getInstances().update(bean);
                     });
         }

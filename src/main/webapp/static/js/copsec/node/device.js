@@ -1237,7 +1237,7 @@ jQuery(function () {
         });
     }
     getDeviceStatus();
-    setInterval(getDeviceStatus, 5000);
+    setInterval(getDeviceStatus, 20000);
 
     function getStatusText(status) {
         let str = '<div><table class="table table-condensed">';

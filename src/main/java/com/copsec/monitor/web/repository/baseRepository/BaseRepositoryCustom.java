@@ -24,23 +24,6 @@ public interface BaseRepositoryCustom {
 
     Page<AuditSyslogMessage> getServerMessage(Query query, Pageable pageable);
 
-    List<SyslogMessage> findByIdAfter();
-
-    void deleteDeviceMessage(SyslogMessage deviceMessage);
-
-    List<String> getAllFileTaskName();
-
-    List<String> getDeviceIdsByTaskNames(List<String> taskNames);
-
-    List<String> getAlarmFileSyncTask();
-
-    /**
-     * 告警事件
-     *
-     * @return
-     */
-    List<WarningEvent> findWarningEvent();
-
     Page<WarningEvent> findWarningEventByCondition(Pageable pageable, WarningEventBean condition);
 
     List<WarningEvent> findWarningEventByCondition(WarningEventBean condition);
@@ -51,6 +34,7 @@ public interface BaseRepositoryCustom {
 
     boolean deleteWarningEvent(WarningEvent bean);
 
+    boolean deleteDeviceOutTimeWarning(String deviceId);
 
     Page<WarningHistory> findWarningHistoryByCondition(Pageable pageable, WarningHistoryBean condition);
 

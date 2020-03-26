@@ -2,8 +2,10 @@ package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.copsec.monitor.web.beans.UserInfoBean;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.beans.node.Status;
 import com.copsec.monitor.web.beans.warning.ReportItem;
 import com.copsec.monitor.web.entity.WarningEvent;
@@ -24,9 +26,9 @@ public class InstancesConfigHandlerImpl extends ReportBaseHandler implements Rep
 
     private static final Logger logger = LoggerFactory.getLogger(InstancesConfigHandlerImpl.class);
 
-    //    private WarningService warningService = SpringContext.getBean(WarningService.class);
+    public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
+        WarningEvent warningEvent = baseHandle(deviceStatus, device, userInfo, warningService, reportItem);
 
-    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
         JSONObject jSONObject = JSON.parseObject(reportItem.getResult().toString());
         //基本信息
@@ -45,6 +47,7 @@ public class InstancesConfigHandlerImpl extends ReportBaseHandler implements Rep
                         warningService.insertWarningEvent(warningEvent);
                     }
 
+                    deviceStatus.setStatus(0);
                     monitorType.setStatus(0);
                     monitorItemType.setStatus(0);
                 }

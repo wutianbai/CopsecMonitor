@@ -1,18 +1,23 @@
 package com.copsec.monitor.web.service.serviceImpl;
 
 import com.copsec.monitor.web.beans.UserBean;
+import com.copsec.monitor.web.beans.UserInfoBean;
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.WarningLevel;
+import com.copsec.monitor.web.beans.monitor.MonitorTaskBean;
 import com.copsec.monitor.web.beans.node.*;
 import com.copsec.monitor.web.commons.CopsecResult;
 import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.config.SystemConfig;
+import com.copsec.monitor.web.entity.WarningEvent;
 import com.copsec.monitor.web.exception.CopsecException;
-import com.copsec.monitor.web.fileReaders.*;
-import com.copsec.monitor.web.pools.DevicePools;
-import com.copsec.monitor.web.pools.LinkPools;
-import com.copsec.monitor.web.pools.UserInfoPools;
-import com.copsec.monitor.web.pools.ZonePools;
+import com.copsec.monitor.web.fileReaders.DeviceFileReader;
+import com.copsec.monitor.web.fileReaders.LinkFileReader;
+import com.copsec.monitor.web.fileReaders.UserInfoReader;
+import com.copsec.monitor.web.fileReaders.ZoneFileReader;
+import com.copsec.monitor.web.pools.*;
 import com.copsec.monitor.web.pools.deviceStatus.DeviceStatusPools;
 import com.copsec.monitor.web.service.DeviceService;
+import com.copsec.monitor.web.service.WarningService;
 import com.copsec.monitor.web.utils.FormatUtils;
 import com.copsec.monitor.web.utils.logUtils.LogUtils;
 import org.slf4j.Logger;
@@ -40,6 +45,9 @@ public class DeviceServiceImpl implements DeviceService {
     private ZoneFileReader zoneReader;
     @Autowired
     private UserInfoReader userInfoReader;
+
+    @Autowired
+    private WarningService warningService;
 
     @Override
     public CopsecResult getData() {
@@ -112,8 +120,26 @@ public class DeviceServiceImpl implements DeviceService {
         }
     }
 
+    private StringBuilder checkMonitorTask(String deviceId) {
+        //检查是否有对应监控组
+        StringBuilder str = new StringBuilder();
+        List<MonitorTaskBean> monitorTaskList = MonitorTaskPools.getInstances().getAll();
+        monitorTaskList.forEach(monitorTask -> {
+            List<String> deviceIdList = Arrays.asList(monitorTask.getDeviceId().split(",", -1));
+            if (deviceIdList.contains(deviceId)) {
+                str.append("[" + monitorTask.getTaskName() + "]");
+            }
+        });
+        return str;
+    }
+
     @Override
     public CopsecResult deleteDevice(UserBean userInfo, String ip, String deviceId) {
+        StringBuilder taskStr = checkMonitorTask(deviceId);
+        if (!"".equals(taskStr.toString())) {
+            return CopsecResult.failed("不可删除", "监控任务" + taskStr.toString() + "包含此设备");
+        }
+
         Device device = DevicePools.getInstance().getDevice(deviceId);
         if (!ObjectUtils.isEmpty(device)) {
             DevicePools.getInstance().delete(deviceId);
@@ -288,30 +314,36 @@ public class DeviceServiceImpl implements DeviceService {
         return CopsecResult.success("更新成功");
     }
 
-    private final ConcurrentHashMap<String, Status> statusMap = new ConcurrentHashMap<>();
-
-    private Status getStatusBean(Object key) {
-        Status status = statusMap.get(key.toString());
-        if (ObjectUtils.isEmpty(status)) {
-            status = new Status();
-            statusMap.putIfAbsent((String) key, status);
-        }
-        return status;
-    }
-
     @Override
     public CopsecResult getDeviceStatus() {
-        ConcurrentHashMap<String, ConcurrentHashMap<String, Status>> deviceStatusMap = DeviceStatusPools.getInstances().getMap();
+        ConcurrentHashMap<String, Status> deviceStatusMap = DeviceStatusPools.getInstances().getMap();//取出设备状态缓存
+
+//        ConcurrentHashMap<String, Device> noOnlineDevice = getDifferenceSetByGuava(DevicePools.getInstance().getMap(), deviceStatusMap);
+////        for (Iterator it = noOnlineDevice.entrySet().iterator(); it.hasNext(); ) {
+////            Map.Entry entry = (Map.Entry) it.next();
+////
+////            Device device = (Device) entry.getValue();
+////            UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());
+////            final WarningEvent warningEvent = new WarningEvent();
+//////            warningEvent.setEventSource(MonitorItemEnum.SYSTEMTYPE);
+////            warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
+////            warningEvent.setEventDetail("设备失去连接");
+////            warningEvent.setEventTime(new Date());
+////            warningEvent.setDeviceId(device.getData().getDeviceId());
+////            warningEvent.setDeviceName(device.getData().getDeviceHostname());
+////            warningEvent.setUserId(userInfo.getUserId());
+////            warningEvent.setUserName(userInfo.getUserName());
+////            warningEvent.setUserMobile(userInfo.getMobile());
+////        }
+
         for (Iterator it = deviceStatusMap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
-            ConcurrentHashMap<String, Status> deviceStatus = (ConcurrentHashMap<String, Status>) entry.getValue();
 
-            Status statusBean = getStatusBean(entry.getKey());
+            Status statusBean = (Status) entry.getValue();
 
             long errorStatus;
-//            Device device =  DevicePools.getInstance().getDevice(entry.getKey().toString());
-//            updateDevice(new UserBean(), "127.0.0.1", device);//更新后台设备上报时间
-            Date updateTime = DevicePools.getInstance().getDevice(entry.getKey().toString()).getData().getReportTime();
+            Device device = DevicePools.getInstance().getDevice(entry.getKey().toString());
+            Date updateTime = device.getData().getReportTime();
             if (ObjectUtils.isEmpty(updateTime)) {
                 errorStatus = config.getDeviceUpdateTime() * 30000 + 1;
             } else {
@@ -319,23 +351,36 @@ public class DeviceServiceImpl implements DeviceService {
             }
             statusBean.setUpdateTime(FormatUtils.getFormatDate(updateTime));
 
-            if (errorStatus > (config.getDeviceUpdateTime() * 30000)) {
+            if (errorStatus > (config.getDeviceUpdateTime() * 30000)) {//上报超时 并产生告警
                 statusBean.setWarnMessage(Resources.ERROR_MESSAGE);
                 statusBean.setStatus(2);
+
+                UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());
+                WarningEvent warningEvent = new WarningEvent();
+                warningEvent.setMonitorId(device.getData().getDeviceId());//设置监控ID为设备ID
+//            warningEvent.setEventSource(MonitorItemEnum.SYSTEMTYPE);
+                warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
+                warningEvent.setEventDetail("上报超时 设备失去连接");
+                warningEvent.setEventTime(new Date());
+                warningEvent.setDeviceId(device.getData().getDeviceId());
+                warningEvent.setDeviceName(device.getData().getDeviceHostname());
+                warningEvent.setUserId(userInfo.getUserId());
+                warningEvent.setUserName(userInfo.getUserName());
+                warningEvent.setUserMobile(userInfo.getMobile());
+                if (!warningService.checkIsWarningByTime(warningEvent.getMonitorId())) {
+                    warningService.insertWarningEvent(warningEvent);
+                }
             } else if (statusBean.getStatus() == 0) {
-                statusBean.setWarnMessage("故障");
-                statusBean.setStatus(0);
+                statusBean.setWarnMessage(Resources.WARNING_MESSAGE);
+                warningService.deleteDeviceOutTimeWarning(device.getData().getDeviceId());
             } else {
-                statusBean.setWarnMessage("健康");
-                statusBean.setStatus(1);
+                statusBean.setWarnMessage(Resources.NORMAL_MESSAGE);
+                warningService.deleteDeviceOutTimeWarning(device.getData().getDeviceId());
             }
 
-            statusBean.setDeviceId(entry.getKey().toString());
-            statusBean.setMessage(deviceStatus);
-
-            statusMap.replace(entry.getKey().toString(), statusBean);
+            DeviceStatusPools.getInstances().update(entry.getKey().toString(), statusBean);
         }
-        return CopsecResult.success(statusMap);
+        return CopsecResult.success(deviceStatusMap);
     }
 }
 

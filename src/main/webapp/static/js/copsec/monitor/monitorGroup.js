@@ -1,6 +1,7 @@
 let oTable,//定义变量名，用于存放dataTable对象，一般定义为全局的比较好
     allItems,
     $select = $("#monitorItems");
+
 function page(id, url, newId) {
     $.ajax({//使用ajax的方式获取
         url: url,//异步请求的接口地址
@@ -89,11 +90,21 @@ function page(id, url, newId) {
                         "mData": "monitorItems",
                         "sTitle": "监控项",
                         "mRender": function (d, type, full, meta) {
-                            let names = new Array();
-                            for (let i in d) {
-                                names.push(d[i].monitorName);
+                            let newArr = new Array();
+                            let arr1 = new Array();
+                            let arr2 = d.split(',');
+                            $.each(allItems, function (index, value) {
+                                arr1.push(value.monitorId);
+                            });
+                            if (!isEmpty(arr2)) {
+                                $.each(arr1, function (index, value) {
+                                    if ($.inArray(arr1[index], arr2) > -1) {
+                                        newArr.push(allItems[index].monitorName);
+                                    }
+                                });
                             }
-                            return names.toString();
+
+                            return newArr.toString();
                         }
                     },
                     {
@@ -111,7 +122,7 @@ function page(id, url, newId) {
             });
 
             $select.empty();
-            reloadSelect("monitorItems","选择监控项...");
+            reloadSelect("monitorItems", "选择监控项...");
             $.each(allItems, function (index, value) {
                 $select.append("<option value=" + value.monitorId + ">" + value.monitorName + "</option>");
             });
@@ -162,7 +173,8 @@ function addData() {
             data: {
                 'id': id,
                 'name': name,
-                'jsonStr': JSON.stringify(monitorItems)
+                'monitorItems': monitorItems.toString()
+                // 'jsonStr': JSON.stringify(monitorItems)
             },
             method: 'POST',
             dataType: "json",
@@ -186,11 +198,11 @@ function addData() {
 function updateData(bean) {
     $("#monitorGroupName").val(bean.name);
 
-    let arr = new Array();
-    $.each(bean.monitorItems, function (index, value) {
-        arr.push(value.monitorId);
-    });
-    $select.val(arr).trigger('change');
+    // let arr = new Array();
+    // $.each(bean.monitorItems, function (index, value) {
+    //     arr.push(value.monitorId);
+    // });
+    $select.val(bean.monitorItems.split(',')).trigger('change');
 
     let $confirmButton = $("<button class='btn btn-success'>保存</button>");
     addButton("monitorGroupModal", "更新监控组", $confirmButton);
@@ -214,7 +226,8 @@ function updateData(bean) {
             data: {
                 'id': bean.id,
                 'name': name,
-                'jsonStr': JSON.stringify(monitorItems)
+                'monitorItems': monitorItems.toString()
+                // 'jsonStr': JSON.stringify(monitorItems)
             },
             method: 'POST',
             dataType: "json",

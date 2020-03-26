@@ -33,6 +33,8 @@ public interface WarningService {
 
     boolean deleteWarningEvent(WarningEvent bean);
 
+    boolean deleteDeviceOutTimeWarning(String deviceId);
+
     Page<WarningHistoryBean> searchWarningHistory(UserBean userInfo, String ip, Pageable pageable, WarningHistoryBean condition);
 
     CopsecResult deleteWarningHistory(UserBean userInfo, String ip, WarningHistoryBean bean);

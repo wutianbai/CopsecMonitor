@@ -25,9 +25,9 @@ public interface MonitorService {
 
     CopsecResult getAllMonitorGroup();
 
-    CopsecResult addMonitorGroup(UserBean userInfo, String ip, MonitorGroupBean bean, List<String> idArray, String filePath);
+    CopsecResult addMonitorGroup(UserBean userInfo, String ip, MonitorGroupBean bean, String filePath);
 
-    CopsecResult updateMonitorGroup(UserBean userInfo, String ip, MonitorGroupBean bean, List<String> idArray, String filePath);
+    CopsecResult updateMonitorGroup(UserBean userInfo, String ip, MonitorGroupBean bean, String filePath);
 
     CopsecResult deleteMonitorGroup(UserBean userInfo, String ip, String id, String filePath);
 
@@ -45,9 +45,9 @@ public interface MonitorService {
 
     CopsecResult getAllMonitorTask();
 
-    CopsecResult addMonitorTask(UserBean userInfo, String ip, MonitorTaskBean bean, List<String> idArray, String filePath);
+    CopsecResult addMonitorTask(UserBean userInfo, String ip, MonitorTaskBean bean, String filePath);
 
-    CopsecResult updateMonitorTask(UserBean userInfo, String ip, MonitorTaskBean bean, List<String> idArray, String filePath);
+    CopsecResult updateMonitorTask(UserBean userInfo, String ip, MonitorTaskBean bean, String filePath);
 
     CopsecResult deleteMonitorTask(UserBean userInfo, String ip, String id, String filePath);
 

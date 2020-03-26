@@ -3,11 +3,13 @@ package com.copsec.monitor.web.repository;
 import com.copsec.monitor.web.beans.LogConditionBean;
 import com.copsec.monitor.web.beans.warning.WarningEventBean;
 import com.copsec.monitor.web.beans.warning.WarningHistoryBean;
-import com.copsec.monitor.web.entity.*;
+import com.copsec.monitor.web.entity.AuditSyslogMessage;
+import com.copsec.monitor.web.entity.OperateLog;
+import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.entity.WarningHistory;
 import com.copsec.monitor.web.repository.baseRepository.BaseRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
@@ -37,37 +39,6 @@ public class BaseRepositoryImpl implements BaseRepositoryCustom {
 
 
     @Override
-    public List<SyslogMessage> findByIdAfter() {
-        return null;
-    }
-
-
-    @Override
-    public void deleteDeviceMessage(SyslogMessage deviceMessage) {
-
-    }
-
-    @Override
-    public List<String> getAllFileTaskName() {
-        return null;
-    }
-
-    @Override
-    public List<String> getDeviceIdsByTaskNames(List<String> taskNames) {
-        return null;
-    }
-
-    @Override
-    public List<String> getAlarmFileSyncTask() {
-        return null;
-    }
-
-    @Override
-    public List<WarningEvent> findWarningEvent() {
-        return null;
-    }
-
-    @Override
     public Page<WarningEvent> findWarningEventByCondition(Pageable pageable, WarningEventBean condition) {
         return null;
     }
@@ -88,6 +59,11 @@ public class BaseRepositoryImpl implements BaseRepositoryCustom {
 
     @Override
     public boolean deleteWarningEvent(WarningEvent bean) {
+        return true;
+    }
+
+    @Override
+    public boolean deleteDeviceOutTimeWarning(String deviceId) {
         return true;
     }
 

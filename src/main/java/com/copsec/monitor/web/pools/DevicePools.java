@@ -51,6 +51,10 @@ public class DevicePools {
         }
     }
 
+    public synchronized Map<String, Device> getMap() {
+        return map;
+    }
+
     public synchronized List<Device> getAll() {
         ArrayList<Device> list = new ArrayList<>();
         map.forEach((k, v) -> list.add(v));

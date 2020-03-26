@@ -2,10 +2,7 @@ package com.copsec.monitor.web.pools;
 
 import com.copsec.monitor.web.beans.monitor.MonitorTaskBean;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MonitorTaskPools {
@@ -47,7 +44,8 @@ public class MonitorTaskPools {
         for (Iterator it = map.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
             MonitorTaskBean monitorTaskBean = (MonitorTaskBean) entry.getValue();
-            if (deviceId.equalsIgnoreCase(monitorTaskBean.getDeviceId())) {
+            List<String> deviceIds = Arrays.asList(monitorTaskBean.getDeviceId().split(",", -1));
+            if (deviceIds.contains(deviceId)) {
                 return monitorTaskBean;
             }
         }

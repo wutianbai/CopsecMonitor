@@ -1,7 +1,9 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
+import com.copsec.monitor.web.beans.UserInfoBean;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.beans.node.Status;
 import com.copsec.monitor.web.beans.warning.ReportItem;
 import com.copsec.monitor.web.entity.WarningEvent;
@@ -25,11 +27,10 @@ public class ProxyLogHandlerImpl extends ReportBaseHandler implements ReportHand
 
     private static final Logger logger = LoggerFactory.getLogger(ProxyLogHandlerImpl.class);
 
-    //    private WarningService warningService = SpringContext.getBean(WarningService.class);
+    public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
+        WarningEvent warningEvent = baseHandle(deviceStatus, device, userInfo, warningService, reportItem);
 
-    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
-
         //基本信息
         monitorItemType.setMessage("代理日志[" + reportItem.getItem() + "]");
         monitorItemType.setResult("异常数[" + reportItem.getResult() + "]");
@@ -46,6 +47,7 @@ public class ProxyLogHandlerImpl extends ReportBaseHandler implements ReportHand
                         warningService.insertWarningEvent(warningEvent);
                     }
 
+                    deviceStatus.setStatus(0);
                     monitorType.setStatus(0);
                     monitorItemType.setStatus(0);
                 }

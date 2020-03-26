@@ -2,7 +2,6 @@ package com.copsec.monitor.web.service.serviceImpl;
 
 import com.copsec.monitor.web.beans.UserBean;
 import com.copsec.monitor.web.beans.UserInfoBean;
-import com.copsec.monitor.web.beans.monitor.MonitorEnum.WarningLevel;
 import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.beans.node.Status;
 import com.copsec.monitor.web.beans.warning.Report;
@@ -178,6 +177,11 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
     }
 
     @Override
+    public boolean deleteDeviceOutTimeWarning(String deviceId) {
+        return warningEventRepository.deleteDeviceOutTimeWarning(deviceId);
+    }
+
+    @Override
     public Page<WarningHistoryBean> searchWarningHistory(UserBean userInfo, String ip, Pageable pageable, WarningHistoryBean condition) {
 
         Page<WarningHistory> pages = warningHistoryRepository.findWarningHistoryByCondition(pageable, condition);
@@ -246,6 +250,7 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
         deviceService.updateDevice(new UserBean(), "127.0.0.1", device);
         UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());//运维用户信息
 
+        Status deviceStatus = new Status();
 //                Multimap<String, Status> monitorTypeMap = LinkedHashMultimap.create();
         ConcurrentHashMap<String, Status> monitorTypeMap = MonitorTypePools.getInstances().getMap();
 //                ConcurrentHashMap<String, List<Status>> monitorItemListMap = MonitorItemListPools.getInstances().getMap();
@@ -290,30 +295,30 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
                     monitorItemListMap.putIfAbsent(reportItem.getMonitorItemType().name(), monitorItemList);
                 }
 
-                final WarningEvent warningEvent = new WarningEvent();
-                warningEvent.setMonitorId(reportItem.getMonitorId());
-                warningEvent.setEventSource(reportItem.getMonitorItemType());
-                warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
-                warningEvent.setEventTime(new Date());
-                warningEvent.setDeviceId(report.getDeviceId());
-                warningEvent.setDeviceName(device.getData().getDeviceHostname());
-                warningEvent.setUserId(userInfo.getUserId());
-                warningEvent.setUserName(userInfo.getUserName());
-                warningEvent.setUserMobile(userInfo.getMobile());
+//                final WarningEvent warningEvent = new WarningEvent();
+//                warningEvent.setMonitorId(reportItem.getMonitorId());
+//                warningEvent.setEventSource(reportItem.getMonitorItemType());
+//                warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
+//                warningEvent.setEventTime(new Date());
+//                warningEvent.setDeviceId(report.getDeviceId());
+//                warningEvent.setDeviceName(device.getData().getDeviceHostname());
+//                warningEvent.setUserId(userInfo.getUserId());
+//                warningEvent.setUserName(userInfo.getUserName());
+//                warningEvent.setUserMobile(userInfo.getMobile());
 
-                if (reportItem.getStatus() == 0) {//获取信息失败告警
-//                        baseHandle(reportItem, warningEvent);
-                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                        warningEvent.setEventDetail(reportItem.getResult().toString());
-                        insertWarningEvent(warningEvent);
-                    }
-                } else {
-                    Optional<ReportHandler> optional = ReportHandlerPools.getInstance().getHandler(reportItem.getMonitorItemType());
-                    if (optional.isPresent()) {
-                        Status status = optional.get().handle(warningService, warningEvent, reportItem, monitorType);
-                        monitorItemList.add(status);
-                    }
+//                if (reportItem.getStatus() == 0) {//获取信息失败告警
+////                        baseHandle(reportItem, warningEvent);
+//                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+//                        warningEvent.setEventDetail(reportItem.getResult().toString());
+//                        insertWarningEvent(warningEvent);
+//                    }
+//                } else {
+                Optional<ReportHandler> optional = ReportHandlerPools.getInstance().getHandler(reportItem.getMonitorItemType());
+                if (optional.isPresent()) {
+                    Status status = optional.get().handle(deviceStatus, device, userInfo, warningService, reportItem, monitorType);
+                    monitorItemList.add(status);
                 }
+//                }
 
                 //根据监控类型更新
                 monitorType.setDeviceId(reportItem.getMonitorType().getName() + "状态");
@@ -325,7 +330,9 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
                 MonitorTypePools.getInstances().update(reportItem.getMonitorType().name(), monitorType);
             });
 //            }
-            DeviceStatusPools.getInstances().update(report.getDeviceId(), monitorTypeMap);//更新设备状态缓存池
         }
+        deviceStatus.setDeviceId(report.getDeviceId());
+        deviceStatus.setMessage(monitorTypeMap);
+        DeviceStatusPools.getInstances().update(report.getDeviceId(), deviceStatus);//更新设备状态缓存池
     }
 }

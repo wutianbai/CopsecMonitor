@@ -1,7 +1,9 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
+import com.copsec.monitor.web.beans.UserInfoBean;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.beans.node.Status;
 import com.copsec.monitor.web.beans.warning.ReportItem;
 import com.copsec.monitor.web.beans.warning.VmInfoBean;
@@ -25,9 +27,9 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
 
     private static final Logger logger = LoggerFactory.getLogger(RaidHandlerImpl.class);
 
-    //    private WarningService warningService = SpringContext.getBean(WarningService.class);
+    public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
+        WarningEvent warningEvent = baseHandle(deviceStatus, device, userInfo, warningService, reportItem);
 
-    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
         ConcurrentHashMap<String, Status> RAIDMap = new ConcurrentHashMap<>();
 
@@ -56,6 +58,7 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
                             warningService.insertWarningEvent(warningEvent);
                         }
 
+                        deviceStatus.setStatus(0);
                         monitorType.setStatus(0);
                         monitorItemType.setStatus(0);
                         diskInfoStatusBean.setStatus(0);
@@ -89,6 +92,7 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
                             warningService.insertWarningEvent(warningEvent);
                         }
 
+                        deviceStatus.setStatus(0);
                         monitorType.setStatus(0);
                         monitorItemType.setStatus(0);
                         domainInfoStatusBean.setStatus(0);
@@ -122,6 +126,7 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
                             warningService.insertWarningEvent(warningEvent);
                         }
 
+                        deviceStatus.setStatus(0);
                         monitorType.setStatus(0);
                         monitorItemType.setStatus(0);
                         volumeInfoStatusBean.setStatus(0);

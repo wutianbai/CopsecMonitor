@@ -94,13 +94,6 @@ function page(id, url, newId) {
                         "mData": "deviceId",
                         "sTitle": "设备",
                         "mRender": function (d, type, full, meta) {
-                            // let name;
-                            // $.each(allDevice, function (index, value) {
-                            //     if (d === value.data.deviceId) {
-                            //         name = value.data.deviceHostname;
-                            //     }
-                            // });
-
                             let newArr = new Array();
                             let arr1 = new Array();
                             let arr2 = d.split(',');
@@ -134,11 +127,26 @@ function page(id, url, newId) {
                         "mData": "warningItems",
                         "sTitle": "告警项",
                         "mRender": function (d, type, full, meta) {
-                            let names = new Array();
-                            for (let i in d) {
-                                names.push(d[i].warningName);
+                            // let names = new Array();
+                            // for (let i in d) {
+                            //     names.push(d[i].warningName);
+                            // }
+                            // return names.toString();
+
+                            let newArr = new Array();
+                            let arr1 = new Array();
+                            let arr2 = d.split(',');
+                            $.each(allItems, function (index, value) {
+                                arr1.push(value.warningId);
+                            });
+                            if (!isEmpty(arr2)) {
+                                $.each(arr1, function (index, value) {
+                                    if ($.inArray(arr1[index], arr2) > -1) {
+                                        newArr.push(allItems[index].warningName);
+                                    }
+                                });
                             }
-                            return names.toString();
+                            return newArr.toString();
                         }
                     },
                     {
@@ -234,7 +242,8 @@ function addData() {
                 'taskName': taskName,
                 'deviceId': deviceId.toString(),
                 'groupId': groupId,
-                'jsonStr': JSON.stringify(warningItems)
+                'warningItems': warningItems.toString()
+                // 'jsonStr': JSON.stringify(warningItems)
             },
             method: 'POST',
             dataType: "json",
@@ -267,11 +276,11 @@ function updateData(bean) {
 
     $("#groupId").val(bean.groupId).trigger("change");
 
-    let arr = new Array();
-    $.each(bean.warningItems, function (index, value) {
-        arr.push(value.warningId);
-    });
-    $select.val(arr).trigger('change');
+    // let arr = new Array();
+    // $.each(bean.warningItems, function (index, value) {
+    //     arr.push(value.warningId);
+    // });
+    $select.val(bean.warningItems.split(",")).trigger('change');
 
     let $confirmButton = $("<button class='btn btn-success'>保存</button>");
     addButton("monitorTaskModal", "更新监控任务", $confirmButton);
@@ -309,7 +318,8 @@ function updateData(bean) {
                 'taskName': taskName,
                 'deviceId': deviceId.toString(),
                 'groupId': groupId,
-                'jsonStr': JSON.stringify(warningItems)
+                'warningItems': warningItems.toString()
+                // 'jsonStr': JSON.stringify(warningItems)
             },
             method: 'POST',
             dataType: "json",

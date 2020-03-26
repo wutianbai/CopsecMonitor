@@ -1,9 +1,10 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
+import com.copsec.monitor.web.beans.UserInfoBean;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
+import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.beans.node.Status;
 import com.copsec.monitor.web.beans.warning.ReportItem;
-import com.copsec.monitor.web.entity.WarningEvent;
 import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
@@ -19,7 +20,8 @@ public class SystemVersionHandlerImpl extends ReportBaseHandler implements Repor
 
     private static final Logger logger = LoggerFactory.getLogger(SystemVersionHandlerImpl.class);
 
-    public Status handle(WarningService warningService, WarningEvent warningEvent, ReportItem reportItem, Status monitorType) {
+    public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
+
         Status monitorItemType = new Status();
         monitorItemType.setMessage(reportItem.getResult());
 

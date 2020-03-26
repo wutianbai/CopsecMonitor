@@ -114,27 +114,27 @@ public class MonitorController {
     @NonNull
     @PostMapping("/monitorGroup/add")
     @ResponseBody
-    public CopsecResult addMonitorGroup(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorGroupBean bean, @RequestParam("jsonStr") String jsonStr) {
+    public CopsecResult addMonitorGroup(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorGroupBean bean) {
         if (logger.isDebugEnabled()) {
             logger.debug("add monitorGroup config {}", bean);
         }
-        List<String> idArray = JSON.parseArray(jsonStr, String.class);
+//        List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
         String filePath = config.getBasePath() + config.getMonitorGroupPath();
-        return monitorService.addMonitorGroup(userInfo, request.getRemoteHost(), bean, idArray, filePath);
+        return monitorService.addMonitorGroup(userInfo, request.getRemoteHost(), bean, filePath);
     }
 
     @NonNull
     @PostMapping("/monitorGroup/update")
     @ResponseBody
-    public CopsecResult updateMonitorGroup(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorGroupBean bean, @RequestParam("jsonStr") String jsonStr) {
+    public CopsecResult updateMonitorGroup(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorGroupBean bean) {
         if (logger.isDebugEnabled()) {
             logger.debug("update monitorGroup config {}", bean);
         }
-        List<String> idArray = JSON.parseArray(jsonStr, String.class);
+//        List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
         String filePath = config.getBasePath() + config.getMonitorGroupPath();
-        return monitorService.updateMonitorGroup(userInfo, request.getRemoteHost(), bean, idArray, filePath);
+        return monitorService.updateMonitorGroup(userInfo, request.getRemoteHost(), bean, filePath);
     }
 
     @NonNull
@@ -232,27 +232,25 @@ public class MonitorController {
     @NonNull
     @PostMapping("/monitorTask/add")
     @ResponseBody
-    public CopsecResult addMonitorTask(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorTaskBean bean, @RequestParam("jsonStr") String jsonStr) {
+    public CopsecResult addMonitorTask(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorTaskBean bean) {
         if (logger.isDebugEnabled()) {
             logger.debug("add monitorTask config {}", bean);
         }
-        List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
         String filePath = config.getBasePath() + config.getMonitorTaskPath();
-        return monitorService.addMonitorTask(userInfo, request.getRemoteHost(), bean, idArray, filePath);
+        return monitorService.addMonitorTask(userInfo, request.getRemoteHost(), bean, filePath);
     }
 
     @NonNull
     @PostMapping("/monitorTask/update")
     @ResponseBody
-    public CopsecResult updateMonitorTask(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorTaskBean bean, @RequestParam("jsonStr") String jsonStr) {
+    public CopsecResult updateMonitorTask(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorTaskBean bean) {
         if (logger.isDebugEnabled()) {
             logger.debug("update monitorTask config {}", bean);
         }
-        List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
         String filePath = config.getBasePath() + config.getMonitorTaskPath();
-        return monitorService.updateMonitorTask(userInfo, request.getRemoteHost(), bean, idArray, filePath);
+        return monitorService.updateMonitorTask(userInfo, request.getRemoteHost(), bean, filePath);
     }
 
     @NonNull
