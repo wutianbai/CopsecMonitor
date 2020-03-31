@@ -4,7 +4,7 @@
         <ul id="main-menu" class="main-menu">
             <li>
                 <a href="#">
-                    <i class="linecons-desktop"></i>
+                    <i class="el-desktop"></i>
                     <span class="title">${system.deviceTitle}</span>
                 </a>
                 <ul>
@@ -25,7 +25,7 @@
 
             <li>
                 <a href="#">
-                    <i class="fa fa-cogs"></i>
+                    <i class="fa fa-chain"></i>
                     <span class="title">${system.linkTitle}</span>
                 </a>
                 <ul>
@@ -43,7 +43,7 @@
 
             <li>
                 <a href="#">
-                    <i class="fa-area-chart"></i>
+                    <i class="fa fa-pie-chart"></i>
                     <span class="title">${system.zoneTitle}</span>
                 </a>
                 <ul>
