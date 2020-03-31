@@ -54,13 +54,6 @@ function page(id, url, newId) {
                     }
                 },
                 "data": data.data[0],//若使用客户端分页，则将表格的数据填写到data属性中，需要数组,数组里面要求是对象
-                "aoColumnDefs":[
-                    {"sClass":"col_class","aTargets":[2]},
-                    {"sClass":"col_class","aTargets":[3]},
-                    {"sClass":"col_class","aTargets":[4]},
-                    {"sClass":"col_class","aTargets":[5]},
-                    {"sClass":"col_class","aTargets":[6]}
-                ],
                 "aoColumns": [//渲染每一列，其实就是配置表头和数据对应显示到哪一列中
                     {
                         "mData": "warningId",
@@ -74,7 +67,7 @@ function page(id, url, newId) {
                     {
                         "mData": "warningId",
                         "sTitle": "序号",
-                        "sClass": "text-center col_class",
+                        "sClass": "text-center",
                         "width": "7%",
                         "mRender": function (d, type, full, meta) {
                             return meta.row + 1 + meta.settings._iDisplayStart;

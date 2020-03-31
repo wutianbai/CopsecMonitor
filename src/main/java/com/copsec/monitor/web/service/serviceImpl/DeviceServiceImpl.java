@@ -1,14 +1,11 @@
 package com.copsec.monitor.web.service.serviceImpl;
 
 import com.copsec.monitor.web.beans.UserBean;
-import com.copsec.monitor.web.beans.UserInfoBean;
-import com.copsec.monitor.web.beans.monitor.MonitorEnum.WarningLevel;
 import com.copsec.monitor.web.beans.monitor.MonitorTaskBean;
 import com.copsec.monitor.web.beans.node.*;
 import com.copsec.monitor.web.commons.CopsecResult;
 import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.config.SystemConfig;
-import com.copsec.monitor.web.entity.WarningEvent;
 import com.copsec.monitor.web.exception.CopsecException;
 import com.copsec.monitor.web.fileReaders.DeviceFileReader;
 import com.copsec.monitor.web.fileReaders.LinkFileReader;
@@ -18,7 +15,6 @@ import com.copsec.monitor.web.pools.*;
 import com.copsec.monitor.web.pools.deviceStatus.DeviceStatusPools;
 import com.copsec.monitor.web.service.DeviceService;
 import com.copsec.monitor.web.service.WarningService;
-import com.copsec.monitor.web.utils.FormatUtils;
 import com.copsec.monitor.web.utils.logUtils.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -316,52 +314,52 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public CopsecResult getDeviceStatus() {
-        ConcurrentHashMap<String, Status> deviceStatusMap = DeviceStatusPools.getInstances().getMap();//取出设备状态缓存
-        for (Iterator it = deviceStatusMap.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry entry = (Map.Entry) it.next();
-
-            Status statusBean = (Status) entry.getValue();
-
-            long errorStatus;
-            Device device = DevicePools.getInstance().getDevice(entry.getKey().toString());
-            if (!ObjectUtils.isEmpty(device.getData().getReportTime())) {
-                statusBean.setUpdateTime(FormatUtils.getFormatDate(device.getData().getReportTime()));
-                errorStatus = System.currentTimeMillis() - device.getData().getReportTime().getTime();
-            } else {
-                errorStatus = config.getDeviceUpdateTime() * 30000 + 1;
-            }
-
-            if (errorStatus > (config.getDeviceUpdateTime() * 30000)) {//上报超时 并产生告警
-                statusBean.setWarnMessage(Resources.ERROR_MESSAGE);
-                statusBean.setStatus(2);
-
-                WarningEvent warningEvent = new WarningEvent();
-                warningEvent.setMonitorId(device.getData().getDeviceId());//设置监控ID为设备ID
-                warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
-                warningEvent.setEventDetail("上报超时 设备失去连接");
-                warningEvent.setEventTime(new Date());
-                warningEvent.setDeviceId(device.getData().getDeviceId());
-                warningEvent.setDeviceName(device.getData().getDeviceHostname());
-                if (!ObjectUtils.isEmpty(device.getData().getMonitorUserId())) {
-                    UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());
-                    warningEvent.setUserId(userInfo.getUserId());
-                    warningEvent.setUserName(userInfo.getUserName());
-                    warningEvent.setUserMobile(userInfo.getMobile());
-                }
-
-                if (!warningService.checkIsWarningByTime(warningEvent.getMonitorId())) {
-                    warningService.insertWarningEvent(warningEvent);
-                }
-            } else if (statusBean.getStatus() == 0) {
-                statusBean.setWarnMessage(Resources.WARNING_MESSAGE);
-                warningService.handleDeviceOutTimeWarning(device.getData().getDeviceId());
-            } else {
-                statusBean.setWarnMessage(Resources.NORMAL_MESSAGE);
-                warningService.handleDeviceOutTimeWarning(device.getData().getDeviceId());
-            }
-
-            DeviceStatusPools.getInstances().update(entry.getKey().toString(), statusBean);
-        }
+//        ConcurrentHashMap<String, Status> deviceStatusMap = DeviceStatusPools.getInstances().getMap();//取出设备状态缓存
+//        for (Iterator it = deviceStatusMap.entrySet().iterator(); it.hasNext(); ) {
+//            Map.Entry entry = (Map.Entry) it.next();
+//
+//            Status statusBean = (Status) entry.getValue();
+//
+//            long errorStatus;
+//            Device device = DevicePools.getInstance().getDevice(entry.getKey().toString());
+//            if (!ObjectUtils.isEmpty(device.getData().getReportTime())) {
+//                statusBean.setUpdateTime(FormatUtils.getFormatDate(device.getData().getReportTime()));
+//                errorStatus = System.currentTimeMillis() - device.getData().getReportTime().getTime();
+//            } else {
+//                errorStatus = config.getDeviceUpdateTime() * 30000 + 1;
+//            }
+//
+//            if (errorStatus > (config.getDeviceUpdateTime() * 30000)) {//上报超时 并产生告警
+//                statusBean.setWarnMessage(Resources.ERROR_MESSAGE);
+//                statusBean.setStatus(2);
+//
+//                WarningEvent warningEvent = new WarningEvent();
+//                warningEvent.setMonitorId(device.getData().getDeviceId());//设置监控ID为设备ID
+//                warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
+//                warningEvent.setEventDetail("上报超时 设备失去连接");
+//                warningEvent.setEventTime(new Date());
+//                warningEvent.setDeviceId(device.getData().getDeviceId());
+//                warningEvent.setDeviceName(device.getData().getDeviceHostname());
+//                if (!ObjectUtils.isEmpty(device.getData().getMonitorUserId())) {
+//                    UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());
+//                    warningEvent.setUserId(userInfo.getUserId());
+//                    warningEvent.setUserName(userInfo.getUserName());
+//                    warningEvent.setUserMobile(userInfo.getMobile());
+//                }
+//
+//                if (!warningService.checkIsWarningByTime(warningEvent.getMonitorId())) {
+//                    warningService.insertWarningEvent(warningEvent);
+//                }
+//            } else if (statusBean.getStatus() == 0) {
+//                statusBean.setWarnMessage(Resources.WARNING_MESSAGE);
+//                warningService.handleDeviceOutTimeWarning(device.getData().getDeviceId());
+//            } else {
+//                statusBean.setWarnMessage(Resources.NORMAL_MESSAGE);
+//                warningService.handleDeviceOutTimeWarning(device.getData().getDeviceId());
+//            }
+//
+//            DeviceStatusPools.getInstances().update(entry.getKey().toString(), statusBean);
+//        }
         return CopsecResult.success(DeviceStatusPools.getInstances().getMap());
     }
 }

@@ -19,6 +19,9 @@ public class CopsecRunner implements CommandLineRunner {
     private SystemConfig systemConfig;
 
     @Autowired
+    private DeviceFileReader deviceReader;
+
+    @Autowired
     private UserFileReader userReader;
 
     @Autowired
@@ -43,6 +46,7 @@ public class CopsecRunner implements CommandLineRunner {
             logger.debug("reading configuration files");
         }
 
+        deviceReader.getData(systemConfig.getBasePath() + systemConfig.getDevicePath());
         userReader.getData(systemConfig.getBasePath() + systemConfig.getUserPath());
 
         userInfoReader.getData(systemConfig.getBasePath() + systemConfig.getUserInfoPath());

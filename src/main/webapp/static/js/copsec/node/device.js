@@ -1242,7 +1242,7 @@ jQuery(function () {
     setInterval(getDeviceStatus, 20000);
 
     function getStatusText(status) {
-        let str = '<div><table class="table table-condensed">';
+        let str = '<table class="table table-condensed">';
         str += "<tr><td>ID:</td><td>" + status.deviceId + "</td></tr>";
         if (!isEmpty(status.message)) {
             $.each(status.message, function (index, value) {
@@ -1260,7 +1260,7 @@ jQuery(function () {
         }
         str += '<tr><td>状态:</td><td>' + status.warnMessage + '</td></tr>';
         str += '<tr><td>更新时间:</td><td>' + status.updateTime + '</td></tr>';
-        str += '</table></div>';
+        str += '</table>';
 
         let div = $(str);
         div.on('click', 'td[name="list"]', function () {
@@ -1421,8 +1421,8 @@ jQuery(function () {
 
 function addOne(str, index, value) {
     if (value.length > 0) {
-        str += '<table class="table table-bordered table-striped">';
-        str += '<tr style="text-align: center;"><td colspan="3">' + index + '</td></tr>';
+        str += '<strong>' + index + '</strong>';
+        str += '<table class="table table-bordered table-striped"><tbody>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 if (value.status === 0) {
@@ -1439,8 +1439,8 @@ function addOne(str, index, value) {
 
 function addApplication(str, index, value) {
     if (value.length > 0) {
-        str += '<table class="table table-bordered table-striped">';
-        str += '<tr style="text-align: center;"><td colspan="2">' + index + '</td></tr>';
+        str += '<strong>' + index + '</strong>';
+        str += '<table class="table table-bordered table-striped"><tbody>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 if (value.status === 0) {
@@ -1457,6 +1457,8 @@ function addApplication(str, index, value) {
 
 function addInstances(str, index, value) {
     if (value.length > 0) {
+        str += '<strong>' + index + '</strong>';
+        str += '<table class="table table-bordered table-striped"><tbody>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 if (value.status === 0) {
@@ -1466,14 +1468,15 @@ function addInstances(str, index, value) {
                 }
             }
         });
+        str += '</table>';
     }
     return str;
 }
 
 function addSystem(str, index, value) {
     if (value.length > 0) {
-        str += '<table class="table table-bordered table-striped">';
-        str += '<tr style="text-align: center;"><td>' + index + '</td></tr>';
+        str += '<strong>' + index + '</strong>';
+        str += '<table class="table table-bordered table-striped"><tbody>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 str += '<tr style="text-align: center;"><td>' + value.message + '</td></tr>';
@@ -1486,8 +1489,8 @@ function addSystem(str, index, value) {
 
 function addDisk(str, index, value) {
     if (value.length > 0) {
-        str += '<table class="table table-bordered table-striped">';
-        str += '<tr style="text-align: center;"><td colspan="12">' + index + '</td></tr>';
+        str += '<strong>' + index + '</strong>';
+        str += '<table class="table table-bordered table-striped"><tbody>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 str += '<tr style="text-align: center"><td colspan="' + Object.keys(value.message).length + '">磁盘[' + index + ']</td></tr>';
@@ -1515,8 +1518,8 @@ function addDisk(str, index, value) {
 
 function addTwo(str, index, value) {
     if (value.length > 0) {
-        str += '<table class="table table-bordered table-striped">';
-        str += '<tr style="text-align: center"><td colspan="12">' + index + '</td></tr>';
+        str += '<strong>' + index + '</strong>';
+        str += '<table class="table table-bordered table-striped"><tbody>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 $.each(value.message, function (index, value) {
@@ -1544,10 +1547,10 @@ function addTwo(str, index, value) {
 
 function addCert(str, index, value) {
     if (value.length > 0) {
-        str += '<table class="table table-bordered table-striped">';
-        str += '<tr style="text-align: center"><td colspan="12">' + index + '</td></tr>';
-        alert(str)
-        str += '<tr style="text-align: center"><td>名称</td><td>主体</td><td>颁发机构</td><td>起始时间</td><td>有效期时间</td><td>证书信息</td><td>状态</td></tr>';
+        str += '<strong>' + index + '</strong>';
+        str += '<table class="table table-bordered table-striped"><tbody>';
+        // str += '<tr style="text-align: center"><td colspan="12">' + index + '</td></tr>';
+        str += '<tr style="text-align: center;"><td>名称</td><td>颁发机构</td><td>起始时间</td><td>有效期时间</td><td>状态</td></tr>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 $.each(value.message, function (index, value) {
@@ -1556,11 +1559,11 @@ function addCert(str, index, value) {
                     } else {
                         str += '<tr style="text-align: center"><td>' + value.message + '</td>';
                     }
-                    str += '<td>' + value.subject + '</td>';
+                    // str += '<td>' + value.subject + '</td>';
                     str += '<td>' + value.issuer + '</td>';
-                    str += '<td>' + value.starTime + '</td>';
-                    str += '<td>' + value.endTime + '</td>';
-                    str += '<td>' + value.result + '</td>';
+                    str += '<td data-format="YYYY-MM-DD hh:mm:ss">' + value.starTime + '</td>';
+                    str += '<td data-format="YYYY-MM-DD hh:mm:ss">' + value.endTime + '</td>';
+                    // str += '<td>' + value.result + '</td>';
                     if (value.status === 0) {
                         str += '<td>异常</td>';
                     } else {
@@ -1570,15 +1573,15 @@ function addCert(str, index, value) {
                 });
             }
         });
-        str += '</table>';
+        str += '</tbody></table>';
     }
     return str;
 }
 
 function addThree(str, index, value) {
     if (value.length > 0) {
-        str += '<table class="table table-bordered table-striped">';
-        str += '<tr style="text-align: center"><td colspan="12">' + index + '</td></tr>';
+        str += '<strong>' + index + '</strong>';
+        str += '<table class="table table-bordered table-striped"><tbody>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
                 $.each(value.message, function (index, value) {
@@ -1594,10 +1597,10 @@ function addThree(str, index, value) {
 }
 
 function showTable(monitorType) {
-    let body = '<div class="main-content"><div class="panel panel-default"><div class="panel-body">';
-    if (monitorType.deviceId === "实例状态") {
-        body += '<table class="table table-bordered table-striped">';
-    }
+    let body = '<div class="main-content"><div class="panel panel-default"><div class="panel-body"><div class="row"><div class="col-md-12">';
+    // if (monitorType.deviceId === "实例状态") {
+    //     body += '<table class="table table-bordered table-striped">';
+    // }
 
     if (!isEmpty(monitorType.message)) {
         $.each(monitorType.message, function (index, value) {
@@ -1631,19 +1634,15 @@ function showTable(monitorType) {
                     s += addApplication(s, index, value);
                     break;
                 case "INSTANCES_WEB70":
-                    // s += addOne(s, index, value);
                     s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_WEBPROXY40":
-                    // s += addOne(s, index, value);
                     s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_CONFIG":
-                    // s += addOne(s, index, value);
                     s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_USER":
-                    // s += addOne(s, index, value);
                     s += addInstances(s, index, value);
                     break;
                 case "NETWORK":
@@ -1668,9 +1667,9 @@ function showTable(monitorType) {
             body += s;
         });
     }
-    if (message.deviceId === "实例状态") {
-        body += '</table>';
-    }
-    body += '</div></div></div>';
+    // if (message.deviceId === "实例状态") {
+    //     body += '</table>';
+    // }
+    body += '</div></div></div></div></div>';
     return body;
 }

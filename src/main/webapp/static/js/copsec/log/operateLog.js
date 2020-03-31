@@ -54,8 +54,8 @@ function page(id, url) {
         "paging": true,//是否分页
         "pagingType": "full_numbers",//分页时会有首页，尾页，上一页和下一页四个按钮,加上数字按钮
         "bLengthChange": true, //开关，是否显示每页显示多少条数据的下拉框
-        "aLengthMenu": [10, 25, 50, 100],
-        'iDisplayLength': 10, //每页初始显示5条记录
+        "aLengthMenu": [20, 50, 100, 200],
+        'iDisplayLength': 20, //每页初始显示5条记录
         'bFilter': false,  //是否使用内置的过滤功能
         "bInfo": true, //开关，是否显示表格的一些信息(当前显示XX-XX条数据，共XX条)
         "bPaginate": true, //开关，是否显示分页器

@@ -57,12 +57,6 @@ function page(id, url, newId) {
                     }
                 },
                 "data": data.data[0],//若使用客户端分页，则将表格的数据填写到data属性中，需要数组,数组里面要求是对象
-                "aoColumnDefs":[
-                    {"sClass":"col_class","aTargets":[2]},
-                    {"sClass":"col_class","aTargets":[3]},
-                    {"sClass":"col_class","aTargets":[4]},
-                    {"sClass":"col_class","aTargets":[5]}
-                ],
                 "aoColumns": [//渲染每一列，其实就是配置表头和数据对应显示到哪一列中
                     {
                         "mData": "taskId",
@@ -76,7 +70,7 @@ function page(id, url, newId) {
                     {
                         "mData": "taskId",//读取数组的对象中的id属性
                         "sTitle": "序号",//表头
-                        "sClass": "text-center col_class",
+                        "sClass": "text-center",
                         "width": "7%",
                         "mRender": function (d, type, full, meta) {//如果需要显示的内容需根据数据封装加工的就写这个属性，0
                             //回调中有4个参数，d：对应mData中的属性的值；type：对应值的类型；full：对应当前这一行的数据，meta对应dataTable的配置

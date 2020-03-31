@@ -10,11 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PageUtils {
     public static Pageable returnPageable(PageInfo condition) {
-        Pageable pageable = null;
+        Pageable pageable;
         if (!ObjectUtils.isEmpty(condition.getSEcho()) && !ObjectUtils.isEmpty(condition.getIDisplayStart()) && !ObjectUtils.isEmpty(condition.getIDisplayLength())) {
-            pageable = PageRequest.of((condition.getIDisplayStart()) / 10, condition.getIDisplayLength());
+            pageable = PageRequest.of((condition.getIDisplayStart()) / 20, condition.getIDisplayLength());
         } else {
-            pageable = PageRequest.of(0, 10);
+            pageable = PageRequest.of(0, 20);
         }
         return pageable;
     }

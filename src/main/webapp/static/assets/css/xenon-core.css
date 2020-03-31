@@ -660,8 +660,8 @@ footer.main-footer .go-up a,
   clear: both;
 }
 body {
-  /*background-color: #eeeeee;*/
-    background-color: #14173e;
+  background-color: #eeeeee;
+    /*background-color: #14173e;*/
 }
 a {
   outline: none !important;
@@ -5389,7 +5389,7 @@ blockquote small {
 .table > thead > tr > th {
   position: relative;
   border-bottom: 1px solid #eeeeee;
-  color: #ffffff;
+  color: #272727;
 }
 .table > thead > tr > td:after,
 .table > thead > tr > th:after {
@@ -5448,12 +5448,12 @@ blockquote small {
   padding: 5px 8px;
 }
 .table.table-model-2 > thead > tr {
-  /*background: #68b828;*/
-    background: #00b19d;
+  background: #68b828;
+    /*background: #00b19d;*/
 }
 .table.table-model-2 > thead > tr > th{
-    /*background: #68b828;*/
-    background: #00b19d;
+    background: #68b828;
+    /*background: #00b19d;*/
 }
 .table.table-model-2 > thead > tr > td:after,
 .table.table-model-2 > thead > tr > th:after {

@@ -85,12 +85,6 @@
 <script type="text/javascript" src="<%=basePath %>static/js/tools/Math.uuid.js"></script>
 <script type="text/javascript" src="<%=basePath %>static/assets/js/tocify/jquery.tocify.min.js"></script>
 
-<style>
-    .col_class{
-        color: #333333;
-    }
-</style>
-
 <div class="modal fade" id="message">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -110,7 +104,7 @@
 </div>
 
 <div class="modal fade custom-width" id="showTable">
-    <div class="modal-dialog" style="width: 60%">
+    <div class="modal-dialog" style="width: 70%">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

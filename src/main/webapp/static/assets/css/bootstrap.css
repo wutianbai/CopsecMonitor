@@ -4322,7 +4322,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 .pagination > li > span:hover,
 .pagination > li > a:focus,
 .pagination > li > span:focus {
-  color: #16191e;
+  color: #272727;
   background-color: #eeeeee;
   border-color: #dddddd;
 }

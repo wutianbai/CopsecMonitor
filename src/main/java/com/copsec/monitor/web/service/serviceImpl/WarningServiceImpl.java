@@ -2,6 +2,7 @@ package com.copsec.monitor.web.service.serviceImpl;
 
 import com.copsec.monitor.web.beans.UserBean;
 import com.copsec.monitor.web.beans.UserInfoBean;
+import com.copsec.monitor.web.beans.monitor.MonitorEnum.WarningLevel;
 import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.beans.node.Status;
 import com.copsec.monitor.web.beans.warning.Report;
@@ -196,7 +197,13 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
         content.forEach(item -> {
             WarningHistoryBean bean = new WarningHistoryBean();
             bean.setEventId(item.getId().toHexString());
-            bean.setEventSource(item.getEventSource().getName());
+
+            if (ObjectUtils.isEmpty(item.getEventSource())) {
+                bean.setEventSource("");
+            } else {
+                bean.setEventSource(item.getEventSource().getName());
+            }
+
             bean.setEventTime(FormatUtils.getFormatDate(item.getEventTime()));
             bean.setEventDetail(item.getEventDetail());
             bean.setEventType(item.getEventType().getName());
@@ -345,6 +352,43 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
         }
         deviceStatus.setDeviceId(report.getDeviceId());
         deviceStatus.setMessage(monitorTypeMap);
+
+        long errorStatus;
+        if (!ObjectUtils.isEmpty(report.getReportTime())) {
+            deviceStatus.setUpdateTime(FormatUtils.getFormatDate(report.getReportTime()));
+            errorStatus = System.currentTimeMillis() - report.getReportTime().getTime();
+        } else {
+            errorStatus = config.getDeviceUpdateTime() * 30000 + 1;
+        }
+
+        if (errorStatus > (config.getDeviceUpdateTime() * 30000)) {//上报超时 并产生告警
+            deviceStatus.setWarnMessage(Resources.ERROR_MESSAGE);
+            deviceStatus.setStatus(2);
+
+            WarningEvent warningEvent = new WarningEvent();
+            warningEvent.setMonitorId(report.getDeviceId());//设置监控ID为设备ID
+            warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
+            warningEvent.setEventDetail("上报超时 设备失去连接");
+            warningEvent.setEventTime(new Date());
+            warningEvent.setDeviceId(report.getDeviceId());
+            warningEvent.setDeviceName(device.getData().getDeviceHostname());
+            if (!ObjectUtils.isEmpty(device.getData().getMonitorUserId())) {
+                warningEvent.setUserId(userInfo.getUserId());
+                warningEvent.setUserName(userInfo.getUserName());
+                warningEvent.setUserMobile(userInfo.getMobile());
+            }
+
+            if (!warningService.checkIsWarningByTime(warningEvent.getMonitorId())) {
+                warningService.insertWarningEvent(warningEvent);
+            }
+        } else if (deviceStatus.getStatus() == 0) {
+            deviceStatus.setWarnMessage(Resources.WARNING_MESSAGE);
+            warningService.handleDeviceOutTimeWarning(report.getDeviceId());
+        } else {
+            deviceStatus.setWarnMessage(Resources.NORMAL_MESSAGE);
+            warningService.handleDeviceOutTimeWarning(report.getDeviceId());
+        }
+
         DeviceStatusPools.getInstances().update(report.getDeviceId(), deviceStatus);//更新设备状态缓存池
     }
 }

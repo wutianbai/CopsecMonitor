@@ -41,7 +41,7 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
     }
 
     @Override
-    public synchronized List<WarningEvent> findWarningEventByCondition(WarningEventBean condition) {
+    public List<WarningEvent> findWarningEventByCondition(WarningEventBean condition) {
         Query query = new Query();
         Sort sort = new Sort(Sort.Direction.DESC, "eventTime");
         Criteria criteria = new Criteria();
@@ -127,7 +127,6 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
         WarningEventBean condition = new WarningEventBean();
         condition.setMonitorId(deviceId);
         List<WarningEvent> warningEventList = findWarningEventByCondition(condition);
-
         List<WarningHistory> warningHistoryList = new ArrayList<>();
         if (warningEventList.size() > 0) {
             warningEventList.forEach(warningEvent -> {
@@ -144,7 +143,6 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
                 warningHistory.setDealTime(new Date());
                 warningHistory.setStatus(1);
                 warningHistoryList.add(warningHistory);
-
             });
         }
         this.mongoTemplate.insert(warningHistoryList, WarningHistory.class);

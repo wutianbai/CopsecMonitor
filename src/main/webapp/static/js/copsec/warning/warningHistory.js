@@ -23,7 +23,7 @@ function page(id, url) {
         {
             "mData": "eventId",//读取数组的对象中的id属性
             "sTitle": "序号",//表头
-            "sClass": "text-center col_class",
+            "sClass": "text-center",
             "width": "6%",//设置宽度,不设置的话就是自动分配
             "mRender": function (d, type, full, meta) {//如果需要显示的内容需根据数据封装加工的就写这个属性，0
                 //回调中有4个参数，d：对应mData中的属性的值；type：对应值的类型；full：对应当前这一行的数据，meta对应dataTable的配置
@@ -34,11 +34,6 @@ function page(id, url) {
         {
             "mData": "eventSource",
             "sTitle": "来源"
-        },
-        {
-            "mData": "eventTime",
-            "sTitle": "发生时间",
-            "width": "8%"
         },
         {
             "mData": "eventDetail",
@@ -65,6 +60,11 @@ function page(id, url) {
         {
             "mData": "userName",
             "sTitle": "处理账户",
+            "width": "8%"
+        },
+        {
+            "mData": "eventTime",
+            "sTitle": "发生时间",
             "width": "8%"
         },
         {
@@ -169,16 +169,6 @@ function page(id, url) {
                 "sLast": "》"
             }
         },
-        "aoColumnDefs": [
-            {"sClass": "col_class", "aTargets": [2]},
-            {"sClass": "col_class", "aTargets": [3]},
-            {"sClass": "col_class", "aTargets": [4]},
-            {"sClass": "col_class", "aTargets": [5]},
-            {"sClass": "col_class", "aTargets": [6]},
-            {"sClass": "col_class", "aTargets": [7]},
-            {"sClass": "col_class", "aTargets": [8]},
-            {"sClass": "col_class", "aTargets": [9]},
-        ],
         "aoColumns": aoColumns
     });
 }
