@@ -26,7 +26,7 @@
 
                 <div class="panel-options">
                     <%--<a href="#">--%>
-                        <%--<i class="linecons-cog"></i>--%>
+                    <%--<i class="linecons-cog"></i>--%>
                     <%--</a>--%>
 
                     <a href="#" data-toggle="panel">
@@ -39,7 +39,7 @@
                     </a>
 
                     <%--<a href="#" data-toggle="remove">--%>
-                        <%--&times;--%>
+                    <%--&times;--%>
                     <%--</a>--%>
                 </div>
             </div>

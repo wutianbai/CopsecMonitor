@@ -1,47 +1,24 @@
 jQuery(function () {
-    // var $ = jQuery;
-    // var navigateUrl = '../navigate';
-    // $(".navbar").load(navigateUrl + ' .navbar-inner');
-    //
-    // $('body').on('mouseover', 'li.has-sub', function () {
-    //     $(this).addClass('hover');
-    // });
-    //
-    // $('body').on('mouseout', 'li.has-sub', function () {
-    //     $(this).removeClass('hover');
-    // });
-    // $("body").find(".panel-heading").css("cursor", "pointer");
-    //
-    // $('body').on('click', '.panel-heading', function () {
-    //     var device = $(this).children().first();
-    //     if (device.hasClass('vertical-top')) {
-    //         return false;
-    //     }
-    //     if ($(this).parent().hasClass('collapsed')) {
-    //         $(this).parent().removeClass('collapsed');
-    //     } else {
-    //         $(this).parent().addClass('collapsed');
-    //     }
-    // });
-    //
-    // $("body").on('click', ".collapse-icon", function () {
-    //     if ($(this).parent().parent().parent().parent().hasClass('collapsed')) {
-    //         $(this).parent().parent().parent().parent().removeClass('collapsed');
-    //     } else {
-    //         $(this).parent().parent().parent().parent().addClass('collapsed');
-    //     }
-    // });
-
-    // $("body").on('click', ".expand-icon", function () {
-    //     if ($(this).parent().parent().parent().parent().hasClass('collapsed')) {
-    //         $(this).parent().parent().parent().parent().removeClass('collapsed');
-    //     } else {
-    //         $(this).parent().parent().parent().parent().addClass('collapsed');
-    //     }
-    // });
-
     getWarningStatus();
     setInterval(getWarningStatus, 2000);
+
+    $("#jquery_jplayer").jPlayer({
+        ready: function () {
+            $(this).jPlayer("setMedia", {
+                title: "Warning",
+                mp3: contextPath + "static/audio/warning.mp3"
+            });
+        },
+        swfPath: contextPath + "static/jplayer/dist/jplayer",
+        supplied: "mp3",
+        wmode: "window",
+        useStateClassSkin: true,
+        autoBlur: false,
+        smoothPlayBar: true,
+        keyEnabled: true,
+        remainingDuration: true,
+        toggleDuration: true
+    });
 });
 
 function getWarningStatus() {
@@ -59,11 +36,15 @@ function getWarningStatus() {
                 $("#badge").addClass("badge-red");
                 $("#badge").text(data.iTotalDisplayRecords);
                 $("#warningStrong").text(data.iTotalDisplayRecords);
+
+                $("#jquery_jplayer").jPlayer("play");//播放告警音频
             } else {
                 $("#badge").removeClass("badge-red");
                 $("#badge").addClass("badge-green");
                 $("#badge").text("");
                 $("#warningStrong").text("0");
+
+                $("#jquery_jplayer").jPlayer("pause");//暂停告警音频
             }
             setScrollbar(data.data);
         },
@@ -143,7 +124,6 @@ function handleAllWarningEvent() {
     });
     getWarningStatus();
 }
-
 /**
  * _url:传入链接地址
  * _method:post or get
@@ -186,11 +166,11 @@ function copsec_search() {
      * 执行搜索函数方法
      */
     this.getData = function (callback) {
-        var $pageInfo = $('#' + this.pageInfo);
+        let $pageInfo = $('#' + this.pageInfo);
 
-        var $page = $('#' + this.page);
+        let $page = $('#' + this.page);
 
-        var $state = $("#" + this.idCheckBox + " thead tr th input[type=checkbox]");
+        let $state = $("#" + this.idCheckBox + " thead tr th input[type=checkbox]");
         if ($state.is(':checked')) {
             $state.prop('checked', false).trigger('change');
         }
@@ -201,11 +181,11 @@ function copsec_search() {
             data: this.data,
             success: function (data, status, jqXHR) {
                 $pageInfo.children().remove();
-                var $tip = $("<label>第</label>");
-                var $select = $("<select class='input-sm'></select>"),
+                let $tip = $("<label>第</label>");
+                let $select = $("<select class='input-sm'></select>"),
                     $sizeSelect = $("<select class='input-sm'><option value='10'>10</option><option value='20'>20</option><option value='50'>50</option><option value='100'>100</option></select>");
 
-                var selectStart = 1, selectEnd = 0;
+                let selectStart = 1, selectEnd = 0;
                 if (data.totalPages <= 10) {
                     selectEnd = data.totalPages;
                 } else if (data.totalPages >= 10) {
@@ -221,7 +201,7 @@ function copsec_search() {
                         selectEnd = data.totalPages;
                     }
                 }
-                for (var num = selectStart; num <= selectEnd; num++) {
+                for (let num = selectStart; num <= selectEnd; num++) {
                     if (num === (data.number + 1)) {
                         $select.append("<option value=" + num + " selected>" + num + "</option>");
                     } else {
@@ -235,12 +215,12 @@ function copsec_search() {
                 $pageInfo.append($tip);
 
                 $page.children().remove();
-                var start = 0, total = 0;
+                let start = 0, total = 0;
                 if (data.totalPages <= 5) {
                     start = 1;
                     total = data.totalPages;
                 } else if (data.totalPages > 5) {
-                    var _c = parseInt(data.number + 1);
+                    let _c = parseInt(data.number + 1);
                     if ((_c - 2) <= 0 && (_c + 2) <= 5) {
                         start = 1;
                         total = 5;
@@ -289,10 +269,10 @@ function copsec_search() {
      * 执行chechbox绑定
      */
     this.bind = function () {
-        var $state = $("#" + this.idCheckBox + " thead input[type='checkbox']");
-        var _list = this.list;
+        let $state = $("#" + this.idCheckBox + " thead input[type='checkbox']");
+        let _list = this.list;
         $state.on('change', function (ev) {
-            var $chcks = $("#" + _list + " tr td input[type='checkbox']");
+            let $chcks = $("#" + _list + " tr td input[type='checkbox']");
             if ($state.is(':checked')) {
                 $chcks.prop('checked', true).trigger('change');
             } else {
@@ -312,10 +292,10 @@ function copsec_search() {
      * 执行分页绑定
      */
     this.bindPageLink = function (callback, fillData) {
-        var copsec = Object.create(this);
+        let copsec = Object.create(this);
         $("#" + this.page).on('click', 'li a', function () {
 
-            var result = 0;
+            let result = 0;
             if ($(this).parent().hasClass('previous')) {
                 result = parseInt($("#" + copsec.page + " li[class~='active']").children().first().text()) - 1;
                 if (!$.isNumeric(result) || result <= 0) {
@@ -326,7 +306,7 @@ function copsec_search() {
             } else {
                 result = ($(this).text());
             }
-            var data = callback(result);
+            let data = callback(result);
             copsec.put(data);
             copsec.getData(fillData);
         });
@@ -336,10 +316,10 @@ function copsec_search() {
      * 执行查询绑定
      */
     this.searchBind = function (dataCall, fillCallback) {
-        var $proxy = Object.create(this);
+        let $proxy = Object.create(this);
         $("#" + this.searchId).on('click', function () {
 
-            var _condition = dataCall(1);
+            let _condition = dataCall(1);
             $proxy.put(_condition);
             $proxy.getData(fillCallback);
         });
@@ -352,11 +332,11 @@ function copsec_search() {
     };
 
     this.selectBind = function (dataCall, callback) {
-        var $proxy = Object.create(this);
-        var $pageInfo = $('#' + this.pageInfo);
+        let $proxy = Object.create(this);
+        let $pageInfo = $('#' + this.pageInfo);
         $pageInfo.on('change', 'select:nth-child(1)', function () {
 
-            var $select = $(this);
+            let $select = $(this);
             $proxy.search(dataCall($select.find('option:selected').val()), callback);
         });
         $pageInfo.on('change', 'select:nth-child(2)', function () {
@@ -367,13 +347,13 @@ function copsec_search() {
 
 //复选框全选功能
 function checkAll(id) {
-    var $chcks = $("#" + id + " tbody input[type='checkbox']");
+    let $chcks = $("#" + id + " tbody input[type='checkbox']");
     $chcks.prop('checked', true).trigger('change');
 }
 
 //复选框不选功能
 function uncheckAll(id) {
-    var $chcks = $("#" + id + " tbody input[type='checkbox']");
+    let $chcks = $("#" + id + " tbody input[type='checkbox']");
     $chcks.prop('checked', false).trigger('change');
 }
 
@@ -400,12 +380,12 @@ function isNumber(num) {
 }
 
 function isId(str) {
-    var reg = /[a-zA-Z0-9]+/;
+    let reg = /[a-zA-Z0-9]+/;
     return reg.test(str);
 }
 
 function ipTest(ip) {
-    var regStr = /^((25[0-5]|2[0-4]\d|[01]?\d\d?)($|(?!\.$)\.)){4}$/;
+    let regStr = /^((25[0-5]|2[0-4]\d|[01]?\d\d?)($|(?!\.$)\.)){4}$/;
     if (!ip) {
         return false;
     } else if ($.trim(ip) === "0.0.0.0") {
@@ -419,7 +399,7 @@ function formatSize2(size, pointLength, units) {
     if (size === 0) {
         return "0B";
     }
-    var unit = units || ['B', 'K', 'M', 'G', 'TB'];
+    let unit = units || ['B', 'K', 'M', 'G', 'TB'];
 
     while ((unit = units.shift()) && size > 1024) {
         size = size / 1024;
@@ -429,7 +409,7 @@ function formatSize2(size, pointLength, units) {
 }
 
 function isLinuxPath(path) {
-    var reg = /^\/(\w+\/?)+$/;
+    let reg = /^\/(\w+\/?)+$/;
     return reg.test(path);
 }
 

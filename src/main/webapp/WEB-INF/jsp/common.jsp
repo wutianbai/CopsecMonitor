@@ -85,6 +85,73 @@
 <script type="text/javascript" src="<%=basePath %>static/js/tools/Math.uuid.js"></script>
 <script type="text/javascript" src="<%=basePath %>static/assets/js/tocify/jquery.tocify.min.js"></script>
 
+<link rel="stylesheet" href="<%=basePath %>static/jplayer/dist/skin/pink.flag/css/jplayer.pink.flag.min.css">
+<%--<script type="text/javascript" src="<%=basePath %>static/jplayer/lib/jquery.min.js"></script>--%>
+<script type="text/javascript" src="<%=basePath %>static/jplayer/dist/jplayer/jquery.jplayer.min.js"></script>
+<%--<script type="text/javascript">--%>
+    <%--<![CDATA[--%>
+    <%--$(document).ready(function () {--%>
+        <%--$("#jquery_jplayer").jPlayer({--%>
+            <%--ready: function () {--%>
+                <%--$(this).jPlayer("setMedia", {--%>
+                    <%--title: "Warning",--%>
+                    <%--mp3: contextPath + "static/audio/warning.mp3"--%>
+                <%--});--%>
+            <%--},--%>
+            <%--swfPath: contextPath + "static/jplayer/dist/jplayer",--%>
+            <%--supplied: "mp3",--%>
+            <%--wmode: "window",--%>
+            <%--useStateClassSkin: true,--%>
+            <%--autoBlur: false,--%>
+            <%--smoothPlayBar: true,--%>
+            <%--keyEnabled: true,--%>
+            <%--remainingDuration: true,--%>
+            <%--toggleDuration: true--%>
+        <%--});--%>
+    <%--});--%>
+    <%--]]>--%>
+<%--</script>--%>
+<div id="jquery_jplayer" class="jp-jplayer" style="display: none"></div>
+<div id="jp_container" class="jp-audio" role="application" aria-label="media player"  style="display: none">
+    <div class="jp-type-single">
+        <div class="jp-gui jp-interface">
+            <div class="jp-volume-controls">
+                <button class="jp-mute" role="button" tabindex="0">mute</button>
+                <button class="jp-volume-max" role="button" tabindex="0">max volume</button>
+                <div class="jp-volume-bar">
+                    <div class="jp-volume-bar-value"></div>
+                </div>
+            </div>
+            <div class="jp-controls-holder">
+                <div class="jp-controls">
+                    <button class="jp-play" role="button" tabindex="0">play</button>
+                    <button class="jp-stop" role="button" tabindex="0">stop</button>
+                </div>
+                <div class="jp-progress">
+                    <div class="jp-seek-bar">
+                        <div class="jp-play-bar"></div>
+                    </div>
+                </div>
+                <div class="jp-current-time" role="timer" aria-label="time">&nbsp;</div>
+                <div class="jp-duration" role="timer" aria-label="duration">&nbsp;</div>
+                <div class="jp-toggles">
+                    <button class="jp-repeat" role="button" tabindex="0">repeat</button>
+                </div>
+            </div>
+        </div>
+        <div class="jp-details">
+            <div class="jp-title" aria-label="title">&nbsp;</div>
+        </div>
+        <div class="jp-no-solution">
+            <span>Update Required</span>
+            To play the media you will need to either update your browser to a recent version or
+            update
+            your <a
+                href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="message">
     <div class="modal-dialog">
         <div class="modal-content">

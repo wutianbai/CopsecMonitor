@@ -10,15 +10,12 @@
                 <ul>
                     <li>
                         <a href="#" id="addDevice"><i class="fa-plus"></i>${system.deviceAdd}</a>
-                        <%--<a href="#" id="addDevice"><i class="fa-plus"></i></a>--%>
                     </li>
                     <li>
                         <a href="#" id="editDevice"><i class="fa-pencil"></i>${system.deviceEdit}</a>
-                        <%--<a href="#" id="editDevice"><i class="fa-pencil"></i></a>--%>
                     </li>
                     <li>
                         <a href="#" id="deleteDevice"><i class="fa-trash"></i>${system.deviceDelete}</a>
-                        <%--<a href="#" id="deleteDevice"><i class="fa-trash"></i></a>--%>
                     </li>
                 </ul>
             </li>
@@ -61,7 +58,6 @@
 
             <li id="topologyUpdate">
                 <a href="#">
-                    <%--<i class="fa-area-chart"></i>--%>
                     <i class=""><span class="fa fa-spin fa-circle-o-notch"></span></i>
                     <span class="title">${system.topologyUpdate}</span>
                 </a>
