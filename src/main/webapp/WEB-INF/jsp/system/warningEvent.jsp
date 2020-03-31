@@ -18,7 +18,7 @@
 <body class="page-body">
 <%@ include file="/WEB-INF/jsp/nav.jsp" %>
 <div class="page-container">
-    <%@ include file="/WEB-INF/jsp/sidebar.jsp" %>
+    <%--<%@ include file="/WEB-INF/jsp/sidebar.jsp" %>--%>
     <div class="main-content">
         <div class="panel panel-default" id="warningEventPanel">
             <div class="panel-heading">

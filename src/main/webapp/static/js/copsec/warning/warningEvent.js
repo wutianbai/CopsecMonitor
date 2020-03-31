@@ -1,4 +1,4 @@
-var oTable;//定义变量名，用于存放dataTable对象，一般定义为全局的比较好
+let oTable;//定义变量名，用于存放dataTable对象，一般定义为全局的比较好
 function searchByCondition() {
     page("warningEventTable", contextPath + "warning/event/search");
 }
@@ -36,7 +36,7 @@ function page(id, url) {
                 "name": "eventDetail",
                 "value": $("#eventDetail").val()
             });
-            var time = $("#eventTime").val().split("&");
+            let time = $("#eventTime").val().split("&");
             aoData.push({
                 "name": "start",
                 "value": time[0]
@@ -50,8 +50,8 @@ function page(id, url) {
         "paging": true,//是否分页
         "pagingType": "full_numbers",//分页时会有首页，尾页，上一页和下一页四个按钮,加上数字按钮
         "bLengthChange": true, //开关，是否显示每页显示多少条数据的下拉框
-        "aLengthMenu": [10, 25, 50, 100],
-        'iDisplayLength': 10, //每页初始显示5条记录
+        "aLengthMenu": [20, 50, 100, 200],
+        'iDisplayLength': 20, //每页初始显示5条记录
         'bFilter': false,  //是否使用内置的过滤功能
         "bInfo": true, //开关，是否显示表格的一些信息(当前显示XX-XX条数据，共XX条)
         "bPaginate": true, //开关，是否显示分页器
@@ -66,12 +66,21 @@ function page(id, url) {
             "sZeroRecords": "没有检索到数据",
             "sSearch": "搜索",
             "oPaginate": {
-                "sFirst": "首页",
-                "sPrevious": "前一页",
-                "sNext": "后一页",
-                "sLast": "尾页"
+                "sFirst": "《",
+                "sPrevious": "<",
+                "sNext": ">",
+                "sLast": "》"
             }
         },
+        // "aoColumnDefs":[
+        //     {"sClass":"col_class","aTargets":[2]},
+        //     {"sClass":"col_class","aTargets":[3]},
+        //     {"sClass":"col_class","aTargets":[4]},
+        //     {"sClass":"col_class","aTargets":[5]},
+        //     {"sClass":"col_class","aTargets":[6]},
+        //     {"sClass":"col_class","aTargets":[7]},
+        //     {"sClass":"col_class","aTargets":[8]}
+        // ],
         "aoColumns": [//渲染每一列，其实就是配置表头和数据对应显示到哪一列中
             {
                 "mData": "eventId",
@@ -85,8 +94,8 @@ function page(id, url) {
             {
                 "mData": "eventId",//读取数组的对象中的id属性
                 "sTitle": "序号",//表头
-                "sClass": "text-center",
-                "width": "5%",//设置宽度,不设置的话就是自动分配
+                "sClass": "text-center col_class",
+                "width": "6%",//设置宽度,不设置的话就是自动分配
                 "mRender": function (d, type, full, meta) {//如果需要显示的内容需根据数据封装加工的就写这个属性，0
                     //回调中有4个参数，d：对应mData中的属性的值；type：对应值的类型；full：对应当前这一行的数据，meta对应dataTable的配置
                     //如果不清楚可以使用console.log();打印出来看看
@@ -99,7 +108,8 @@ function page(id, url) {
             },
             {
                 "mData": "eventTime",
-                "sTitle": "发生时间"
+                "sTitle": "发生时间",
+                "width": "8%"
             },
             {
                 "mData": "eventDetail",
@@ -107,7 +117,8 @@ function page(id, url) {
             },
             {
                 "mData": "eventType",
-                "sTitle": "类型"
+                "sTitle": "类型",
+                "width": "8%"
             },
             // {
             //     "mData": "deviceId",
@@ -115,7 +126,8 @@ function page(id, url) {
             // },
             {
                 "mData": "deviceName",
-                "sTitle": "设备名称"
+                "sTitle": "设备名",
+                "width": "7%"
             },
             // {
             //     "mData": "userId",
@@ -123,11 +135,13 @@ function page(id, url) {
             // },
             {
                 "mData": "userName",
-                "sTitle": "运维账户"
+                "sTitle": "运维账户",
+                "width": "8%"
             },
             {
                 "mData": "userMobile",
-                "sTitle": "联系方式"
+                "sTitle": "联系方式",
+                "width": "8%"
             },
             {
                 "mData": "eventId",
@@ -135,7 +149,7 @@ function page(id, url) {
                 "sClass": "text-center",
                 "width": "10%",
                 "mRender": function (d, type, full) {
-                    var str = '<a class="btn btn-secondary btn-sm btn-icon icon-left" onclick=\'updateData(' + JSON.stringify(full) + ')\'><i class="fa-minus-square-o"></i></a>';
+                    let str = '<a class="btn btn-secondary btn-sm btn-icon icon-left" onclick=\'updateData(' + JSON.stringify(full) + ')\'><i class="fa-minus-square-o"></i></a>';
                     str += '<a class="btn btn-danger btn-sm btn-icon icon-left" onclick=\'deleteData(' + JSON.stringify(full) + ')\'><i class="fa-trash"></i></a>';
                     return str;
                 }
@@ -148,7 +162,7 @@ jQuery(function () {
     searchByCondition();
 
     // Replace checkboxes when they appear
-    var $state = $("#warningEventTable thead input[type='checkbox']");
+    let $state = $("#warningEventTable thead input[type='checkbox']");
     $("#warningEventTable").on('draw.dt', function () {
         cbr_replace();
         $state.trigger('change');
@@ -159,9 +173,9 @@ jQuery(function () {
  * 处理事件
  */
 function updateData(bean) {
-    var $confirmButton = $("<button class='btn btn-success'>确认</button>");
+    let $confirmButton = $("<button class='btn btn-success'>确认</button>");
 
-    var $message = $('<h2 style="text-align: center">确认处理[' + bean.deviceName + ']此条事件？</h2>');
+    let $message = $('<h2 style="text-align: center">确认处理[' + bean.deviceName + ']此条事件？</h2>');
     $("#message").find(".modal-body").html($message);
     addButton("message", "系统提示", $confirmButton);
 
@@ -191,9 +205,9 @@ function updateData(bean) {
  * 删除事件
  */
 function deleteData(bean) {
-    var $confirmButton = $("<button class='btn btn-success'>确认</button>");
+    let $confirmButton = $("<button class='btn btn-success'>确认</button>");
 
-    var $message = $('<h2 style="text-align: center">确认删除[' + bean.deviceName + ']此条事件？</h2>');
+    let $message = $('<h2 style="text-align: center">确认删除[' + bean.deviceName + ']此条事件？</h2>');
     $("#message").find(".modal-body").html($message);
     addButton("message", "系统提示", $confirmButton);
 
@@ -223,7 +237,7 @@ function deleteData(bean) {
  * 处理所选事件
  */
 function handleCheck() {
-    var idArray = new Array();
+    let idArray = new Array();
     $("input:checkbox:checked").each(function () {
         idArray.push($(this).val());
     });
@@ -232,9 +246,9 @@ function handleCheck() {
         return;
     }
 
-    var $confirmButton = $("<button class='btn btn-success'>确认</button>");
+    let $confirmButton = $("<button class='btn btn-success'>确认</button>");
 
-    var $message = $('<h2 style="text-align: center">确认处理所选事件？</h2>');
+    let $message = $('<h2 style="text-align: center">确认处理所选事件？</h2>');
     $("#message").find(".modal-body").html($message);
     addButton("message", "系统提示", $confirmButton);
 
@@ -263,7 +277,7 @@ function handleCheck() {
  * 删除所选事件
  */
 function deleteCheck() {
-    var idArray = new Array();
+    let idArray = new Array();
     $("input:checkbox:checked").each(function () {
         idArray.push($(this).val());
     });
@@ -272,9 +286,9 @@ function deleteCheck() {
         return;
     }
 
-    var $confirmButton = $("<button class='btn btn-success'>确认</button>");
+    let $confirmButton = $("<button class='btn btn-success'>确认</button>");
 
-    var $message = $('<h2 style="text-align: center">确认删除所选事件？</h2>');
+    let $message = $('<h2 style="text-align: center">确认删除所选事件？</h2>');
     $("#message").find(".modal-body").html($message);
     addButton("message", "系统提示", $confirmButton);
 

@@ -9,6 +9,7 @@ import com.copsec.monitor.web.beans.monitor.MonitorItemBean;
 import com.copsec.monitor.web.beans.monitor.MonitorTaskBean;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
 import com.copsec.monitor.web.commons.CopsecResult;
+import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.config.SystemConfig;
 import com.copsec.monitor.web.exception.CopsecException;
 import com.copsec.monitor.web.fileReaders.*;
@@ -71,12 +72,13 @@ public class MonitorServiceImpl implements MonitorService {
         if (ObjectUtils.isEmpty(monitorTaskBean)) {
             return CopsecResult.failed("此设备无监控任务");
         }
+
         MonitorGroupBean monitorGroupBean = MonitorGroupPools.getInstances().get(monitorTaskBean.getGroupId());
         if (ObjectUtils.isEmpty(monitorGroupBean)) {
             return CopsecResult.failed("此设备无监控组");
         }
 
-        return CopsecResult.success(MonitorItemPools.getInstances().get(monitorGroupBean.getMonitorItems()));
+        return CopsecResult.success(MonitorItemPools.getInstances().get(Arrays.asList(monitorGroupBean.getMonitorItems().split(Resources.SPLITE, -1))));
     }
 
     @Override

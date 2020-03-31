@@ -63,7 +63,7 @@ public class BaseRepositoryImpl implements BaseRepositoryCustom {
     }
 
     @Override
-    public boolean deleteDeviceOutTimeWarning(String deviceId) {
+    public boolean handleDeviceOutTimeWarning(String deviceId) {
         return true;
     }
 

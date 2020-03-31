@@ -21,7 +21,7 @@ public class Data {
 
     private String deviceIP;
 
-    private String monitorUserId;
+    private String monitorUserId = "";
 
     private Date reportTime;
 

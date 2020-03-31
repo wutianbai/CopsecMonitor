@@ -34,7 +34,7 @@ public interface BaseRepositoryCustom {
 
     boolean deleteWarningEvent(WarningEvent bean);
 
-    boolean deleteDeviceOutTimeWarning(String deviceId);
+    boolean handleDeviceOutTimeWarning(String deviceId);
 
     Page<WarningHistory> findWarningHistoryByCondition(Pageable pageable, WarningHistoryBean condition);
 

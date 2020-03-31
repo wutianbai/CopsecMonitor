@@ -117,6 +117,7 @@ function setScrollbar(data) {
                 str += '<i class="fa fa-share-alt"></i>';
         }
         str += '<span class="line"><strong>' + value.eventDetail + '</strong></span>';
+        str += '<span class="line small">设备ID[' + value.deviceId + ']</span>';
         str += '<span class="line small time">' + value.eventTime + '</span></a></li>';
         s += str;
     });

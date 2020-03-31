@@ -12,7 +12,7 @@ public enum MonitorItemEnum {
     SYSTEMPATCH("系统补丁", 6, "默认值", MonitorTypeEnum.SYSTEM),
     APPLICATION("应用程序", 7, "请输入代理通道访问路径", MonitorTypeEnum.APPLICATION),
     INSTANCES_WEB70("Web70实例", 8, "请输入实例路径", MonitorTypeEnum.INSTANCE),
-    INSTANCES_WEBPROXY40("WebProxy实例", 9, "请输入实例路径", MonitorTypeEnum.INSTANCE),
+    INSTANCES_WEBPROXY40("WebProxy40实例", 9, "请输入实例路径", MonitorTypeEnum.INSTANCE),
     INSTANCES_CONFIG("配置储存库", 10, "请输入实例路径", MonitorTypeEnum.INSTANCE),
     INSTANCES_USER("用户储存库", 11, "请输入实例路径", MonitorTypeEnum.INSTANCE),
     NETWORK("网络", 12, "请输入网络IP地址", MonitorTypeEnum.NETWORK),

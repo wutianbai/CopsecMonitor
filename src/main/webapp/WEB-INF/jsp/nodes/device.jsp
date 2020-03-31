@@ -26,65 +26,65 @@
 <div class="page-container">
     <%@ include file="/WEB-INF/jsp/sidebar.jsp" %>
     <div class="main-content" style="height: 100%">
-        <div class="vertical-top">
-            <div class="btn-group left-dropdown">
-                <button type="button" class="btn btn-success">${system.deviceTitle}</button>
-                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                    <li class="fa-chevron-down"></li>
-                </button>
-                <ul class="dropdown-menu dropdown-success" role="menu">
-                    <li>
-                        <a href="#" id="addDevice"><i class="fa-plus"></i>${system.deviceAdd}</a>
-                    </li>
-                    <li>
-                        <a href="#" id="editDevice"><i class="fa-pencil"></i>${system.deviceEdit}</a>
-                    </li>
-                    <li>
-                        <a href="#" id="deleteDevice"><i class="fa-trash"></i>${system.deviceDelete}</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="btn-group left-dropdown">
-                <button type="button" class="btn btn-success">${system.linkTitle}</button>
-                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                    <li class="fa-chevron-down"></li>
-                </button>
-                <ul class="dropdown-menu dropdown-success" role="menu">
-                    <li>
-                        <a href="#" id="addLink"><i class="fa-plus"></i>${system.linkAdd}</a>
-                    </li>
-                    <li>
-                        <a href="#" id="editLink"><i class="fa-pencil"></i>${system.linkEdit}</a>
-                    </li>
-                    <li>
-                        <a href="#" id="deleteLink"><i class="fa-trash"></i>${system.linkDelete}</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="btn-group left-dropdown">
-                <button type="button" class="btn btn-success">${system.zoneTitle}</button>
-                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                    <li class="fa-chevron-down"></li>
-                </button>
-                <ul class="dropdown-menu dropdown-success" role="menu">
-                    <li>
-                        <a href="#" id="addZone"><i class="fa-plus"></i>${system.zoneAdd}</a>
-                    </li>
-                    <li>
-                        <a href="#" id="editZone"><i class="fa-pencil"></i>${system.zoneUpdate}</a>
-                    </li>
-                    <li>
-                        <a href="#" id="deleteZone"><i class="fa-trash"></i>${system.zoneDelete}</a>
-                    </li>
-                </ul>
-            </div>
-            <div id="topologyUpdate" class="btn-group left-dropdown">
-                <button type="button" class="btn btn-success">${system.topologyUpdate}</button>
-                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                    <i class=""><span class="fa fa-spin fa-circle-o-notch"></span></i>
-                </button>
-            </div>
-        </div>
+        <%--<div class="vertical-top">--%>
+            <%--<div class="btn-group left-dropdown">--%>
+                <%--<button type="button" class="btn btn-success">${system.deviceTitle}</button>--%>
+                <%--<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">--%>
+                    <%--<li class="fa-chevron-down"></li>--%>
+                <%--</button>--%>
+                <%--<ul class="dropdown-menu dropdown-success" role="menu">--%>
+                    <%--<li>--%>
+                        <%--<a href="#" id="addDevice"><i class="fa-plus"></i>${system.deviceAdd}</a>--%>
+                    <%--</li>--%>
+                    <%--<li>--%>
+                        <%--<a href="#" id="editDevice"><i class="fa-pencil"></i>${system.deviceEdit}</a>--%>
+                    <%--</li>--%>
+                    <%--<li>--%>
+                        <%--<a href="#" id="deleteDevice"><i class="fa-trash"></i>${system.deviceDelete}</a>--%>
+                    <%--</li>--%>
+                <%--</ul>--%>
+            <%--</div>--%>
+            <%--<div class="btn-group left-dropdown">--%>
+                <%--<button type="button" class="btn btn-success">${system.linkTitle}</button>--%>
+                <%--<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">--%>
+                    <%--<li class="fa-chevron-down"></li>--%>
+                <%--</button>--%>
+                <%--<ul class="dropdown-menu dropdown-success" role="menu">--%>
+                    <%--<li>--%>
+                        <%--<a href="#" id="addLink"><i class="fa-plus"></i>${system.linkAdd}</a>--%>
+                    <%--</li>--%>
+                    <%--<li>--%>
+                        <%--<a href="#" id="editLink"><i class="fa-pencil"></i>${system.linkEdit}</a>--%>
+                    <%--</li>--%>
+                    <%--<li>--%>
+                        <%--<a href="#" id="deleteLink"><i class="fa-trash"></i>${system.linkDelete}</a>--%>
+                    <%--</li>--%>
+                <%--</ul>--%>
+            <%--</div>--%>
+            <%--<div class="btn-group left-dropdown">--%>
+                <%--<button type="button" class="btn btn-success">${system.zoneTitle}</button>--%>
+                <%--<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">--%>
+                    <%--<li class="fa-chevron-down"></li>--%>
+                <%--</button>--%>
+                <%--<ul class="dropdown-menu dropdown-success" role="menu">--%>
+                    <%--<li>--%>
+                        <%--<a href="#" id="addZone"><i class="fa-plus"></i>${system.zoneAdd}</a>--%>
+                    <%--</li>--%>
+                    <%--<li>--%>
+                        <%--<a href="#" id="editZone"><i class="fa-pencil"></i>${system.zoneUpdate}</a>--%>
+                    <%--</li>--%>
+                    <%--<li>--%>
+                        <%--<a href="#" id="deleteZone"><i class="fa-trash"></i>${system.zoneDelete}</a>--%>
+                    <%--</li>--%>
+                <%--</ul>--%>
+            <%--</div>--%>
+            <%--<div id="topologyUpdate" class="btn-group left-dropdown">--%>
+                <%--<button type="button" class="btn btn-success">${system.topologyUpdate}</button>--%>
+                <%--<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">--%>
+                    <%--<i class=""><span class="fa fa-spin fa-circle-o-notch"></span></i>--%>
+                <%--</button>--%>
+            <%--</div>--%>
+        <%--</div>--%>
         <div id="cy" class="cy"></div>
     </div>
 </div>

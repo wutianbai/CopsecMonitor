@@ -26,7 +26,8 @@ public class MemoryHandlerImpl extends ReportBaseHandler implements ReportHandle
     private static final Logger logger = LoggerFactory.getLogger(MemoryHandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = baseHandle(deviceStatus, device, userInfo, warningService, reportItem);
+        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
 
         Status monitorItemType = new Status();
 

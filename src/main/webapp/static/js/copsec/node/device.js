@@ -10,7 +10,7 @@ jQuery(function () {
         ERROR_STATUS = 0,
         ERROR_COLOR = "#cb5353",
         NORMAL_COLOR = "#5ab95d",
-        WARNING_COLOR = "#c4b500",
+        WARNING_COLOR = "#ffff00",
         RUNNING_COLOR = "rgb(0, 209, 255)";
 
     let SWITCH_NORMAL = contextPath + "static/images/server/switch/switch-32-n1.svg",
@@ -418,6 +418,7 @@ jQuery(function () {
             cy.add(data.data[0]);
             cy.add(data.data[1]);
 
+            $("#monitorUserId").append('<option value="">无</option>');
             $.each(data.data[3], function (index, value) {
                 $("#monitorUserId").append("<option value=" + value.userId + ">" + value.userName + "</option>");
             });
@@ -428,9 +429,7 @@ jQuery(function () {
                     showStatus(ele, START_MESSAGE);
 
                     //设备初始状态都标红
-                    // updateStatus(ele, ERROR_COLOR, _text);
                     updateNode(ele, ERROR_STATUS);
-                    // updateEdeges(ele, "highlightedError");
                 }
             });
         } else {
@@ -517,6 +516,7 @@ jQuery(function () {
     });
 
     let $zones = $("#zone");
+
     function reloadZone() {
         let zones = getNetworkZone();
         $zones.empty();
@@ -579,10 +579,10 @@ jQuery(function () {
                 }
             }
 
-            if (isEmpty(monitorUserId)) {
-                toastr.error("请选择运维负责人", opts);
-                return false;
-            }
+            // if (isEmpty(monitorUserId)) {
+            //     toastr.error("请选择运维负责人", opts);
+            //     return false;
+            // }
 
             if (!isNumber(x) || !isNumber(y)) {
                 toastr.error("请输入数字坐标", opts);
@@ -671,10 +671,10 @@ jQuery(function () {
                 }
             }
 
-            if (isEmpty(monitorUserId)) {
-                toastr.error("请选择运维负责人", opts);
-                return false;
-            }
+            // if (isEmpty(monitorUserId)) {
+            //     toastr.error("请选择运维负责人", opts);
+            //     return false;
+            // }
 
             $.ajax({
                 url: contextPath + 'node/device/update',
@@ -1194,6 +1194,8 @@ jQuery(function () {
         tip.hide();
     }
 
+    getDeviceStatus();
+
     function getDeviceStatus() {
         $.ajax({
             url: contextPath + 'node/status/' + $.now(),
@@ -1208,22 +1210,22 @@ jQuery(function () {
                         _text = getStatusText(v);
                         if (v.status === ERROR_STATUS) {
                             if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
-                                toastr.error(cy.$id(k).data('deviceHostname') + " 设备状态异常!", "系统提示", opts);
-                                // updateStatus(cy.$id(k), WARNING_COLOR, _text);
-                                // updateNode(cy.$id(k), WARNING_STATUS);
-                                // updateEdeges(cy.$id(k), "highlightedError");
+                                // toastr.error(cy.$id(k).data('deviceHostname') + " 设备状态异常!", "系统提示", opts);
                                 updateStatus(cy.$id(k), ERROR_COLOR, _text);
                                 updateNode(cy.$id(k), ERROR_STATUS);
                                 updateEdeges(cy.$id(k), "highlightedError");
                             }
                         } else if (v.status === WARNING_STATUS) {
                             if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
-                                toastr.error(cy.$id(k).data('deviceHostname') + " 设备上报超时!", "系统提示", opts);
-                                updateStatus(cy.$id(k), WARNING_COLOR, _text);
-                                updateNode(cy.$id(k), WARNING_STATUS);
-                                updateEdeges(cy.$id(k), "highlightedWarning");
+                                // toastr.error(cy.$id(k).data('deviceHostname') + " 设备上报超时!", "系统提示", opts);
+                                // updateStatus(cy.$id(k), WARNING_COLOR, _text);
+                                // updateNode(cy.$id(k), WARNING_STATUS);
+                                // updateEdeges(cy.$id(k), "highlightedWarning");
+                                updateStatus(cy.$id(k), ERROR_COLOR, _text);
+                                updateNode(cy.$id(k), ERROR_STATUS);
+                                updateEdeges(cy.$id(k), "highlightedError");
                             }
-                        } else if (v.status === NORMAL_STATUS){
+                        } else if (v.status === NORMAL_STATUS) {
                             updateStatus(cy.$id(k), NORMAL_COLOR, _text);
                             updateNode(cy.$id(k), NORMAL_STATUS);
                             updateEdeges(cy.$id(k), "highlightedIn");
@@ -1236,7 +1238,7 @@ jQuery(function () {
             }
         });
     }
-    getDeviceStatus();
+
     setInterval(getDeviceStatus, 20000);
 
     function getStatusText(status) {
@@ -1247,7 +1249,7 @@ jQuery(function () {
                 let s = '';
                 if (!isEmpty(value.message)) {
                     if (value.status === 0) {
-                        s += '<tr><td name="list" type=' + JSON.stringify(value) + '>' + value.deviceId + '</td><td style="color: red">异常</td>';
+                        s += '<tr><td name="list" type=' + JSON.stringify(value) + '>' + value.deviceId + '</td><td style="color: yellow">异常</td>';
                     } else {
                         s += '<tr><td name="list" type=' + JSON.stringify(value) + '>' + value.deviceId + '</td><td>正常</td>';
                     }
@@ -1259,15 +1261,14 @@ jQuery(function () {
         str += '<tr><td>状态:</td><td>' + status.warnMessage + '</td></tr>';
         str += '<tr><td>更新时间:</td><td>' + status.updateTime + '</td></tr>';
         str += '</table></div>';
+
         let div = $(str);
         div.on('click', 'td[name="list"]', function () {
             let title = $(this).text();
             let message = $(this).attr("type");
             $("#showTable").find(".modal-title").text(title);
-            // let str = '<table  class="table table-bordered table-striped" >';
-            // str += showTable(str, $.parseJSON(message));
+
             let body = showTable($.parseJSON(message));
-            // str += "</table>";
             $("#showTable").find(".modal-body").html(body);
 
             $("#showTable").modal('show', {backdrop: 'static'});
@@ -1367,6 +1368,8 @@ jQuery(function () {
         });
     }
 
+    movePoint();
+
     function movePoint() {
         cy.edges().each(function (e, index) {
             let sourcePosition = e.sourceEndpoint();
@@ -1412,7 +1415,7 @@ jQuery(function () {
                 });
         });
     }
-    movePoint();
+
     setInterval(movePoint, 3000);
 });
 
@@ -1539,6 +1542,39 @@ function addTwo(str, index, value) {
     return str;
 }
 
+function addCert(str, index, value) {
+    if (value.length > 0) {
+        str += '<table class="table table-bordered table-striped">';
+        str += '<tr style="text-align: center"><td colspan="12">' + index + '</td></tr>';
+        alert(str)
+        str += '<tr style="text-align: center"><td>名称</td><td>主体</td><td>颁发机构</td><td>起始时间</td><td>有效期时间</td><td>证书信息</td><td>状态</td></tr>';
+        $.each(value, function (index, value) {
+            if (!isEmpty(value.message)) {
+                $.each(value.message, function (index, value) {
+                    if (value.status === 0) {
+                        str += '<tr style="text-align: center;color: red"><td>' + value.message + '</td>';
+                    } else {
+                        str += '<tr style="text-align: center"><td>' + value.message + '</td>';
+                    }
+                    str += '<td>' + value.subject + '</td>';
+                    str += '<td>' + value.issuer + '</td>';
+                    str += '<td>' + value.starTime + '</td>';
+                    str += '<td>' + value.endTime + '</td>';
+                    str += '<td>' + value.result + '</td>';
+                    if (value.status === 0) {
+                        str += '<td>异常</td>';
+                    } else {
+                        str += '<td>正常</td>';
+                    }
+                    str += '</tr>';
+                });
+            }
+        });
+        str += '</table>';
+    }
+    return str;
+}
+
 function addThree(str, index, value) {
     if (value.length > 0) {
         str += '<table class="table table-bordered table-striped">';
@@ -1557,14 +1593,14 @@ function addThree(str, index, value) {
     return str;
 }
 
-function showTable(message) {
+function showTable(monitorType) {
     let body = '<div class="main-content"><div class="panel panel-default"><div class="panel-body">';
-    // if (message.deviceId === "实例状态") {
-    //     body += '<table class="table table-bordered table-striped">';
-    // }
+    if (monitorType.deviceId === "实例状态") {
+        body += '<table class="table table-bordered table-striped">';
+    }
 
-    if (!isEmpty(message.message)) {
-        $.each(message.message, function (index, value) {
+    if (!isEmpty(monitorType.message)) {
+        $.each(monitorType.message, function (index, value) {
             let s = '';
             switch (index) {
                 case "CPU":
@@ -1595,23 +1631,23 @@ function showTable(message) {
                     s += addApplication(s, index, value);
                     break;
                 case "INSTANCES_WEB70":
-                    s += addOne(s, index, value);
-                    // s += addInstances(s, index, value);
+                    // s += addOne(s, index, value);
+                    s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_WEBPROXY40":
-                    s += addOne(s, index, value);
-                    // s += addInstances(s, index, value);
+                    // s += addOne(s, index, value);
+                    s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_CONFIG":
-                    s += addOne(s, index, value);
-                    // s += addInstances(s, index, value);
+                    // s += addOne(s, index, value);
+                    s += addInstances(s, index, value);
                     break;
                 case "INSTANCES_USER":
-                    s += addOne(s, index, value);
-                    // s += addInstances(s, index, value);
+                    // s += addOne(s, index, value);
+                    s += addInstances(s, index, value);
                     break;
                 case "NETWORK":
-                    s += addOne(s, index, value);
+                    s += addApplication(s, index, value);
                     break;
                 case "ACCESSLOG":
                     s += addOne(s, index, value);
@@ -1620,10 +1656,10 @@ function showTable(message) {
                     s += addOne(s, index, value);
                     break;
                 case "CERT70":
-                    s += addTwo(s, index, value);
+                    s += addCert(s, index, value);
                     break;
                 case "CERT40":
-                    s += addTwo(s, index, value);
+                    s += addCert(s, index, value);
                     break;
                 case "IMSERVICE":
                     s += addTwo(s, index, value);
@@ -1632,9 +1668,9 @@ function showTable(message) {
             body += s;
         });
     }
-    // if (message.deviceId === "实例状态") {
-    //     body += '</table>';
-    // }
+    if (message.deviceId === "实例状态") {
+        body += '</table>';
+    }
     body += '</div></div></div>';
     return body;
 }

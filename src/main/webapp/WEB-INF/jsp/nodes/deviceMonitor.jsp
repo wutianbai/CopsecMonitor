@@ -24,7 +24,7 @@
 <body class="page-body" style="background-color: #2d2e30;">
 <%@ include file="/WEB-INF/jsp/nav.jsp" %>
 <div class="page-container">
-    <%@ include file="/WEB-INF/jsp/sidebar.jsp" %>
+    <%--<%@ include file="/WEB-INF/jsp/sidebar.jsp" %>--%>
     <div class="main-content" style="height: 100%">
         <div id="cy" class="cy"></div>
     </div>

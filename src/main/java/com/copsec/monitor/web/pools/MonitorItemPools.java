@@ -47,7 +47,6 @@ public class MonitorItemPools {
         idArray.stream().
                 filter(d -> !ObjectUtils.isEmpty(d) && map.containsKey(d))
                 .forEach((id) -> list.add(map.get(id)));
-
         return list;
     }
 

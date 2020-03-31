@@ -30,7 +30,8 @@ public class UserHandlerImpl extends ReportBaseHandler implements ReportHandler 
     private static final Logger logger = LoggerFactory.getLogger(UserHandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = baseHandle(deviceStatus, device, userInfo, warningService, reportItem);
+        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
 
         Status monitorItemType = new Status();
         ConcurrentHashMap<String, Status> map = new ConcurrentHashMap<>();

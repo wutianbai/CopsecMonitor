@@ -13,6 +13,8 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
+import com.copsec.monitor.web.utils.CommonUtils;
+import com.copsec.monitor.web.utils.FormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -28,7 +30,8 @@ public class Cert70HandlerImpl extends ReportBaseHandler implements ReportHandle
     private static final Logger logger = LoggerFactory.getLogger(Cert70HandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = baseHandle(deviceStatus, device, userInfo, warningService, reportItem);
+        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
 
         Status monitorItemType = new Status();
         ConcurrentHashMap<String, Status> CERT70Map = new ConcurrentHashMap<>();
@@ -41,7 +44,12 @@ public class Cert70HandlerImpl extends ReportBaseHandler implements ReportHandle
 
             //基本信息
             statusBean.setMessage("证书70[" + certInfo.getNickname() + "]");
+            statusBean.setSubject(certInfo.getSubject());
+            statusBean.setIssuer(certInfo.getIssuer());
+            statusBean.setStarTime(FormatUtils.getFormatDate(certInfo.getStarTime()));
+            statusBean.setEndTime(FormatUtils.getFormatDate(certInfo.getEndTime()));
             statusBean.setResult(certInfo.getMessage());
+            statusBean.setState(certInfo.getStatus() == 1 ? "正常" : "异常");
 
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
@@ -61,7 +69,8 @@ public class Cert70HandlerImpl extends ReportBaseHandler implements ReportHandle
                     }
                 });
             }
-            CERT70Map.putIfAbsent(certInfo.getNickname(), statusBean);
+//            CERT70Map.putIfAbsent(certInfo.getNickname(), statusBean);
+            CERT70Map.putIfAbsent(CommonUtils.generateString(6), statusBean);
         });
         monitorItemType.setMessage(CERT70Map);
 

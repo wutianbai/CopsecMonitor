@@ -39,10 +39,10 @@ function page(id, url, newId) {
                     "sZeroRecords": "没有检索到数据",
                     "sSearch": "搜索",
                     "oPaginate": {
-                        "sFirst": "首页",
-                        "sPrevious": "前一页",
-                        "sNext": "后一页",
-                        "sLast": "尾页"
+                        "sFirst": "《",
+                        "sPrevious": "<",
+                        "sNext": ">",
+                        "sLast": "》"
                     },
                     "oAria": {
                         "sSortAscending": ": 以升序排列此列",
@@ -50,7 +50,13 @@ function page(id, url, newId) {
                     }
                 },
                 "data": data.data,//若使用客户端分页，则将表格的数据填写到data属性中，需要数组,数组里面要求是对象
-                // "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ] }],
+                "aoColumnDefs":[
+                    {"sClass":"col_class","aTargets":[2]},
+                    {"sClass":"col_class","aTargets":[3]},
+                    {"sClass":"col_class","aTargets":[4]},
+                    {"sClass":"col_class","aTargets":[5]},
+                    {"sClass":"col_class","aTargets":[6]}
+                ],
                 "aoColumns": [//渲染每一列，其实就是配置表头和数据对应显示到哪一列中
                     {
                         // "bSortable": false,
@@ -66,8 +72,8 @@ function page(id, url, newId) {
                     {
                         "mData": "userId",//读取数组的对象中的id属性
                         "sTitle": "序号",//表头
-                        "sClass": "text-center",
-                        "width": "5%",//设置宽度,不设置的话就是自动分配
+                        "sClass": "text-center col_class",
+                        "width": "7%",//设置宽度,不设置的话就是自动分配
                         "mRender": function (d, type, full, meta) {//如果需要显示的内容需根据数据封装加工的就写这个属性，0
                             //回调中有4个参数，d：对应mData中的属性的值；type：对应值的类型；full：对应当前这一行的数据，meta对应dataTable的配置
                             //如果不清楚可使用console.log();打印出来看看

@@ -84,6 +84,13 @@
 
 <script type="text/javascript" src="<%=basePath %>static/js/tools/Math.uuid.js"></script>
 <script type="text/javascript" src="<%=basePath %>static/assets/js/tocify/jquery.tocify.min.js"></script>
+
+<style>
+    .col_class{
+        color: #333333;
+    }
+</style>
+
 <div class="modal fade" id="message">
     <div class="modal-dialog">
         <div class="modal-content">

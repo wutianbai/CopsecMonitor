@@ -4,119 +4,128 @@
         <ul id="main-menu" class="main-menu">
             <li>
                 <a href="#">
-                    <i class="fa fa-cogs"></i>
-                    <span class="title">${system.systemMng}</span>
+                    <i class="linecons-desktop"></i>
+                    <span class="title">${system.deviceTitle}</span>
                 </a>
                 <ul>
                     <li>
-                        <a href="<%=basePath%>system/systemReset">
-                            <span class="title">${system.systemReset}</span>
-                        </a>
+                        <a href="#" id="addDevice"><i class="fa-plus"></i>${system.deviceAdd}</a>
+                        <%--<a href="#" id="addDevice"><i class="fa-plus"></i></a>--%>
                     </li>
-                    <c:if test="${userInfo.role eq 'systemAdmin'}">
-                        <li>
-                            <a href="<%=basePath%>system/opsAccount">
-                                <span class="title">${system.opsAccount}</span>
-                            </a>
-                        </li>
-                    </c:if>
+                    <li>
+                        <a href="#" id="editDevice"><i class="fa-pencil"></i>${system.deviceEdit}</a>
+                        <%--<a href="#" id="editDevice"><i class="fa-pencil"></i></a>--%>
+                    </li>
+                    <li>
+                        <a href="#" id="deleteDevice"><i class="fa-trash"></i>${system.deviceDelete}</a>
+                        <%--<a href="#" id="deleteDevice"><i class="fa-trash"></i></a>--%>
+                    </li>
                 </ul>
             </li>
 
-            <c:if test="${userInfo.role eq 'systemAdmin'}">
-                <li>
-                    <a href="#">
-                        <i class="linecons-desktop"></i>
-                        <span class="title">${system.deviceTitle}</span>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="<%=basePath%>node/device">
-                                <span class="title">${system.deviceManage}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </c:if>
+            <li>
+                <a href="#">
+                    <i class="fa fa-cogs"></i>
+                    <span class="title">${system.linkTitle}</span>
+                </a>
+                <ul>
+                    <li>
+                        <a href="#" id="addLink"><i class="fa-plus"></i>${system.linkAdd}</a>
+                    </li>
+                    <li>
+                        <a href="#" id="editLink"><i class="fa-pencil"></i>${system.linkEdit}</a>
+                    </li>
+                    <li>
+                        <a href="#" id="deleteLink"><i class="fa-trash"></i>${system.linkDelete}</a>
+                    </li>
+                </ul>
+            </li>
 
-            <c:if test="${userInfo.role ne 'auditAdmin'}">
-                <li>
-                    <a href="#">
-                        <i class="el-laptop"></i>
-                        <span class="title">监控</span>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="<%=basePath%>node/deviceMonitor">
-                                <span class="title">设备拓扑</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </c:if>
+            <li>
+                <a href="#">
+                    <i class="fa-area-chart"></i>
+                    <span class="title">${system.zoneTitle}</span>
+                </a>
+                <ul>
+                    <li>
+                        <a href="#" id="addZone"><i class="fa-plus"></i>${system.zoneAdd}</a>
+                    </li>
+                    <li>
+                        <a href="#" id="editZone"><i class="fa-pencil"></i>${system.zoneUpdate}</a>
+                    </li>
+                    <li>
+                        <a href="#" id="deleteZone"><i class="fa-trash"></i>${system.zoneDelete}</a>
+                    </li>
+                </ul>
+            </li>
 
-            <c:if test="${userInfo.role eq 'systemAdmin'}">
-                <li>
-                    <a href="#">
-                        <i class="fa fa-bar-chart"></i>
-                        <span class="title">${system.monitorConfTitle}</span>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="<%=basePath%>monitor/monitorItem">
-                                <span class="title">${system.monitorItem}</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<%=basePath%>monitor/monitorGroup">
-                                <span class="title">${system.monitorGroup}</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<%=basePath%>monitor/warningItem">
-                                <span class="title">${system.warningItem}</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<%=basePath%>monitor/monitorTask">
-                                <span class="title">${system.monitorTask}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </c:if>
-
-            <c:if test="${userInfo.role ne 'auditAdmin'}">
-                <li>
-                    <a href="#">
-                        <i class="fa-area-chart"></i>
-                        <span class="title">告警历史</span>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="<%=basePath%>system/warningHistory">
-                                <span class="title">告警历史信息</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </c:if>
-
-            <c:if test="${userInfo.role eq 'auditAdmin'}">
-                <li>
-                    <a href="#">
-                        <i class="fa fa-file-code-o"></i>
-                        <span class="title">操作审计</span>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="<%=basePath%>system/operateLog">
-                                <span class="title">审计日志维护</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </c:if>
+            <li id="topologyUpdate">
+                <a href="#">
+                    <%--<i class="fa-area-chart"></i>--%>
+                    <i class=""><span class="fa fa-spin fa-circle-o-notch"></span></i>
+                    <span class="title">${system.topologyUpdate}</span>
+                </a>
+            </li>
         </ul>
+
+        <%--<div class="vertical-top">--%>
+        <%--<div class="btn-group left-dropdown">--%>
+        <%--&lt;%&ndash;<button type="button" class="btn btn-success">${system.deviceTitle}</button>&ndash;%&gt;--%>
+        <%--<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">--%>
+        <%--<li class="fa-chevron-down"></li>--%>
+        <%--</button>--%>
+        <%--<ul class="dropdown-menu dropdown-success" role="menu">--%>
+        <%--<li>--%>
+        <%--<a href="#" id="addDevice"><i class="fa-plus"></i>${system.deviceAdd}</a>--%>
+        <%--</li>--%>
+        <%--<li>--%>
+        <%--<a href="#" id="editDevice"><i class="fa-pencil"></i>${system.deviceEdit}</a>--%>
+        <%--</li>--%>
+        <%--<li>--%>
+        <%--<a href="#" id="deleteDevice"><i class="fa-trash"></i>${system.deviceDelete}</a>--%>
+        <%--</li>--%>
+        <%--</ul>--%>
+        <%--</div>--%>
+        <%--<div class="btn-group left-dropdown">--%>
+        <%--&lt;%&ndash;<button type="button" class="btn btn-success">${system.linkTitle}</button>&ndash;%&gt;--%>
+        <%--<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">--%>
+        <%--<li class="fa-chevron-down"></li>--%>
+        <%--</button>--%>
+        <%--<ul class="dropdown-menu dropdown-success" role="menu">--%>
+        <%--<li>--%>
+        <%--<a href="#" id="addLink"><i class="fa-plus"></i>${system.linkAdd}</a>--%>
+        <%--</li>--%>
+        <%--<li>--%>
+        <%--<a href="#" id="editLink"><i class="fa-pencil"></i>${system.linkEdit}</a>--%>
+        <%--</li>--%>
+        <%--<li>--%>
+        <%--<a href="#" id="deleteLink"><i class="fa-trash"></i>${system.linkDelete}</a>--%>
+        <%--</li>--%>
+        <%--</ul>--%>
+        <%--</div>--%>
+        <%--<div class="btn-group left-dropdown">--%>
+        <%--&lt;%&ndash;<button type="button" class="btn btn-success">${system.zoneTitle}</button>&ndash;%&gt;--%>
+        <%--<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">--%>
+        <%--<li class="fa-chevron-down"></li>--%>
+        <%--</button>--%>
+        <%--<ul class="dropdown-menu dropdown-success" role="menu">--%>
+        <%--<li>--%>
+        <%--<a href="#" id="addZone"><i class="fa-plus"></i>${system.zoneAdd}</a>--%>
+        <%--</li>--%>
+        <%--<li>--%>
+        <%--<a href="#" id="editZone"><i class="fa-pencil"></i>${system.zoneUpdate}</a>--%>
+        <%--</li>--%>
+        <%--<li>--%>
+        <%--<a href="#" id="deleteZone"><i class="fa-trash"></i>${system.zoneDelete}</a>--%>
+        <%--</li>--%>
+        <%--</ul>--%>
+        <%--</div>--%>
+        <%--<div id="topologyUpdate" class="btn-group left-dropdown">--%>
+        <%--&lt;%&ndash;<button type="button" class="btn btn-success">${system.topologyUpdate}</button>&ndash;%&gt;--%>
+        <%--<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">--%>
+        <%--<i class=""><span class="fa fa-spin fa-circle-o-notch"></span></i>--%>
+        <%--</button>--%>
+        <%--</div>--%>
+        <%--</div>--%>
     </div>
 </div>

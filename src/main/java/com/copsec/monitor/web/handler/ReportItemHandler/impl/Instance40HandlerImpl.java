@@ -27,31 +27,31 @@ public class Instance40HandlerImpl extends ReportBaseHandler implements ReportHa
     private static final Logger logger = LoggerFactory.getLogger(Instance40HandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = baseHandle(deviceStatus, device, userInfo, warningService, reportItem);
-
         Status monitorItemType = new Status();
         JSONObject jSONObject = JSON.parseObject(reportItem.getResult().toString());
         //基本信息
         monitorItemType.setMessage(reportItem.getItem());
         monitorItemType.setResult(jSONObject.getString("ports"));
 
-        List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
-        if (warningItemList.size() > 0) {
-            warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                if (Integer.parseInt(jSONObject.getString("status")) == 0) {
-                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                        warningEvent.setEventDetail("WEBPROXY40实例[" + reportItem.getItem() + "]" + jSONObject.getString("ports") + jSONObject.getString("message"));
+        if (reportItem.getStatus() == 0) {
+            WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+            warningEvent.setEventDetail("WebProxy40实例[" + reportItem.getItem() + "]" + jSONObject.getString("ports") + jSONObject.getString("message"));
 
-                        warningEvent.setId(null);
-                        warningService.insertWarningEvent(warningEvent);
-                    }
+            List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
+            if (warningItemList.size() > 0) {
+                warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
+                    warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                });
+            }
 
-                    deviceStatus.setStatus(0);
-                    monitorType.setStatus(0);
-                    monitorItemType.setStatus(0);
-                }
-            });
+            if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+                warningEvent.setId(null);
+                warningService.insertWarningEvent(warningEvent);
+            }
+
+            deviceStatus.setStatus(0);
+            monitorType.setStatus(0);
+            monitorItemType.setStatus(0);
         }
 
         if (logger.isDebugEnabled()) {

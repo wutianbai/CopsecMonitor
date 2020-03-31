@@ -25,7 +25,8 @@ public class NetworkHandlerImpl extends ReportBaseHandler implements ReportHandl
     private static final Logger logger = LoggerFactory.getLogger(NetworkHandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = baseHandle(deviceStatus, device, userInfo, warningService, reportItem);
+        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
 
         Status monitorItemType = new Status();
         //基本信息
@@ -35,9 +36,7 @@ public class NetworkHandlerImpl extends ReportBaseHandler implements ReportHandl
         List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
         if (warningItemList.size() > 0) {
             warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-//            warningItemList.forEach(warningItem -> {
                 if (!reportItem.getResult().toString().contains("正常")) {
-                    System.err.println(warningService.checkIsWarningByTime(reportItem.getMonitorId()));
                     if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
                         warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
                         warningEvent.setEventDetail("网络[" + reportItem.getItem() + "]" + reportItem.getResult());

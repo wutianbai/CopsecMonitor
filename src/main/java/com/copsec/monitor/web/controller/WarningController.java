@@ -109,6 +109,15 @@ public class WarningController {
         return warningService.deleteCheckWarningHistory(userInfo, request.getRemoteHost(), idArray);
     }
 
+    @PostMapping(value = "/history/deleteAll")
+    @ResponseBody
+    public CopsecResult deleteAllWarningHistory(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("delete all warningHistory");
+        }
+        return warningService.deleteAllWarningHistory(userInfo, request.getRemoteHost());
+    }
+
     @PostMapping(value = "/event/receive")
     @ResponseBody
     public CopsecResult receiveWarningEvent(String report) {

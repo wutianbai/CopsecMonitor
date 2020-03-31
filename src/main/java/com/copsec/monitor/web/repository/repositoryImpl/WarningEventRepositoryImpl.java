@@ -4,6 +4,7 @@ import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.WarningLevel;
 import com.copsec.monitor.web.beans.warning.WarningEventBean;
 import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.entity.WarningHistory;
 import com.copsec.monitor.web.repository.BaseRepositoryImpl;
 import com.copsec.monitor.web.utils.DateUtils;
 import com.copsec.monitor.web.utils.FormatUtils;
@@ -18,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -43,6 +45,10 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
         Query query = new Query();
         Sort sort = new Sort(Sort.Direction.DESC, "eventTime");
         Criteria criteria = new Criteria();
+
+        if (!ObjectUtils.isEmpty(condition.getMonitorId())) {
+            criteria.and("monitorId").is(condition.getMonitorId());
+        }
 
         if (!ObjectUtils.isEmpty(condition.getEnd())) {
             Date end = FormatUtils.getDate(condition.getEnd());
@@ -117,13 +123,37 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
     }
 
     @Override
-    public boolean deleteDeviceOutTimeWarning(String deviceId) {
+    public boolean handleDeviceOutTimeWarning(String deviceId) {
+        WarningEventBean condition = new WarningEventBean();
+        condition.setMonitorId(deviceId);
+        List<WarningEvent> warningEventList = findWarningEventByCondition(condition);
+
+        List<WarningHistory> warningHistoryList = new ArrayList<>();
+        if (warningEventList.size() > 0) {
+            warningEventList.forEach(warningEvent -> {
+                WarningHistory warningHistory = new WarningHistory();
+                warningHistory.setId(warningEvent.getId());
+//                warningHistory.setEventSource(warningEvent.getEventSource());
+                warningHistory.setEventTime(warningEvent.getEventTime());
+                warningHistory.setEventDetail(warningEvent.getEventDetail());
+                warningHistory.setEventType(warningEvent.getEventType());
+                warningHistory.setDeviceId(warningEvent.getDeviceId());
+                warningHistory.setDeviceName(warningEvent.getDeviceName());
+                warningHistory.setUserId("SYSTEM");
+                warningHistory.setUserName("系统");
+                warningHistory.setDealTime(new Date());
+                warningHistory.setStatus(1);
+                warningHistoryList.add(warningHistory);
+
+            });
+        }
+        this.mongoTemplate.insert(warningHistoryList, WarningHistory.class);
+
         Query query = new Query();
         Criteria criteria = new Criteria();
         criteria.and("monitorId").is(deviceId);
         query.addCriteria(criteria);
 
-//        Query query = new Query(Criteria.where("monitorId").is(deviceId));
         DeleteResult deleteResult = this.mongoTemplate.remove(query, WarningEvent.class);
         return deleteResult.wasAcknowledged();
     }

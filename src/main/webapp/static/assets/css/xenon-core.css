@@ -660,7 +660,8 @@ footer.main-footer .go-up a,
   clear: both;
 }
 body {
-  background-color: #eeeeee;
+  /*background-color: #eeeeee;*/
+    background-color: #14173e;
 }
 a {
   outline: none !important;
@@ -789,7 +790,8 @@ body {
 .sidebar-menu {
   display: table-cell;
   position: relative;
-  width: 340px;
+  /*width: 340px;*/
+  width: 280px;
   background: #2c2e2f;
   z-index: 1;
 }
@@ -1245,7 +1247,7 @@ body {
     position: relative;
     display: inline-block;
     line-height: 1;
-    color: #7d7f7f;
+    color: #000000;
     z-index: 1;
   }
   .navbar.horizontal-menu .navbar-inner .navbar-nav a > i {
@@ -3089,6 +3091,7 @@ body.chat-open #chat {
 .panel {
   position: relative;
   background: #ffffff;
+  color:#000000;
   padding: 20px 30px;
   border: 0;
   margin-bottom: 30px;
@@ -3130,13 +3133,13 @@ body.chat-open #chat {
 }
 .panel .panel-heading > .panel-options a[data-toggle="panel"] span {
   display: block;
-  font-size: 16px;
+  font-size: 24px;
   width: 10px;
   text-align: center;
 }
 .panel .panel-heading > .panel-options a[data-toggle="panel"] span.expand-icon {
   display: none;
-  font-size: 18px;
+  font-size: 24px;
 }
 .panel .panel-heading > .panel-options a[data-toggle="remove"] {
   font-size: 18px;
@@ -3166,7 +3169,7 @@ body.chat-open #chat {
 .panel .panel-body {
   padding: 0;
   padding-top: 20px;
-  color: #979898;
+  color: #000000;
 }
 .panel .panel-body.no-padding {
   padding: 0;
@@ -3264,8 +3267,8 @@ body.chat-open #chat {
   background: rgba(238, 238, 238, 0.6);
 }
 .panel.panel-success .panel-heading {
-  background-color: #8dc63f;
-  color: #ffffff;
+  background-color: #00b19d;
+  color: #000000;
 }
 .panel.panel-success .panel-heading > .panel-title {
   color: #ffffff;
@@ -3487,7 +3490,7 @@ body.chat-open #chat {
   margin-top: -20px;
   margin-left: -30px;
   margin-right: -30px;
-  padding: 20px 30px;
+  padding: 10px 20px;
   border-bottom: 0;
 }
 .panel.panel-color.collapsed > .panel-heading {
@@ -4472,6 +4475,17 @@ label.cbr-inline + .cbr-inline {
   background: #68b828;
   border-color: #68b828;
 }
+.dropdown-menu.dropdown-turquoise {
+    background: #00b19d;
+    border-color: #00b19d;
+}
+
+.dropdown-menu.dropdown-turquoise .divider {
+    height: 1px;
+    margin: 8px 0;
+    overflow: hidden;
+    background-color: #009181;
+}
 .dropdown-menu.dropdown-secondary .divider {
   height: 1px;
   margin: 8px 0;
@@ -4790,7 +4804,7 @@ label.cbr-inline + .cbr-inline {
   color: #fff;
 }
 .label.label-info {
-  background-color: #40bbea;
+  background-color: #277095;
   color: #fff;
 }
 .label.label-warning {
@@ -4828,6 +4842,52 @@ label.cbr-inline + .cbr-inline {
 .label.label-black {
   background-color: #222222;
   color: #fff;
+}
+
+.label.label-userDefined1 {
+  background-color: #d51569;
+  color: #fff;
+}
+.label.label-userDefined2 {
+  background-color: #b20b58;
+  color: #fff;
+}
+.label.label-userDefined3 {
+  background-color: #2ac67b;
+  color: #fff;
+}
+.label.label-userDefined4 {
+     background-color: #8d8927;
+     color: #fff;
+ }
+.label.label-userDefined5 {
+    background-color: #598d58;
+    color: #fff;
+}
+.label.label-userDefined6 {
+    background-color: #8a754f;
+    color: #fff;
+}
+
+.label.label-userDefined7 {
+    background-color: #148538;
+    color: #fff;
+}
+.label.label-userDefined8 {
+    background-color: #b36466;
+    color: #fff;
+}
+.label.label-userDefined9 {
+    background-color: #b4144e;
+    color: #fff;
+}
+.label.label-userDefined10 {
+    background-color: #b46c13;
+    color: #fff;
+}
+.label.label-userDefined11 {
+    background-color: #89b40a;
+    color: #fff;
 }
 .label.label-white {
   color: #333;
@@ -5290,7 +5350,7 @@ blockquote small {
 .table > thead > tr > th,
 .table > tbody > tr > th,
 .table > tfood > tr > th {
-  padding: 12px 15px;
+  /*padding: 12px 15px;*/
 }
 .text-center.table > thead > tr > td,
 .text-center.table > tbody > tr > td,
@@ -5329,7 +5389,7 @@ blockquote small {
 .table > thead > tr > th {
   position: relative;
   border-bottom: 1px solid #eeeeee;
-  color: #2c2e2f;
+  color: #ffffff;
 }
 .table > thead > tr > td:after,
 .table > thead > tr > th:after {
@@ -5388,7 +5448,12 @@ blockquote small {
   padding: 5px 8px;
 }
 .table.table-model-2 > thead > tr {
-  background: #f6f6f6;
+  /*background: #68b828;*/
+    background: #00b19d;
+}
+.table.table-model-2 > thead > tr > th{
+    /*background: #68b828;*/
+    background: #00b19d;
 }
 .table.table-model-2 > thead > tr > td:after,
 .table.table-model-2 > thead > tr > th:after {
@@ -6410,7 +6475,7 @@ lesshat-selector {
 @-webkit-keyframes loaderAnimate2{ 0%{ -webkit-transform: rotate(0deg); } 100%{ -webkit-transform: rotate(220deg); }}
 @-moz-keyframes loaderAnimate2{ 0%{ -moz-transform: rotate(0deg); } 100%{ -moz-transform: rotate(220deg); }}
 @-o-keyframes loaderAnimate2{ 0%{ -o-transform: rotate(0deg); } 100%{ -o-transform: rotate(220deg); }}
-@keyframes loaderAnimate2{ 0%{-webkit-transform: rotate(0deg);-moz-transform: rotate(0deg);-ms-transform: rotate(0deg);transform: rotate(0deg); } 100%{-webkit-transform: rotate(220deg);-moz-transform: rotate(220deg);-ms-transform: rotate(220deg);transform: rotate(220deg); };
+@keyframes loaderAnimate2{ 0%{-webkit-transform: rotate(0deg);-moz-transform: rotate(0deg);-ms-transform: rotate(0deg);transform: rotate(0deg); } 100%{-webkit-transform: rotate(220deg);-moz-transform: rotate(220deg);-ms-transform: rotate(220deg);transform: rotate(220deg); }
 }
 lesshat-selector {
   -lh-property: 0; } 

@@ -18,7 +18,7 @@
 <body class="page-body">
 <%@ include file="/WEB-INF/jsp/nav.jsp" %>
 <div class="page-container">
-    <%@ include file="/WEB-INF/jsp/sidebar.jsp" %>
+    <%--<%@ include file="/WEB-INF/jsp/sidebar.jsp" %>--%>
     <div class="main-content">
         <div class="panel panel-default" id="warningHistoryPanel">
             <div class="panel-heading">
@@ -26,7 +26,7 @@
 
                 <div class="panel-options">
                     <%--<a href="#">--%>
-                        <%--<i class="linecons-cog"></i>--%>
+                    <%--<i class="linecons-cog"></i>--%>
                     <%--</a>--%>
 
                     <a href="#" data-toggle="panel">
@@ -39,7 +39,7 @@
                     </a>
 
                     <%--<a href="#" data-toggle="remove">--%>
-                        <%--&times;--%>
+                    <%--&times;--%>
                     <%--</a>--%>
                 </div>
             </div>
@@ -90,7 +90,8 @@
                             <button class="btn btn-success" onclick="uncheckAll('warningHistoryTable')"><i
                                     class="fa fa-circle-o"></i>
                             </button>
-                            <button class="btn btn-red" onclick="deleteCheck()"><i class="fa fa-trash-o"></i></button>
+                            <button class="btn btn-warning" onclick="deleteCheck()"><i class="fa fa-trash-o"></i></button>
+                            <button class="btn btn-red" onclick="deleteAll()"><i class="fa fa-trash-o"></i></button>
                         </div>
                     </c:if>
                     <div class="col-sm-offset-11 form-group">

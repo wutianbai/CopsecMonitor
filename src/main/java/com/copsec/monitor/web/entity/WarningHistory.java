@@ -15,7 +15,6 @@ public class WarningHistory {
 
 	@Id
 	private ObjectId id;
-//    private String eventId;
     private MonitorItemEnum eventSource;
     private Date eventTime;
     private String eventDetail;

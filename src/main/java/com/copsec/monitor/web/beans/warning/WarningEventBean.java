@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class WarningEventBean extends PageInfo {
 	private String eventId;
+	private String monitorId;
 	private String eventSource;
 	private String eventTime;
 	private String eventDetail;

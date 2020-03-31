@@ -75,7 +75,12 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
             WarningEventBean bean = new WarningEventBean();
             bean.setEventId(item.getId().toHexString());
 //            bean.setEventSource(MonitorItemEnum.valueOf(item.getEventSource()));
-            bean.setEventSource(item.getEventSource().getName());
+            if (ObjectUtils.isEmpty(item.getEventSource())) {
+                bean.setEventSource("");
+            } else {
+                bean.setEventSource(item.getEventSource().getName());
+            }
+
             bean.setEventTime(FormatUtils.getFormatDate(item.getEventTime()));
             bean.setEventDetail(item.getEventDetail());
 //            bean.setEventType(WarningLevel.valueOf(item.getEventType()));
@@ -177,8 +182,8 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
     }
 
     @Override
-    public boolean deleteDeviceOutTimeWarning(String deviceId) {
-        return warningEventRepository.deleteDeviceOutTimeWarning(deviceId);
+    public boolean handleDeviceOutTimeWarning(String deviceId) {
+        return warningEventRepository.handleDeviceOutTimeWarning(deviceId);
     }
 
     @Override
@@ -227,6 +232,13 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
         });
         LogUtils.sendSuccessLog(userInfo.getId(), ip, "删除所选告警历史", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_WARNING);
         return CopsecResult.success("删除所选告警历史成功");
+    }
+
+    @Override
+    public CopsecResult deleteAllWarningHistory(UserBean userInfo, String ip) {
+        warningHistoryRepository.deleteAll();
+        LogUtils.sendSuccessLog(userInfo.getId(), ip, "处理所有告警历史", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_WARNING);
+        return CopsecResult.success("处理所有告警历史成功");
     }
 
     @Override
