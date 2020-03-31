@@ -90,8 +90,8 @@
                             <button class="btn btn-success" onclick="uncheckAll('warningHistoryTable')"><i
                                     class="fa fa-circle-o"></i>
                             </button>
-                            <button class="btn btn-warning" onclick="deleteCheck()"><i class="fa fa-trash-o"></i></button>
-                            <button class="btn btn-red" onclick="deleteAll()"><i class="fa fa-trash-o"></i></button>
+                            <button class="btn btn-red" onclick="deleteCheck()"><i class="fa fa-trash-o"></i></button>
+                            <button class="btn btn-red" onclick="deleteAll()"><i class="fa fa-bank"></i></button>
                         </div>
                     </c:if>
                     <div class="col-sm-offset-11 form-group">
