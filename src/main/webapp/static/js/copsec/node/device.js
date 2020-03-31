@@ -1432,7 +1432,7 @@ function addOne(str, index, value) {
                 }
             }
         });
-        str += '</table>';
+        str += '</tbody></table>';
     }
     return str;
 }
@@ -1450,7 +1450,7 @@ function addApplication(str, index, value) {
                 }
             }
         });
-        str += '</table>';
+        str += '</tbody></table>';
     }
     return str;
 }
@@ -1468,7 +1468,7 @@ function addInstances(str, index, value) {
                 }
             }
         });
-        str += '</table>';
+        str += '</tbody></table>';
     }
     return str;
 }
@@ -1482,7 +1482,7 @@ function addSystem(str, index, value) {
                 str += '<tr style="text-align: center;"><td>' + value.message + '</td></tr>';
             }
         });
-        str += '</table>';
+        str += '</tbody></table>';
     }
     return str;
 }
@@ -1491,10 +1491,10 @@ function addDisk(str, index, value) {
     if (value.length > 0) {
         str += '<strong>' + index + '</strong>';
         str += '<table class="table table-bordered table-striped"><tbody>';
+        str += '<tr style="text-align: center"><td>盘符</td><td>总量</td><td>使用率</td></tr>';
         $.each(value, function (index, value) {
             if (!isEmpty(value.message)) {
-                str += '<tr style="text-align: center"><td colspan="' + Object.keys(value.message).length + '">磁盘[' + index + ']</td></tr>';
-                str += '<tr style="text-align: center"><td>盘符</td><td>总量</td><td>使用率</td></tr>';
+                str += '<tr style="text-align: center"><td colspan="' + Object.keys(value.message).length + '">磁盘[' + (index + 1) + ']</td></tr>';
                 $.each(value.message, function (index, value) {
                     if (value.status === 0) {
                         str += '<tr style="text-align: center;color: red;"><td>' + value.message + '</td>';
@@ -1511,7 +1511,7 @@ function addDisk(str, index, value) {
                 });
             }
         });
-        str += '</table>';
+        str += '</tbody></table>';
     }
     return str;
 }
@@ -1540,7 +1540,7 @@ function addTwo(str, index, value) {
                 });
             }
         });
-        str += '</table>';
+        str += '</tbody></table>';
     }
     return str;
 }
@@ -1591,7 +1591,7 @@ function addThree(str, index, value) {
                 });
             }
         });
-        str += '</table>';
+        str += '</tbody></table>';
     }
     return str;
 }
