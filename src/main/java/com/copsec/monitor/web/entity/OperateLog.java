@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
-@Document(collection = "operate")
+@Document(collection = "operateLog")
 @Getter
 @Setter
 @Data

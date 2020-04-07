@@ -31,7 +31,7 @@ public class CommonController {
     private SystemConfig config;
 
     @Autowired
-    private SystemService commonService;
+    private SystemService systemService;
 
     @RequestMapping(value = {"/"})
     public String toLogin() {
@@ -40,17 +40,17 @@ public class CommonController {
 
     @PostMapping(value = "/login")
     public String login(UserBean userInfo, HttpServletRequest request, Model model) {
-
         if (logger.isDebugEnabled()) {
             logger.debug("user is going to login {}", userInfo);
         }
-        CopsecResult result = commonService.login(userInfo, request.getRemoteAddr());
+
+        CopsecResult result = systemService.login(userInfo, request.getRemoteAddr());
         if (result.getCode() == CopsecResult.FALIED_CODE) {
             model.addAttribute("message", result.getMessage());
             return "login";
         }
+        
         UserBean userBean = (UserBean) result.getData();
-
         HttpSession session = request.getSession();
         session.setAttribute("userInfo", userBean);
 

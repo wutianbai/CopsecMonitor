@@ -3,15 +3,12 @@ jQuery(function () {
         DEVICE_WARNING = contextPath + "static/images/server/kebo/server-32n1.svg",
         DEVICE_ERROR = contextPath + "/static/images/server/kebo/server-32e1.svg",
         START_MESSAGE = "信息未上报",
-        // NORMAL_STATUS = "normal",
-        // ERROR_STATUS = "error",
         WARNING_STATUS = 2,
         NORMAL_STATUS = 1,
         ERROR_STATUS = 0,
         ERROR_COLOR = "#cb5353",
         NORMAL_COLOR = "#5ab95d",
-        WARNING_COLOR = "#ffff00",
-        RUNNING_COLOR = "rgb(0, 209, 255)";
+        WARNING_COLOR = "#ffff00";
 
     let SWITCH_NORMAL = contextPath + "static/images/server/switch/switch-32-n1.svg",
         SWITCH_WARNING = contextPath + "static/images/server/switch/switch-32-n1.svg",

@@ -1,6 +1,6 @@
-var oTable;//定义变量名，用于存放dataTable对象，一般定义为全局的比较好
-var iDisplayStart;
-var iDisplayLength;
+let oTable;//定义变量名，用于存放dataTable对象，一般定义为全局的比较好
+let iDisplayStart;
+let iDisplayLength;
 
 function searchByCondition() {
     page("operateLogTable", contextPath + "system/operateLog/search");
@@ -40,7 +40,7 @@ function page(id, url) {
                 "name": "result",
                 "value": $("#result").val()
             });
-            var time = $("#date").val().split("&");
+            let time = $("#date").val().split("&");
             aoData.push({
                 "name": "start",
                 "value": time[0]
@@ -144,7 +144,7 @@ jQuery(function () {
         $(this).data('select2').results.addClass('overflow-hidden').perfectScrollbar();
     });
     // Replace checkboxes when they appear
-    var $state = $("#operateLogTable thead input[type='checkbox']");
+    let $state = $("#operateLogTable thead input[type='checkbox']");
     $("#operateLogTable").on('draw.dt', function () {
         cbr_replace();
         $state.trigger('change');
@@ -155,7 +155,7 @@ jQuery(function () {
  * 删除所选日志
  */
 function deleteCheck() {
-    var idArray = new Array();
+    let idArray = new Array();
     $("input:checkbox:checked").each(function () {
         idArray.push($(this).val());
     });
@@ -164,9 +164,9 @@ function deleteCheck() {
         return;
     }
 
-    var $confirmButton = $("<button class='btn btn-success'>确认</button>");
+    let $confirmButton = $("<button class='btn btn-success'>确认</button>");
 
-    var $message = $('<h2 style="text-align: center">确认删除所选日志？</h2>');
+    let $message = $('<h2 style="text-align: center">确认删除所选日志？</h2>');
     $("#message").find(".modal-body").html($message);
     addButton("message", "系统提示", $confirmButton);
 
@@ -191,9 +191,9 @@ function deleteCheck() {
 }
 
 function deleteAll() {
-    var $confirmButton = $("<button class='btn btn-success'>确认</button>");
+    let $confirmButton = $("<button class='btn btn-success'>确认</button>");
 
-    var $message = $('<h2 style="text-align: center">确认清空日志？</h2>');
+    let $message = $('<h2 style="text-align: center">确认清空操作日志？</h2>');
     $("#message").find(".modal-body").html($message);
     addButton("message", "系统提示", $confirmButton);
 
@@ -218,9 +218,10 @@ function deleteAll() {
 }
 
 function exportLog() {
-    var time = $("#date").val().split("&");
+    let time = $("#date").val().split("&");
     $.fileDownload(contextPath + "system/operateLog/export", {
         data: {
+            "fileName": "operateLog",
             "iDisplayStart": iDisplayStart,
             "iDisplayLength": iDisplayLength,
             "operateUser": $("#operateUser").val(),

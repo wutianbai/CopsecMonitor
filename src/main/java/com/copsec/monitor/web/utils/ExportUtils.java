@@ -16,7 +16,6 @@ public class ExportUtils {
     private static final Logger logger = LoggerFactory.getLogger(ExportUtils.class);
 
     public static OutputStream makeExcel(List<LogConditionBean> list, String fileName, HttpServletResponse response) {
-
         Date date = new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -26,7 +25,6 @@ public class ExportUtils {
 
             e1.printStackTrace();
         }
-
 
         OutputStream output = null;
         try {

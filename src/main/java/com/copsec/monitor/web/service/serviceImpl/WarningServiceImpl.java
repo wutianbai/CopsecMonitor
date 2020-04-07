@@ -270,28 +270,14 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
         UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());//运维用户信息
 
         Status deviceStatus = new Status();
-//                Multimap<String, Status> monitorTypeMap = LinkedHashMultimap.create();
         ConcurrentHashMap<String, Status> monitorTypeMap = MonitorTypePools.getInstances().getMap();
-//                ConcurrentHashMap<String, List<Status>> monitorItemListMap = MonitorItemListPools.getInstances().getMap();
-//                for (MonitorItemEnum i : MonitorItemEnum.values()) {
-//                    List<Status> list = new ArrayList<>();
-//                    newMonitorItemListMap.putIfAbsent(i.name(), list);
-//                }
-//
-//                for (MonitorTypeEnum e : MonitorTypeEnum.values()) {
-//                    Status status = new Status();
-//                    status.setMessage(newMonitorItemListMap);
-//                    monitorTypeMap.put(e.name(),status);
-//                }
 
         List<ReportItem> reportItems = report.getReportItems();//获取上报项
         if (!ObjectUtils.isEmpty(reportItems)) {
             reportItems.parallelStream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(reportItem -> {
-//                        Status monitorType = monitorTypeMap.get(reportItem.getMonitorType().name());//主类型
                 Status monitorType = MonitorTypePools.getInstances().get(reportItem.getMonitorType().name());//主类型
                 if (ObjectUtils.isEmpty(monitorType)) {
                     monitorType = new Status();
-//                            monitorTypeMap.putIfAbsent(reportItem.getMonitorType().name(), monitorType);
                     MonitorTypePools.getInstances().add(reportItem.getMonitorType().name(), monitorType);
                 }
 
@@ -301,7 +287,6 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
 //                        }
 //                        title += "[" + reportItem.getMonitorItemType().name() + "]";
 
-//                        final ConcurrentHashMap<String, List<Status>> monitorItemListMap = (ConcurrentHashMap<String, List<Status>>) monitorType.getMessage();
                 ConcurrentHashMap<String, List<Status>> monitorItemListMap = (ConcurrentHashMap<String, List<Status>>) monitorType.getMessage();
                 if (ObjectUtils.isEmpty(monitorItemListMap)) {
                     monitorItemListMap = MonitorItemListPools.getInstances().getMap();
@@ -314,30 +299,11 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
                     monitorItemListMap.putIfAbsent(reportItem.getMonitorItemType().name(), monitorItemList);
                 }
 
-//                final WarningEvent warningEvent = new WarningEvent();
-//                warningEvent.setMonitorId(reportItem.getMonitorId());
-//                warningEvent.setEventSource(reportItem.getMonitorItemType());
-//                warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
-//                warningEvent.setEventTime(new Date());
-//                warningEvent.setDeviceId(report.getDeviceId());
-//                warningEvent.setDeviceName(device.getData().getDeviceHostname());
-//                warningEvent.setUserId(userInfo.getUserId());
-//                warningEvent.setUserName(userInfo.getUserName());
-//                warningEvent.setUserMobile(userInfo.getMobile());
-
-//                if (reportItem.getStatus() == 0) {//获取信息失败告警
-////                        baseHandle(reportItem, warningEvent);
-//                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-//                        warningEvent.setEventDetail(reportItem.getResult().toString());
-//                        insertWarningEvent(warningEvent);
-//                    }
-//                } else {
                 Optional<ReportHandler> optional = ReportHandlerPools.getInstance().getHandler(reportItem.getMonitorItemType());
                 if (optional.isPresent()) {
                     Status status = optional.get().handle(deviceStatus, device, userInfo, warningService, reportItem, monitorType);
                     monitorItemList.add(status);
                 }
-//                }
 
                 //根据监控类型更新
                 monitorType.setDeviceId(reportItem.getMonitorType().getName() + "状态");
@@ -345,7 +311,6 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
                 monitorItemListMap.replace(reportItem.getMonitorItemType().name(), monitorItemList);
                 monitorType.setMessage(monitorItemListMap);
 
-//                        monitorTypeMap.put(reportItem.getMonitorType().name(), monitorType);
                 MonitorTypePools.getInstances().update(reportItem.getMonitorType().name(), monitorType);
             });
 //            }

@@ -8,6 +8,7 @@ import com.copsec.monitor.web.commons.CopsecResult;
 import com.copsec.monitor.web.config.SystemConfig;
 import com.copsec.monitor.web.service.SystemService;
 import com.copsec.monitor.web.utils.ExportUtils;
+import com.copsec.monitor.web.utils.FormatUtils;
 import com.copsec.monitor.web.utils.PageUtils;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -170,7 +172,7 @@ public class SystemController {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        header.setContentDispositionFormData("attachement", System.currentTimeMillis() + "auditLog.xls");
+        header.setContentDispositionFormData("attachement", "operateLog[" + FormatUtils.getFormatDate(new Date()) + "].xls");
         header.setContentLength(file.length());
         header.setExpires(0);
         header.set("Set-Cookie", "fileDownload=true; path=/");

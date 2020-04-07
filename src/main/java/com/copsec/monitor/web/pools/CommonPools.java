@@ -93,7 +93,7 @@ public class CommonPools {
 //        return ipMap.get(id);
 //    }
 
-    public synchronized List<String> getNetowkConfig(NetworkType type) {
+    public synchronized List<String> getNetworkConfig(NetworkType type) {
         List<String> list = new ArrayList<>();
         if (ObjectUtils.isEmpty(map.get(type))) {
             return list;

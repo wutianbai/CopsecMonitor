@@ -1,6 +1,5 @@
 package com.copsec.monitor.web.service.serviceImpl;
 
-import com.copsec.monitor.web.beans.LockBean;
 import com.copsec.monitor.web.beans.LogConditionBean;
 import com.copsec.monitor.web.beans.UserBean;
 import com.copsec.monitor.web.beans.UserInfoBean;
@@ -10,16 +9,12 @@ import com.copsec.monitor.web.config.SystemConfig;
 import com.copsec.monitor.web.entity.AuditSyslogMessage;
 import com.copsec.monitor.web.entity.OperateLog;
 import com.copsec.monitor.web.exception.CopsecException;
-import com.copsec.monitor.web.fileReaders.CommonFileReader;
 import com.copsec.monitor.web.fileReaders.FileReaderFactory;
 import com.copsec.monitor.web.fileReaders.UserFileReader;
 import com.copsec.monitor.web.fileReaders.UserInfoReader;
 import com.copsec.monitor.web.fileReaders.fileReaderEnum.FileReaderType;
-import com.copsec.monitor.web.fileReaders.fileReaderEnum.NetworkType;
-import com.copsec.monitor.web.pools.CommonPools;
 import com.copsec.monitor.web.pools.UserInfoPools;
 import com.copsec.monitor.web.pools.UserPools;
-import com.copsec.monitor.web.pools.WrongPasswordPool;
 import com.copsec.monitor.web.repository.AuditSyslogMessageRepository;
 import com.copsec.monitor.web.repository.LogRepository;
 import com.copsec.monitor.web.service.SystemService;
@@ -62,9 +57,6 @@ public class SystemServiceImpl implements SystemService {
     private LogRepository logRepository;
 
     @Autowired
-    private CommonFileReader commonFileReader;
-
-    @Autowired
     private AuditSyslogMessageRepository auditSyslogMessageRepository;
 
     @Override
@@ -92,55 +84,57 @@ public class SystemServiceImpl implements SystemService {
 //            return CopsecResult.failed("此主机不在远程管理IP列表中，不允许登录!");
 //        }
 
-        LockBean lock = WrongPasswordPool.getInstances().get(userBean.getId());
-        List<String> _list = CommonPools.getInstances().getNetowkConfig(NetworkType.LOGINLOCKTIME);
-        int time = 0;
-        if (ObjectUtils.isEmpty(_list)) {
-            time = 1;
-        } else {
-            time = Integer.valueOf(CommonPools.getInstances().getNetowkConfig(NetworkType.LOGINLOCKTIME).get(0));
-        }
+//        LockBean lock = WrongPasswordPool.getInstances().get(userBean.getId());
+//        List<String> _list = CommonPools.getInstances().getNetworkConfig(NetworkType.LOGINLOCKTIME);
+//        int time = 0;
+//        if (ObjectUtils.isEmpty(_list)) {
+//            time = 1;
+//        } else {
+//            time = Integer.valueOf(CommonPools.getInstances().getNetworkConfig(NetworkType.LOGINLOCKTIME).get(0));
+//        }
 
         if (!userBean.getPassword().equals(MD5Util.encryptMD5(userInfo.getPassword()))) {
-            String message = "";
-            /**
-             * 密码错误记录
-             */
-            if (ObjectUtils.isEmpty(lock)) {
-                int total = Integer.valueOf(CommonPools.getInstances().getNetowkConfig(NetworkType.LOGINTRYTIME).get(0));
-                lock = new LockBean(total);
-                WrongPasswordPool.getInstances().add(userBean.getId(), lock);
-                message = "密码错误，已尝试" + lock.getAttemptNum() + "次，还可以尝试" + lock.getTryTime() + "次!";
-            } else {
-                /**
-                 * 已锁定
-                 */
-                if (lock.isLocked()) {
-                    if ((System.currentTimeMillis() - lock.getLockCurrentTime()) >= time * 1000) {
-                        lock.setAttemptNum(1);
-                    } else {
-                        lock.updateAttemTime();
-                    }
-                    message = "密码错误，已尝试" + lock.getAttemptNum() + "次，还可以尝试" + lock.getTryTime() + "次!";
-                } else {
-                    lock.updateAttemTime();
-                    if (lock.getAttemptNum() == lock.getTotalNum()) {
-                        lock.setLocked(true);
-                        message = "密码错误，账号已锁定,请" + time + "分钟后重试";
-                    } else {
-                        message = "密码错误，已尝试" + lock.getAttemptNum() + "次，还可以尝试" + lock.getTryTime() + "次!";
-                    }
-                }
-            }
+//            String message = "";
+//            /**
+//             * 密码错误记录
+//             */
+//            if (ObjectUtils.isEmpty(lock)) {
+//                int total = Integer.valueOf(CommonPools.getInstances().getNetworkConfig(NetworkType.LOGINTRYTIME).get(0));
+//                lock = new LockBean(total);
+//                WrongPasswordPool.getInstances().add(userBean.getId(), lock);
+//                message = "密码错误，已尝试" + lock.getAttemptNum() + "次，还可以尝试" + lock.getTryTime() + "次!";
+//            } else {
+//                /**
+//                 * 已锁定
+//                 */
+//                if (lock.isLocked()) {
+//                    if ((System.currentTimeMillis() - lock.getLockCurrentTime()) >= time * 1000) {
+//                        lock.setAttemptNum(1);
+//                    } else {
+//                        lock.updateAttemTime();
+//                    }
+//                    message = "密码错误，已尝试" + lock.getAttemptNum() + "次，还可以尝试" + lock.getTryTime() + "次!";
+//                } else {
+//                    lock.updateAttemTime();
+//                    if (lock.getAttemptNum() == lock.getTotalNum()) {
+//                        lock.setLocked(true);
+//                        message = "密码错误，账号已锁定,请" + time + "分钟后重试";
+//                    } else {
+//                        message = "密码错误，已尝试" + lock.getAttemptNum() + "次，还可以尝试" + lock.getTryTime() + "次!";
+//                    }
+//                }
+//            }
+            String message = "密码错误";
             LogUtils.sendFailLog(userInfo.getId(), ip, message, config.getLogHost(), config.getLogPort(), config.getLogCollection(), "登录");
 
             return CopsecResult.failed(message);
-        } else {
-            if (!ObjectUtils.isEmpty(lock) && lock.isLocked()) {
-                return CopsecResult.failed("账号已锁定,请" + time + "分钟后重试");
-            }
-            WrongPasswordPool.getInstances().remove(userBean.getId());
         }
+//        else {
+//            if (!ObjectUtils.isEmpty(lock) && lock.isLocked()) {
+//                return CopsecResult.failed("账号已锁定,请" + time + "分钟后重试");
+//            }
+//            WrongPasswordPool.getInstances().remove(userBean.getId());
+//        }
         LogUtils.sendSuccessLog(userInfo.getId(), ip, "登录成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "登录");
 
         return CopsecResult.success(userBean);

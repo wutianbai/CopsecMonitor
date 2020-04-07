@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class LogConditionBean extends PageInfo{
+public class LogConditionBean extends PageInfo {
 
     private String id;
     private String operateUser;
@@ -17,7 +17,6 @@ public class LogConditionBean extends PageInfo{
 
     private String start;
     private String end;
-
 
 
     private int page;

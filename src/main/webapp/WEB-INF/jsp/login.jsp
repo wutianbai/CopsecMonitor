@@ -1,5 +1,5 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"
-         contentType="text/html; charset=UTF-8" %>
+<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -9,7 +9,6 @@
             + request.getServerName() + ":" + request.getServerPort()
             + path + "/";
 %>
-<!DOCTYPE>
 <html>
 <head>
     <title>${system.title}</title>
@@ -39,17 +38,23 @@
     <script type="text/javascript">
         $(function () {
             $.idcode.setCode();
-            var top = getTopWinow(); //获取当前页面的顶层窗口对象
-            if (top != window) {
+            let top = getTopWindow(); //获取当前页面的顶层窗口对象
+            if (top !== window) {
                 top.location.href = '<%=basePath %>/login'; //跳转到登录页面
             }
         });
+        function getTopWindow() {
+            let p = window;
+            if (p !== p.parent) {
+                p = p.parent;
+            }
+            return p;
+        }
 
         document.onkeydown = keyListener;
-
         function keyListener(e) {
             e = e ? e : event;
-            if (e.keyCode == 13) {
+            if (e.keyCode === 13) {
                 //兼容火狐和IE的，回车按键，表单提交进行验证
                 check_login();
             }
@@ -57,15 +62,17 @@
 
         function check_login() {
             $("#login_msg").html("");
-            var userName = $.trim($("#userName").val());
-            var password = $.trim($("#password").val());
-            var validateJson = $.idcode.validateCode();
+            let userName = $.trim($("#userName").val());
+            let password = $.trim($("#password").val());
+            let validateJson = $.idcode.validateCode();
 
-            if (userName == "" || password == "") {
+            if (userName === "" || password === "") {
                 $("#login_msg").html("用户名或密码不能为空");
+                toastr.error("用户名或密码不能为空");
                 return;
             } else if (!validateJson) {
                 $("#login_msg").html("验证码错误");
+                toastr.error("验证码错误");
                 return;
             } else {
                 show_loading_bar({
@@ -84,24 +91,8 @@
             $("#userName").val("");
             $("#password").val("");
         }
-
-        function getTopWinow() {
-            var p = window;
-            if (p != p.parent) {
-                p = p.parent;
-            }
-            return p;
-        }
     </script>
     <style>
-        .login-page.login-light {
-            background: #14173e;
-        }
-
-        .form-bg {
-            background: #14173e;
-        }
-
         .form-horizontal {
             background: #fff;
             padding-bottom: 40px;
@@ -267,9 +258,6 @@
             <form class="form-horizontal" method="post" id="loginForm" action="<%=basePath%>login">
                 <div class="login-header" style="text-align: center">
                     <span class="heading">${system.title}</span>
-
-                    <span id="login_msg"
-                          style="color: red; font-size: 12px; font-weight: bold; text-align: center; display: block;">${message}</span>
                 </div>
 
                 <div class="form-group">
@@ -285,6 +273,8 @@
                     <span id="idcode"></span>
                 </div>
                 <div class="form-group">
+                    <span id="login_msg"
+                          style="color: red; font-size: 12px; font-weight: bold; text-align: left;">${message}</span>
                     <input type="button" class="btn btn-turquoise" onclick="resetForm()" value="重置"/>
                     <input type="button" class="btn btn-turquoise" onclick="check_login()" value="登录"/>
                 </div>
