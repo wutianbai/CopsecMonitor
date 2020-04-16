@@ -39,7 +39,6 @@ public class CpuHandlerImpl extends ReportBaseHandler implements ReportHandler {
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (warningItem.getWarningLevel().name().equals("NORMAL")) {
-                        deviceStatus.setStatus(1);
                         monitorType.setStatus(1);
                     } else {
                         if (warningItem.getThreadHold() < Integer.parseInt(reportItem.getResult().toString())) {

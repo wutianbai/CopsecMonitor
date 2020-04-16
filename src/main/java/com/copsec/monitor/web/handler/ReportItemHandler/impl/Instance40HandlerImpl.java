@@ -42,7 +42,6 @@ public class Instance40HandlerImpl extends ReportBaseHandler implements ReportHa
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (warningItem.getWarningLevel().name().equals("NORMAL")) {
-                        deviceStatus.setStatus(1);
                         monitorType.setStatus(1);
                     }else{
                         warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别

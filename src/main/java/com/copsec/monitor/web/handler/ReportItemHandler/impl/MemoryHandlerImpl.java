@@ -40,7 +40,6 @@ public class MemoryHandlerImpl extends ReportBaseHandler implements ReportHandle
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (warningItem.getThreadHold() < Integer.parseInt(reportItem.getResult().toString())) {
                         if (warningItem.getWarningLevel().name().equals("NORMAL")) {
-                            deviceStatus.setStatus(1);
                             monitorType.setStatus(1);
                         } else {
                             warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别

@@ -54,7 +54,6 @@ public class ImServiceHandlerImpl extends ReportBaseHandler implements ReportHan
                 if (warningItemList.size() > 0) {
                     warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                         if (warningItem.getWarningLevel().name().equals("NORMAL")) {
-                            deviceStatus.setStatus(1);
                             monitorType.setStatus(1);
                             monitorItemType.setStatus(1);
                         } else {

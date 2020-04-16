@@ -270,11 +270,12 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
         UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());//运维用户信息
 
         Status deviceStatus = new Status();
+        ConcurrentHashMap<String, String> deviceStatusMap = new ConcurrentHashMap<>();
         ConcurrentHashMap<String, Status> monitorTypeMap = MonitorTypePools.getInstances().getMap();
 
         List<ReportItem> reportItems = report.getReportItems();//获取上报项
         if (!ObjectUtils.isEmpty(reportItems)) {
-            reportItems.parallelStream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(reportItem -> {
+            reportItems.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(reportItem -> {
                 Status monitorType = MonitorTypePools.getInstances().get(reportItem.getMonitorType().name());//主类型
                 if (ObjectUtils.isEmpty(monitorType)) {
                     monitorType = new Status();

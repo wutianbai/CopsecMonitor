@@ -30,7 +30,7 @@ public class ProxyLogHandlerImpl extends ReportBaseHandler implements ReportHand
         Status monitorItemType = new Status();
         //基本信息
         JSONObject log = JSON.parseObject(reportItem.getItem());
-        monitorItemType.setMessage("[路径" + log.getString("logPath") + "]阈值[" + log.getString("threadHold") + "]");
+        monitorItemType.setMessage("路径[" + log.getString("logPath") + "]阈值[" + log.getString("threadHold") + "]");
         monitorItemType.setResult(reportItem.getResult().toString());
 
         if (reportItem.getStatus() == 0) {
@@ -41,7 +41,6 @@ public class ProxyLogHandlerImpl extends ReportBaseHandler implements ReportHand
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (warningItem.getWarningLevel().name().equals("NORMAL")) {
-                        deviceStatus.setStatus(1);
                         monitorType.setStatus(1);
                     } else {
                         warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别

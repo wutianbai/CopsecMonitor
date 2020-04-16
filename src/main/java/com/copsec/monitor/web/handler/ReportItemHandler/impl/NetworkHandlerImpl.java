@@ -34,12 +34,11 @@ public class NetworkHandlerImpl extends ReportBaseHandler implements ReportHandl
             baseHandle(deviceStatus, monitorType, monitorItemType);
 
             WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-            warningEvent.setEventDetail("网络[" + reportItem.getItem() + "][" + reportItem.getResult() + "]");
+            warningEvent.setEventDetail("网络[" + reportItem.getItem() + "]" + reportItem.getResult());
             List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (warningItem.getWarningLevel().name().equals("NORMAL")) {
-                        deviceStatus.setStatus(1);
                         monitorType.setStatus(1);
                     } else {
                         if (!reportItem.getResult().toString().contains("正常")) {

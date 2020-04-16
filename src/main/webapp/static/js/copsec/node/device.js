@@ -1411,7 +1411,7 @@ jQuery(function () {
         });
     }
     movePoint();
-    setInterval(movePoint, 2000);
+    setInterval(movePoint, 5000);
 });
 
 function addOne(str, index, value) {
