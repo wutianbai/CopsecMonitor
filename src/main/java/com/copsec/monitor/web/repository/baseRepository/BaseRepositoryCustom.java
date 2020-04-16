@@ -3,10 +3,11 @@ package com.copsec.monitor.web.repository.baseRepository;
 import com.copsec.monitor.web.beans.LogConditionBean;
 import com.copsec.monitor.web.beans.warning.WarningEventBean;
 import com.copsec.monitor.web.beans.warning.WarningHistoryBean;
-import com.copsec.monitor.web.entity.*;
+import com.copsec.monitor.web.entity.OperateLog;
+import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.entity.WarningHistory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
 
@@ -21,8 +22,6 @@ public interface BaseRepositoryCustom {
     void deleteCheckOperateLog(List<String> ids);
 
     void deleteAllOperateLog();
-
-    Page<AuditSyslogMessage> getServerMessage(Query query, Pageable pageable);
 
     Page<WarningEvent> findWarningEventByCondition(Pageable pageable, WarningEventBean condition);
 

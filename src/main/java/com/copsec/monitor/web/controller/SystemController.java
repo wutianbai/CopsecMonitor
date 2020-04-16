@@ -17,14 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
@@ -165,7 +162,7 @@ public class SystemController {
 
         HttpStatus status = HttpStatus.CREATED;
         Page<LogConditionBean> logs = systemService.searchOperateLog(PageUtils.returnPageable(condition), condition);
-        String fileName = config.getBackupFilePath() + File.separator + "logs-" + condition.getFileName() + ".xls";
+        String fileName = config.getBackupFilePath() + File.separator + "operateLog[" + FormatUtils.getFormatDate(new Date()) + "].xls";
         ExportUtils.makeExcel(logs.getContent(), fileName);
 
         File file = new File(fileName);
@@ -190,20 +187,5 @@ public class SystemController {
             file.delete();
         }
         return CopsecResult.success();
-    }
-
-    @PostMapping(value = "/server/logs")
-    @ResponseBody
-    public Page<LogConditionBean> getServerMessage(@SessionAttribute UserBean userInfo, LogConditionBean condition) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("search server logs by condition {}", condition);
-        }
-        Pageable pageable = null;
-        if (!ObjectUtils.isEmpty(condition.getPage()) && !ObjectUtils.isEmpty(condition.getSize())) {
-            pageable = PageRequest.of(condition.getPage(), condition.getSize());
-        } else {
-            pageable = PageRequest.of(0, 10);
-        }
-        return systemService.getServerMessage(condition, pageable);
     }
 }

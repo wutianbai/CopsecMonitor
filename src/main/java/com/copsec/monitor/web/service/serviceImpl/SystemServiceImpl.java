@@ -6,7 +6,6 @@ import com.copsec.monitor.web.beans.UserInfoBean;
 import com.copsec.monitor.web.commons.CopsecResult;
 import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.config.SystemConfig;
-import com.copsec.monitor.web.entity.AuditSyslogMessage;
 import com.copsec.monitor.web.entity.OperateLog;
 import com.copsec.monitor.web.exception.CopsecException;
 import com.copsec.monitor.web.fileReaders.FileReaderFactory;
@@ -15,7 +14,6 @@ import com.copsec.monitor.web.fileReaders.UserInfoReader;
 import com.copsec.monitor.web.fileReaders.fileReaderEnum.FileReaderType;
 import com.copsec.monitor.web.pools.UserInfoPools;
 import com.copsec.monitor.web.pools.UserPools;
-import com.copsec.monitor.web.repository.AuditSyslogMessageRepository;
 import com.copsec.monitor.web.repository.LogRepository;
 import com.copsec.monitor.web.service.SystemService;
 import com.copsec.monitor.web.utils.FormatUtils;
@@ -28,16 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Service
 public class SystemServiceImpl implements SystemService {
@@ -55,9 +47,6 @@ public class SystemServiceImpl implements SystemService {
 
     @Autowired
     private LogRepository logRepository;
-
-    @Autowired
-    private AuditSyslogMessageRepository auditSyslogMessageRepository;
 
     @Override
     public CopsecResult login(UserBean userInfo, String ip) {
@@ -292,41 +281,5 @@ public class SystemServiceImpl implements SystemService {
         logRepository.deleteAllOperateLog();
         LogUtils.sendSuccessLog(userInfo.getId(), ip, "清空系统操作日志", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "清空系统操作日志");
         return CopsecResult.success("清空系统操作日志成功");
-    }
-
-    @Override
-    public Page<LogConditionBean> getServerMessage(LogConditionBean condition, Pageable pageable) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("get server log by condition {}", condition);
-        }
-        Query query = new Query();
-        Criteria criteria = new Criteria("host");
-        criteria.exists(true);
-        if (!ObjectUtils.isEmpty(condition.getIp())) {
-            criteria.and("host").is(condition.getIp());
-        } else if (!ObjectUtils.isEmpty(condition.getDesc())) {
-            Pattern pattern = Pattern.compile("^.*" + condition.getDesc() + ".*$", Pattern.CASE_INSENSITIVE);
-            criteria.and("message").regex(pattern);
-        } else if (!ObjectUtils.isEmpty(condition.getStart()) && !ObjectUtils.isEmpty(condition.getEnd())) {
-            Date start = FormatUtils.getDate(condition.getStart());
-            Date end = FormatUtils.getDate(condition.getEnd());
-            criteria.and("reportTime").gte(start).lte(end);
-        }
-        query.addCriteria(criteria);
-        query.with(new Sort(Direction.DESC, "reportTime"));
-        Page<AuditSyslogMessage> page = auditSyslogMessageRepository.getServerMessage(query, pageable);
-
-        List<LogConditionBean> list = Lists.newArrayList();
-        if (!ObjectUtils.isEmpty(page)) {
-            page.get().forEach(item -> {
-                LogConditionBean bean = new LogConditionBean();
-                bean.setIp(item.getHost());
-                bean.setDate(FormatUtils.getFormatDate(item.getReportTime()));
-                bean.setDesc(item.getMessage());
-                list.add(bean);
-            });
-        }
-
-        return new PageImpl<>(list, page.getPageable(), page.getTotalElements());
     }
 }

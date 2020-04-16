@@ -30,7 +30,4 @@ public interface SystemService {
     CopsecResult deleteCheckOperateLog(UserBean userInfo, String ip, List<String> ids);
 
     CopsecResult deleteAllLog(UserBean userInfo, String ip);
-
-    Page<LogConditionBean> getServerMessage(LogConditionBean condition, Pageable pageable);
-
 }
