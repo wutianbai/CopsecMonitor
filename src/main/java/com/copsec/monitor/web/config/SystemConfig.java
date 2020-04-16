@@ -15,12 +15,6 @@ public class SystemConfig {
 	@Value("${production.title}")
 	private String title;
 
-	@Value("{production.system.password}")
-	private String systemPassword;
-
-	@Value("${production.system.type}")
-	private String systemType;
-
 	@Value("${mongo.db.log.listen.host}")
 	private String logHost;
 

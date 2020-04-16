@@ -34,24 +34,24 @@ public class InstancesConfigHandlerImpl extends ReportBaseHandler implements Rep
         monitorItemType.setResult(jSONObject.getString("ports"));
 
         if (reportItem.getStatus() == 0) {
-            WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-            warningEvent.setEventDetail("配置储存库[" + reportItem.getItem() + "]" + jSONObject.getString("ports") + jSONObject.getString("message"));
+            baseHandle(deviceStatus, monitorType, monitorItemType);
 
+            WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+            warningEvent.setEventDetail("配置储存库[" + reportItem.getItem() + "][" + jSONObject.getString("ports") + "][" + jSONObject.getString("message") + "]");
             List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                    warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                    if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                        deviceStatus.setStatus(1);
+                        monitorType.setStatus(1);
+                    }else{
+                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                        generateWarningEvent(warningService, reportItem, warningEvent);
+                    }
                 });
+            } else {
+                generateWarningEvent(warningService, reportItem, warningEvent);
             }
-
-            if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                warningEvent.setId(null);
-                warningService.insertWarningEvent(warningEvent);
-            }
-
-            deviceStatus.setStatus(0);
-            monitorType.setStatus(0);
-            monitorItemType.setStatus(0);
         }
 
         if (logger.isDebugEnabled()) {

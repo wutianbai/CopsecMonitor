@@ -142,17 +142,13 @@ public class SystemServiceImpl implements SystemService {
 
     @Override
     public CopsecResult passwordReset(UserBean userInfo, String orig, String newCode, String ip) {
-
         if (!userInfo.getPassword().equalsIgnoreCase(MD5Util.encryptMD5(orig))) {
-
             LogUtils.sendFailLog(userInfo.getId(), ip, "重置密码失败，原密码错误", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "重置密码");
             return CopsecResult.failed("原密码错误");
         }
 
         userInfo.setPassword(MD5Util.encryptMD5(newCode));
-
         UserPools.getInstances().update(userInfo);
-
         try {
             userFileReader.writeDate(UserPools.getInstances().getAll(),
                     config.getBasePath() + config.getUserPath());
@@ -160,7 +156,7 @@ public class SystemServiceImpl implements SystemService {
             logger.error(e.getMessage(), e);
         }
         LogUtils.sendSuccessLog(userInfo.getId(), ip, "密码重置成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "重置密码");
-        return CopsecResult.success("密码修改成功");
+        return CopsecResult.success("密码重置成功 请重新登录");
     }
 
     @Override

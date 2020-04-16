@@ -1,6 +1,7 @@
 package com.copsec.monitor.web.service.serviceImpl;
 
 import com.copsec.monitor.web.beans.UserBean;
+import com.copsec.monitor.web.beans.UserInfoBean;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorTypeEnum;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.WarningLevel;
@@ -8,14 +9,17 @@ import com.copsec.monitor.web.beans.monitor.MonitorGroupBean;
 import com.copsec.monitor.web.beans.monitor.MonitorItemBean;
 import com.copsec.monitor.web.beans.monitor.MonitorTaskBean;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.commons.CopsecResult;
 import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.config.SystemConfig;
+import com.copsec.monitor.web.entity.WarningEvent;
 import com.copsec.monitor.web.exception.CopsecException;
 import com.copsec.monitor.web.fileReaders.*;
 import com.copsec.monitor.web.fileReaders.fileReaderEnum.FileReaderType;
 import com.copsec.monitor.web.pools.*;
 import com.copsec.monitor.web.service.MonitorService;
+import com.copsec.monitor.web.service.WarningService;
 import com.copsec.monitor.web.utils.logUtils.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +29,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -46,6 +51,9 @@ public class MonitorServiceImpl implements MonitorService {
 
     @Autowired
     private WarningItemReader warningItemReader;
+
+    @Autowired
+    private WarningService warningService;
 
     @Override
     public CopsecResult getAllMonitorItem() {
@@ -70,6 +78,26 @@ public class MonitorServiceImpl implements MonitorService {
     public CopsecResult getMonitorItemByDeviceId(String deviceId) {
         MonitorTaskBean monitorTaskBean = MonitorTaskPools.getInstances().getByDeviceId(deviceId);
         if (ObjectUtils.isEmpty(monitorTaskBean)) {
+            Device device = DevicePools.getInstance().getDevice(deviceId);
+
+            WarningEvent warningEvent = new WarningEvent();
+//            warningEvent.setMonitorId(deviceId);//设置监控ID为设备ID
+            warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
+            warningEvent.setEventDetail("监控任务不存在");
+            warningEvent.setEventTime(new Date());
+            warningEvent.setDeviceId(deviceId);
+            warningEvent.setDeviceName(device.getData().getDeviceHostname());
+
+            UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());
+            if (!ObjectUtils.isEmpty(userInfo)) {
+                warningEvent.setUserId(userInfo.getUserId());
+                warningEvent.setUserName(userInfo.getUserName());
+                warningEvent.setUserMobile(userInfo.getMobile());
+            }
+
+//            if (!warningService.checkIsWarningByTime(warningEvent.getMonitorId())) {
+            warningService.insertWarningEvent(warningEvent);
+//            }
             return CopsecResult.failed("此设备无监控任务");
         }
 

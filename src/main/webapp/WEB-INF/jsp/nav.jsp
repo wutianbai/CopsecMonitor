@@ -56,7 +56,7 @@
 
                 <a href="#" data-toggle="user-info-menu-horizontal">
                     <i class="fa-bell-o"></i>
-                    <span class="badge badge-success">7</span>
+                    <span class="badge badge-success" id="mobile-menu-badge"></span>
                 </a>
 
                 <!-- data-toggle="mobile-menu-horizontal" will show horizontal menu link only -->
@@ -195,7 +195,7 @@
                 <li class="dropdown xs-left">
                     <a href="#" data-toggle="dropdown" class="notification-icon notification-icon-messages">
                         <i class="fa-bell-o"></i>
-                        <span class="badge badge-green" id="badge"></span>
+                        <span class="badge badge-success" id="badge"></span>
                     </a>
 
                     <ul class="dropdown-menu notifications">

@@ -1,20 +1,20 @@
 jQuery(function () {
-    var $body = $('body');
+    let $body = $('body');
     /**
      * 保存按钮
      */
     $('#save').on('click', function () {
-        var orig = $body.find('.form-group:nth-child(1) input').val(),
+        let orig = $body.find('.form-group:nth-child(1) input').val(),
             newPwd = $body.find('.form-group:nth-child(2) input').val(),
             confirm = $body.find('.form-group:nth-child(3) input').val();
-        var test = /^(?=.*[0-9].*)(?=.*[A-Z].*)(?=.*[a-z].*).{8,32}$/;
+        let test = /^(?=.*[0-9].*)(?=.*[A-Z].*)(?=.*[a-z].*).{8,32}$/;
 
-        if (orig == "") {
+        if (orig === "") {
             toastr.error("请输入原密码");
             return false;
         }
 
-        if (newPwd == "") {
+        if (newPwd === "") {
             toastr.error("请输入新密码");
             return false;
         }
@@ -24,7 +24,7 @@ jQuery(function () {
             return false;
         }
 
-        if (confirm != newPwd) {
+        if (confirm !== newPwd) {
             toastr.error("密码不一致，请重新输入");
             return false;
         }
@@ -35,9 +35,9 @@ jQuery(function () {
             method: 'POST',
             dataType: 'json',
             success: function (data) {
-                if (data.code == 200) {
-                    $("#message").find(".modal-body").text(data.message);
-                    $("#message").modal('show', {backdrop: 'fade'});
+                if (data.code === 200) {
+                    toastr.info(data.message);
+                    setTimeout("$(location).attr('href', '/')",1000);
                 } else {
                     toastr.error(data.message);
                 }

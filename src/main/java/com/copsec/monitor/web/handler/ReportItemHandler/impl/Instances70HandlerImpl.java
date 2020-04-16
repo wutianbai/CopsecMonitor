@@ -21,9 +21,6 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-/**
- * 读取server.xml配置文件获取pid信息和listener信息
- */
 @Component
 public class Instances70HandlerImpl extends ReportBaseHandler implements ReportHandler {
 
@@ -37,24 +34,24 @@ public class Instances70HandlerImpl extends ReportBaseHandler implements ReportH
         monitorItemType.setResult(jSONObject.getString("ports"));
 
         if (reportItem.getStatus() == 0) {
-            WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-            warningEvent.setEventDetail("Web70实例[" + reportItem.getItem() + "]" + jSONObject.getString("ports") + jSONObject.getString("message"));
+            baseHandle(deviceStatus, monitorType, monitorItemType);
 
+            WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+            warningEvent.setEventDetail("Web70实例[" + reportItem.getItem() + "][" + jSONObject.getString("ports") + "][" + jSONObject.getString("message") + "]");
             List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                    warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                    if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                        deviceStatus.setStatus(1);
+                        monitorType.setStatus(1);
+                    }else{
+                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                        generateWarningEvent(warningService, reportItem, warningEvent);
+                    }
                 });
+            } else {
+                generateWarningEvent(warningService, reportItem, warningEvent);
             }
-
-            if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                warningEvent.setId(null);
-                warningService.insertWarningEvent(warningEvent);
-            }
-
-            deviceStatus.setStatus(0);
-            monitorType.setStatus(0);
-            monitorItemType.setStatus(0);
         }
 
         if (logger.isDebugEnabled()) {

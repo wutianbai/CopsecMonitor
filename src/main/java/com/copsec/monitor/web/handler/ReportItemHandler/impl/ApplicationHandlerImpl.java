@@ -31,26 +31,24 @@ public class ApplicationHandlerImpl extends ReportBaseHandler implements ReportH
         monitorItemType.setResult(reportItem.getResult().toString());
 
         if (reportItem.getStatus() == 0) {
-            monitorItemType.setResult("访问异常");
+            baseHandle(deviceStatus, monitorType, monitorItemType);
 
             WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-            warningEvent.setEventDetail("通道[" + reportItem.getItem() + "]" + reportItem.getResult().toString());
-
+            warningEvent.setEventDetail("通道[" + reportItem.getItem() + "][" + reportItem.getResult().toString() + "]");
             List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                    warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                    if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                        deviceStatus.setStatus(1);
+                        monitorType.setStatus(1);
+                    } else {
+                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                        generateWarningEvent(warningService, reportItem, warningEvent);
+                    }
                 });
+            } else {
+                generateWarningEvent(warningService, reportItem, warningEvent);
             }
-
-            if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                warningEvent.setId(null);
-                warningService.insertWarningEvent(warningEvent);
-            }
-
-            deviceStatus.setStatus(0);
-            monitorType.setStatus(0);
-            monitorItemType.setStatus(0);
         }
 
         if (logger.isDebugEnabled()) {

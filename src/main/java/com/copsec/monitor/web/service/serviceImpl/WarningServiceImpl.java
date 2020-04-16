@@ -337,7 +337,7 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
             warningEvent.setEventTime(new Date());
             warningEvent.setDeviceId(report.getDeviceId());
             warningEvent.setDeviceName(device.getData().getDeviceHostname());
-            if (!ObjectUtils.isEmpty(device.getData().getMonitorUserId())) {
+            if (!ObjectUtils.isEmpty(userInfo)) {
                 warningEvent.setUserId(userInfo.getUserId());
                 warningEvent.setUserName(userInfo.getUserName());
                 warningEvent.setUserMobile(userInfo.getMobile());

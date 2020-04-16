@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,11 +62,12 @@ public class SystemController {
      */
     @PostMapping(value = {"code/update"})
     @ResponseBody
-    public CopsecResult updatePassword(@SessionAttribute UserBean userInfo,
-                                       UserBean bean, HttpServletRequest request) {
-
-        return systemService.passwordReset(userInfo, bean.getPassword(),
-                bean.getNewCode(), request.getRemoteHost());
+    public CopsecResult updatePassword(@SessionAttribute UserBean userInfo, SessionStatus status, UserBean bean, HttpServletRequest request) {
+        CopsecResult result = systemService.passwordReset(userInfo, bean.getPassword(), bean.getNewCode(), request.getRemoteHost());
+        if (result.getCode() == 200) {
+            status.setComplete();
+        }
+        return result;
     }
 
     @PostMapping("/userInfo/get")

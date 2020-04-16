@@ -19,15 +19,15 @@ import java.util.List;
 
 public class ReportBaseHandler {
     public static WarningEvent makeWarningEvent(ReportItem reportItem, Device device, UserInfoBean userInfo) {
-        final WarningEvent warningEvent = new WarningEvent();
+        WarningEvent warningEvent = new WarningEvent();
         warningEvent.setMonitorId(reportItem.getMonitorId());
         warningEvent.setEventSource(reportItem.getMonitorItemType());
-        warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
+        warningEvent.setEventType(WarningLevel.WARNING);//初始告警级别
         warningEvent.setEventTime(new Date());
         warningEvent.setDeviceId(device.getData().getDeviceId());
         warningEvent.setDeviceName(device.getData().getDeviceHostname());
 
-        if(!ObjectUtils.isEmpty(userInfo)){
+        if (!ObjectUtils.isEmpty(userInfo)) {
             warningEvent.setUserId(userInfo.getUserId());
             warningEvent.setUserName(userInfo.getUserName());
             warningEvent.setUserMobile(userInfo.getMobile());
@@ -35,40 +35,17 @@ public class ReportBaseHandler {
         return warningEvent;
     }
 
-    public static void baseHandle(Status deviceStatus, WarningService warningService, ReportItem reportItem, WarningEvent warningEvent) {
-        if (reportItem.getStatus() == 0) {//获取信息失败告警
-            deviceStatus.setStatus(0);
-            if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                warningEvent.setId(null);
-                warningEvent.setEventDetail(reportItem.getResult().toString());
-                warningService.insertWarningEvent(warningEvent);
-            }
-        }
+    public static void baseHandle(Status deviceStatus, Status monitorType, Status monitorItemType) {
+        deviceStatus.setStatus(0);
+        monitorType.setStatus(0);
+        monitorItemType.setStatus(0);
     }
 
-//    public static WarningEvent baseHandle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem) {
-//        final WarningEvent warningEvent = new WarningEvent();
-//        warningEvent.setMonitorId(reportItem.getMonitorId());
-//        warningEvent.setEventSource(reportItem.getMonitorItemType());
-//        warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
-//        warningEvent.setEventTime(new Date());
-//        warningEvent.setDeviceId(device.getData().getDeviceId());
-//        warningEvent.setDeviceName(device.getData().getDeviceHostname());
-//        warningEvent.setUserId(userInfo.getUserId());
-//        warningEvent.setUserName(userInfo.getUserName());
-//        warningEvent.setUserMobile(userInfo.getMobile());
-//
-//        if (reportItem.getStatus() == 0) {//获取信息失败告警
-//            deviceStatus.setStatus(0);
-//            if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-//                warningEvent.setId(null);
-//                warningEvent.setEventDetail(reportItem.getResult().toString());
-//                warningService.insertWarningEvent(warningEvent);
-//            }
-//        }
-//
-//        return warningEvent;
-//    }
+    public static void generateWarningEvent(WarningService warningService, ReportItem reportItem, WarningEvent warningEvent) {
+        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+            warningService.insertWarningEvent(warningEvent);
+        }
+    }
 
     public static List<WarningItemBean> getWarningItemList(ReportItem reportItem) {
         List<WarningItemBean> warningItemList = WarningItemPools.getInstances().getAll();//所有告警项

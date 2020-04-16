@@ -86,7 +86,6 @@ public class CommonController {
      */
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String logout(@SessionAttribute UserBean userInfo, SessionStatus status, HttpServletRequest request) {
-
         LogUtils.sendSuccessLog(userInfo.getId(), request.getRemoteAddr(), "退出",
                 config.getLogHost(), config.getLogPort(), config.getLogCollection(), "退出");
         status.setComplete();

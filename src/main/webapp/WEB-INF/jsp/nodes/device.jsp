@@ -191,30 +191,30 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="control-label">连线样式</label>
-                            <script type="text/javascript">
-                                jQuery(document).ready(function ($) {
-                                    $("#linkStyle").select2({
-                                        allowClear: true
-                                    }).on('select2-open', function () {
-                                        $(this).data('select2').results.addClass('overflow-hidden').perfectScrollbar();
-                                    });
-                                });
-                            </script>
-                            <select class="form-control" id="linkStyle">
-                                <option value="taxi">单箭头-折线</option>
-                                <option value="unbundled-bezier">单箭头-曲线</option>
-                                <option value="straight">单箭头-直线</option>
-                                <option value="taxi42">双箭头-折线</option>
-                                <option value="unbundled-bezier42">双箭头-曲线</option>
-                                <option value="straight42">双箭头-直线</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+                <%--<div class="row">--%>
+                    <%--<div class="col-md-12">--%>
+                        <%--<div class="form-group">--%>
+                            <%--<label class="control-label">连线样式</label>--%>
+                            <%--<script type="text/javascript">--%>
+                                <%--jQuery(document).ready(function ($) {--%>
+                                    <%--$("#linkStyle").select2({--%>
+                                        <%--allowClear: true--%>
+                                    <%--}).on('select2-open', function () {--%>
+                                        <%--$(this).data('select2').results.addClass('overflow-hidden').perfectScrollbar();--%>
+                                    <%--});--%>
+                                <%--});--%>
+                            <%--</script>--%>
+                            <%--<select class="form-control" id="linkStyle">--%>
+                                <%--<option value="taxi">单箭头-折线</option>--%>
+                                <%--<option value="unbundled-bezier">单箭头-曲线</option>--%>
+                                <%--<option value="straight">单箭头-直线</option>--%>
+                                <%--<option value="taxi42">双箭头-折线</option>--%>
+                                <%--<option value="unbundled-bezier42">双箭头-曲线</option>--%>
+                                <%--<option value="straight42">双箭头-直线</option>--%>
+                            <%--</select>--%>
+                        <%--</div>--%>
+                    <%--</div>--%>
+                <%--</div>--%>
             </div>
 
             <div class="modal-footer">

@@ -14,7 +14,6 @@ import com.copsec.monitor.web.fileReaders.ZoneFileReader;
 import com.copsec.monitor.web.pools.*;
 import com.copsec.monitor.web.pools.deviceStatus.DeviceStatusPools;
 import com.copsec.monitor.web.service.DeviceService;
-import com.copsec.monitor.web.service.WarningService;
 import com.copsec.monitor.web.utils.logUtils.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +42,6 @@ public class DeviceServiceImpl implements DeviceService {
     private ZoneFileReader zoneReader;
     @Autowired
     private UserInfoReader userInfoReader;
-
-    @Autowired
-    private WarningService warningService;
 
     @Override
     public CopsecResult getData() {

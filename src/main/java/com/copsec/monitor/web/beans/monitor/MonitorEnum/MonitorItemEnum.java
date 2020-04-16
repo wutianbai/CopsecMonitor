@@ -3,7 +3,7 @@ package com.copsec.monitor.web.beans.monitor.MonitorEnum;
 import java.util.concurrent.ConcurrentHashMap;
 
 public enum MonitorItemEnum {
-    CPU("中央处理机", 0, "请输入阈值", MonitorTypeEnum.SYSTEM),
+    CPU("CPU", 0, "请输入阈值", MonitorTypeEnum.SYSTEM),
     DISK("磁盘", 1, "请输入阈值", MonitorTypeEnum.SYSTEM),
     MEMORY("内存", 2, "请输入阈值", MonitorTypeEnum.SYSTEM),
     USER("用户", 3, "使用\",\"分隔的用户id标识", MonitorTypeEnum.SYSTEM),

@@ -606,7 +606,7 @@ jQuery(function () {
                         cy.add(data.data);
                         toastr.info("添加设备成功");
                         showStatus(cy.$id(deviceId), START_MESSAGE);
-
+                        updateNode(cy.$id(deviceId), ERROR_STATUS);
                         $("#deviceModal").modal('hide');
                     } else {
                         toastr.error(data.message, opts);
@@ -780,17 +780,18 @@ jQuery(function () {
                 return false;
             }
 
-            if (isEmpty($linkStyle.val())) {
-                toastr.error("请选择连线样式", opts);
-                return false;
-            }
+            // if (isEmpty($linkStyle.val())) {
+            //     toastr.error("请选择连线样式", opts);
+            //     return false;
+            // }
 
             $.ajax({
                 url: contextPath + 'node/link/add',
                 data: JSON.stringify({
                     'source': $start.val(),
                     'targets': $end.val(),
-                    'classes': $linkStyle.val()
+                    // 'classes': $linkStyle.val()
+                    'classes': 'straight'
                 }),
                 method: 'POST',
                 dataType: "json",
@@ -823,7 +824,7 @@ jQuery(function () {
         }
 
         addData($start, $end, false, node);
-        $("#linkStyle").val(node.style('curve-style')).trigger('change');
+        // $("#linkStyle").val(node.style('curve-style')).trigger('change');
 
         let $confirmButton = $("<button class='btn btn-success'>保存</button>");
         addButton("linkModal", "更新连接", $confirmButton);
@@ -838,10 +839,10 @@ jQuery(function () {
                 return false;
             }
 
-            if (isEmpty($linkStyle.val())) {
-                toastr.error("请选择连线样式", opts);
-                return false;
-            }
+            // if (isEmpty($linkStyle.val())) {
+            //     toastr.error("请选择连线样式", opts);
+            //     return false;
+            // }
 
             $.ajax({
                 url: contextPath + 'node/link/update',
@@ -849,7 +850,8 @@ jQuery(function () {
                     'id': node.data('id'),
                     'source': $start.val(),
                     'targets': $end.val(),
-                    'classes': $linkStyle.val()
+                    // 'classes': $linkStyle.val()
+                    'classes': 'straight'
                 }),
                 method: 'POST',
                 dataType: "json",
@@ -1191,8 +1193,6 @@ jQuery(function () {
         tip.hide();
     }
 
-    getDeviceStatus();
-
     function getDeviceStatus() {
         $.ajax({
             url: contextPath + 'node/status/' + $.now(),
@@ -1210,22 +1210,22 @@ jQuery(function () {
                                 // toastr.error(cy.$id(k).data('deviceHostname') + " 设备状态异常!", "系统提示", opts);
                                 updateStatus(cy.$id(k), ERROR_COLOR, _text);
                                 updateNode(cy.$id(k), ERROR_STATUS);
-                                updateEdeges(cy.$id(k), "highlightedError");
+                                updateEdges(cy.$id(k), "highlightedError");
                             }
                         } else if (v.status === WARNING_STATUS) {
                             if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
                                 // toastr.error(cy.$id(k).data('deviceHostname') + " 设备上报超时!", "系统提示", opts);
                                 // updateStatus(cy.$id(k), WARNING_COLOR, _text);
                                 // updateNode(cy.$id(k), WARNING_STATUS);
-                                // updateEdeges(cy.$id(k), "highlightedWarning");
+                                // updateEdges(cy.$id(k), "highlightedWarning");
                                 updateStatus(cy.$id(k), ERROR_COLOR, _text);
                                 updateNode(cy.$id(k), ERROR_STATUS);
-                                updateEdeges(cy.$id(k), "highlightedError");
+                                updateEdges(cy.$id(k), "highlightedError");
                             }
                         } else if (v.status === NORMAL_STATUS) {
                             updateStatus(cy.$id(k), NORMAL_COLOR, _text);
                             updateNode(cy.$id(k), NORMAL_STATUS);
-                            updateEdeges(cy.$id(k), "highlightedIn");
+                            updateEdges(cy.$id(k), "highlightedIn");
                         }
                     }
                 }
@@ -1235,7 +1235,7 @@ jQuery(function () {
             }
         });
     }
-
+    getDeviceStatus();
     setInterval(getDeviceStatus, 20000);
 
     function getStatusText(status) {
@@ -1359,13 +1359,11 @@ jQuery(function () {
         }
     }
 
-    function updateEdeges(node, className) {
+    function updateEdges(node, className) {
         node.connectedEdges().each(function (e, index) {
             e.flashClass(className, 1800);
         });
     }
-
-    movePoint();
 
     function movePoint() {
         cy.edges().each(function (e, index) {
@@ -1405,15 +1403,15 @@ jQuery(function () {
                 },
                 {
                     easing: "ease-in-out-quart",
-                    duration: 3000,
+                    duration: 2000,
                     complete: function () {
                         cy.remove("#" + e.data("id") + index);
                     }
                 });
         });
     }
-
-    setInterval(movePoint, 3000);
+    movePoint();
+    setInterval(movePoint, 2000);
 });
 
 function addOne(str, index, value) {
@@ -1529,7 +1527,11 @@ function addTwo(str, index, value) {
                         str += '<td>' + value.result + '</td>';
                     }
                     if (value.status === 0) {
-                        str += '<td>异常</td>';
+                        if (index === "USER") {
+                            str += '<td>已锁定</td>';
+                        } else {
+                            str += '<td>异常</td>';
+                        }
                     } else {
                         str += '<td>正常</td>';
                     }
@@ -1558,8 +1560,10 @@ function addCert(str, index, value) {
                     }
                     // str += '<td>' + value.subject + '</td>';
                     str += '<td>' + value.issuer + '</td>';
-                    str += '<td data-format="YYYY-MM-DD hh:mm:ss">' + value.starTime + '</td>';
-                    str += '<td data-format="YYYY-MM-DD hh:mm:ss">' + value.endTime + '</td>';
+                    str += '<td>' + value.starTime + '</td>';
+                    str += '<td>' + value.endTime + '</td>';
+                    // str += '<td data-format="YYYY-MM-DD hh:mm:ss">' + value.starTime + '</td>';
+                    // str += '<td data-format="YYYY-MM-DD hh:mm:ss">' + value.endTime + '</td>';
                     // str += '<td>' + value.result + '</td>';
                     if (value.status === 0) {
                         str += '<td>异常</td>';

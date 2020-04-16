@@ -25,31 +25,32 @@ public class NetworkHandlerImpl extends ReportBaseHandler implements ReportHandl
     private static final Logger logger = LoggerFactory.getLogger(NetworkHandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
-
         Status monitorItemType = new Status();
         //基本信息
         monitorItemType.setMessage(reportItem.getItem());
         monitorItemType.setResult(reportItem.getResult().toString());
 
-        List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
-        if (warningItemList.size() > 0) {
-            warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                if (!reportItem.getResult().toString().contains("正常")) {
-                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                        warningEvent.setEventDetail("网络[" + reportItem.getItem() + "]" + reportItem.getResult());
+        if (reportItem.getStatus() == 0) {
+            baseHandle(deviceStatus, monitorType, monitorItemType);
 
-                        warningEvent.setId(null);
-                        warningService.insertWarningEvent(warningEvent);
+            WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+            warningEvent.setEventDetail("网络[" + reportItem.getItem() + "][" + reportItem.getResult() + "]");
+            List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
+            if (warningItemList.size() > 0) {
+                warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
+                    if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                        deviceStatus.setStatus(1);
+                        monitorType.setStatus(1);
+                    } else {
+                        if (!reportItem.getResult().toString().contains("正常")) {
+                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                            generateWarningEvent(warningService, reportItem, warningEvent);
+                        }
                     }
-
-                    deviceStatus.setStatus(0);
-                    monitorType.setStatus(0);
-                    monitorItemType.setStatus(0);
-                }
-            });
+                });
+            } else {
+                generateWarningEvent(warningService, reportItem, warningEvent);
+            }
         }
 
         if (logger.isDebugEnabled()) {

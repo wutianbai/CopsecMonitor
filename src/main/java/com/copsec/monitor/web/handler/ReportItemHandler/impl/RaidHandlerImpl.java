@@ -12,7 +12,6 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -28,10 +27,8 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
     private static final Logger logger = LoggerFactory.getLogger(RaidHandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
-
         Status monitorItemType = new Status();
+
         ConcurrentHashMap<String, Status> RAIDMap = new ConcurrentHashMap<>();
 
         List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
@@ -42,31 +39,36 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
         Status diskInfoStatusBean = new Status();
         vmInfo.getDiskInfos().stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(diskInfo -> {
             Status diskInfoStatus = new Status();
-
             //基本信息
             diskInfoStatus.setMessage("虚拟机[" + diskInfo.getId() + "]磁盘");
             diskInfoStatus.setResult("容量[" + diskInfo.getSize() + "]");
             diskInfoStatus.setState("剩余空间[" + diskInfo.getSpare() + "]");
 
-            if (warningItemList.size() > 0) {
-                warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                    if (Integer.parseInt(diskInfo.getStatus()) == 0) {
-                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                            warningEvent.setEventDetail("虚拟机[" + diskInfo.getId() + "]磁盘 异常");
+            if (reportItem.getStatus() == 0) {
+                baseHandle(deviceStatus, monitorType, monitorItemType);
+                diskInfoStatusBean.setStatus(0);
+                diskInfoStatus.setStatus(0);
 
-                            warningEvent.setId(null);
-                            warningService.insertWarningEvent(warningEvent);
+                WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+                warningEvent.setEventDetail("虚拟机[" + diskInfo.getId() + "]磁盘 异常");
+                if (warningItemList.size() > 0) {
+                    warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
+                        if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                            deviceStatus.setStatus(1);
+                            monitorType.setStatus(1);
+                            monitorItemType.setStatus(1);
+                        } else {
+                            if (Integer.parseInt(diskInfo.getStatus()) == 0) {
+                                warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                                generateWarningEvent(warningService, reportItem, warningEvent);
+                            }
                         }
-
-                        deviceStatus.setStatus(0);
-                        monitorType.setStatus(0);
-                        monitorItemType.setStatus(0);
-                        diskInfoStatusBean.setStatus(0);
-                        diskInfoStatus.setStatus(0);
-                    }
-                });
+                    });
+                } else {
+                    generateWarningEvent(warningService, reportItem, warningEvent);
+                }
             }
+
             diskInfoMap.putIfAbsent(diskInfo.getId(), diskInfoStatus);
         });
         diskInfoStatusBean.setMessage(diskInfoMap);
@@ -76,31 +78,36 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
         Status domainInfoStatusBean = new Status();
         vmInfo.getDomainInfos().stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(domainInfo -> {
             Status domainInfoStatus = new Status();
-
             //基本信息
             domainInfoStatus.setMessage("虚拟机[" + domainInfo.getName() + "]域");
             domainInfoStatus.setResult("使用率[" + domainInfo.getUtil() + "]");
             domainInfoStatus.setState("CPU数[" + domainInfo.getMem() + "]");
 
-            if (warningItemList.size() > 0) {
-                warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                    if (Integer.parseInt(domainInfo.getState()) == 0) {
-                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                            warningEvent.setEventDetail("虚拟机[" + domainInfo.getName() + "]域 异常");
-                            warningEvent.setId(new ObjectId(reportItem.getMonitorId().replace("-", "")));
-                            warningService.deleteWarningEvent(warningEvent);
-                            warningService.insertWarningEvent(warningEvent);
-                        }
+            if (reportItem.getStatus() == 0) {
+                baseHandle(deviceStatus, monitorType, monitorItemType);
+                domainInfoStatusBean.setStatus(0);
+                domainInfoStatus.setStatus(0);
 
-                        deviceStatus.setStatus(0);
-                        monitorType.setStatus(0);
-                        monitorItemType.setStatus(0);
-                        domainInfoStatusBean.setStatus(0);
-                        domainInfoStatus.setStatus(0);
-                    }
-                });
+                WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+                warningEvent.setEventDetail("虚拟机[" + domainInfo.getName() + "]域 异常");
+                if (warningItemList.size() > 0) {
+                    warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
+                        if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                            deviceStatus.setStatus(1);
+                            monitorType.setStatus(1);
+                            monitorItemType.setStatus(1);
+                        } else {
+                            if (Integer.parseInt(domainInfo.getState()) == 0) {
+                                warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                                generateWarningEvent(warningService, reportItem, warningEvent);
+                            }
+                        }
+                    });
+                } else {
+                    generateWarningEvent(warningService, reportItem, warningEvent);
+                }
             }
+
             domainInfoMap.putIfAbsent(domainInfo.getName(), domainInfoStatus);
         });
         domainInfoStatusBean.setMessage(domainInfoMap);
@@ -110,31 +117,36 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
         Status volumeInfoStatusBean = new Status();
         vmInfo.getVolumeInfos().stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(volumeInfo -> {
             Status volumeInfoStatus = new Status();
-
             //基本信息
             volumeInfoStatus.setMessage("虚拟机[" + volumeInfo.getName() + "]卷");
             volumeInfoStatus.setResult("等级[" + volumeInfo.getLevel() + "]");
             volumeInfoStatus.setState("磁盘数[" + volumeInfo.getNumDisks() + "]");
 
-            if (warningItemList.size() > 0) {
-                warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                    if (Integer.parseInt(volumeInfo.getStatus()) == 0) {
-                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                            warningEvent.setEventDetail("虚拟机[" + volumeInfo.getName() + "]卷 异常");
-                            warningEvent.setId(new ObjectId(reportItem.getMonitorId().replace("-", "")));
-                            warningService.deleteWarningEvent(warningEvent);
-                            warningService.insertWarningEvent(warningEvent);
-                        }
+            if (reportItem.getStatus() == 0) {
+                baseHandle(deviceStatus, monitorType, monitorItemType);
+                volumeInfoStatusBean.setStatus(0);
+                volumeInfoStatus.setStatus(0);
 
-                        deviceStatus.setStatus(0);
-                        monitorType.setStatus(0);
-                        monitorItemType.setStatus(0);
-                        volumeInfoStatusBean.setStatus(0);
-                        volumeInfoStatus.setStatus(0);
-                    }
-                });
+                WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+                warningEvent.setEventDetail("虚拟机[" + volumeInfo.getName() + "]卷 异常");
+                if (warningItemList.size() > 0) {
+                    warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
+                        if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                            deviceStatus.setStatus(1);
+                            monitorType.setStatus(1);
+                            monitorItemType.setStatus(1);
+                        } else {
+                            if (Integer.parseInt(volumeInfo.getStatus()) == 0) {
+                                warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                                generateWarningEvent(warningService, reportItem, warningEvent);
+                            }
+                        }
+                    });
+                } else {
+                    generateWarningEvent(warningService, reportItem, warningEvent);
+                }
             }
+
             volumeInfoMap.putIfAbsent(volumeInfo.getId(), volumeInfoStatus);
         });
         volumeInfoStatusBean.setMessage(volumeInfoMap);

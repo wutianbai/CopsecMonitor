@@ -1,12 +1,13 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.copsec.monitor.web.beans.UserInfoBean;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
 import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.beans.node.Status;
 import com.copsec.monitor.web.beans.warning.ReportItem;
-import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.entity.WarningEvent;
 import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
@@ -21,15 +22,16 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Component
-public class MemoryHandlerImpl extends ReportBaseHandler implements ReportHandler {
+public class AccessLogHandlerImpl extends ReportBaseHandler implements ReportHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(MemoryHandlerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AccessLogHandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
-        //状态基本信息
-        monitorItemType.setMessage("内存" + reportItem.getItem());
-        monitorItemType.setResult("使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "]");
+        //基本信息
+        JSONObject log = JSON.parseObject(reportItem.getItem());
+        monitorItemType.setMessage("[路径" + log.getString("logPath") + "]阈值[" + log.getString("threadHold") + "]");
+        monitorItemType.setResult(reportItem.getResult().toString());
 
         if (reportItem.getStatus() == 0) {
             baseHandle(deviceStatus, monitorType, monitorItemType);
@@ -38,25 +40,23 @@ public class MemoryHandlerImpl extends ReportBaseHandler implements ReportHandle
             List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
             if (warningItemList.size() > 0) {
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                    if (warningItem.getThreadHold() < Integer.parseInt(reportItem.getResult().toString())) {
-                        if (warningItem.getWarningLevel().name().equals("NORMAL")) {
-                            deviceStatus.setStatus(1);
-                            monitorType.setStatus(1);
-                        } else {
-                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                            warningEvent.setEventDetail("[内存]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "][异常]" + "超出阈值[" + warningItem.getThreadHold() + Resources.PERCENTAGE + "]");
-                            generateWarningEvent(warningService, reportItem, warningEvent);
-                        }
+                    if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                        deviceStatus.setStatus(1);
+                        monitorType.setStatus(1);
+                    } else {
+                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                        warningEvent.setEventDetail("授权日志[" + log.getString("logPath") + "][" + reportItem.getResult() + "]" + "超出阈值[" + warningItem.getThreadHold() + "]");
+                        generateWarningEvent(warningService, reportItem, warningEvent);
                     }
                 });
             } else {
-                warningEvent.setEventDetail("[内存]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "][异常]");
+                warningEvent.setEventDetail("授权日志[" + log.getString("logPath") + "][" + reportItem.getResult() + "]");
                 generateWarningEvent(warningService, reportItem, warningEvent);
             }
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("MemoryHandler return {}" + monitorItemType);
+            logger.debug("AccessLogHandler return {}" + monitorItemType);
         }
 
         return monitorItemType;
@@ -64,6 +64,6 @@ public class MemoryHandlerImpl extends ReportBaseHandler implements ReportHandle
 
     @PostConstruct
     public void init() {
-        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.MEMORY, this);
+        ReportHandlerPools.getInstance().registerHandler(MonitorItemEnum.ACCESSLOG, this);
     }
 }

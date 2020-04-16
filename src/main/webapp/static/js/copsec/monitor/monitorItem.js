@@ -157,14 +157,6 @@ jQuery(function () {
     });
 });
 
-// function isCert() {
-//     if ($('#isCert').prop('checked')) {
-//
-//     } else {
-//
-//     }
-// }
-
 function changeItemLabel() {
     let m = $("#monitorItemType").val();
     if (m === "CERT70" || m === "CERT40") {
@@ -172,7 +164,7 @@ function changeItemLabel() {
         $('#itemRow').css("display", 'none');
         $('#certRow').css("display", 'block');
         $('#logRow').css("display", 'none');
-        $("#item").val("")
+        $("#item").val("");
         $("#logPath").val("");
         $("#threadHold").val("");
     } else if (m === "ACCESSLOG" || m === "PROXYLOG") {
@@ -180,7 +172,7 @@ function changeItemLabel() {
         $('#itemRow').css("display", 'none');
         $('#certRow').css("display", 'none');
         $('#logRow').css("display", 'block');
-        $("#item").val("")
+        $("#item").val("");
         $("#instanceName").val("");
         $("#nickname").val("");
     } else {
@@ -202,8 +194,6 @@ function addData() {
     //清空数据
     let $modal = $("#monitorItemModal").find(".modal-body");
     $modal.find('input').removeAttr('disabled').val('');
-    // $("#isCert").prop("checked", false);
-    // isCert();
     changeItemLabel();
 
     let $confirmButton = $("<button class='btn btn-success'>保存</button>");
@@ -235,23 +225,22 @@ function addData() {
         //     return false;
         // }
 
-        // if (!isEmpty(item)) {
-        //     if (!isLinuxPath(item)) {
-        //         toastr.error("请填写正确的路径");
-        //         return false;
-        //     }
-        // }
+        if(monitorItemType === "NETWORK"){
+            if (!ipTest(item)) {
+                toastr.error("请输入正确的IP地址");
+                return false;
+            }
+        }
 
         if (monitorItemType === "CERT70" || monitorItemType === "CERT40") {
-            // if (!isEmpty(instanceName)) {
-            //     if (!isLinuxPath(instanceName)) {
-            //         toastr.error("请填写正确的路径");
-            //         return false;
-            //     }
-            // }
             if (isEmpty(instanceName)) {
                 toastr.error("请输入证书路径");
                 return false;
+            }else{
+                if (!isLinuxPath(instanceName)) {
+                    toastr.error("请填写正确的路径");
+                    return false;
+                }
             }
 
             if (isEmpty(nickname)) {
@@ -259,15 +248,14 @@ function addData() {
                 return false;
             }
         } else if (monitorItemType === "ACCESSLOG" || monitorItemType === "PROXYLOG") {
-            // if (!isEmpty(logPath)) {
-            //     if (!isLinuxPath(logPath)) {
-            //         toastr.error("请填写正确的路径");
-            //         return false;
-            //     }
-            // }
             if (isEmpty(logPath)) {
                 toastr.error("请输入日志路径");
                 return false;
+            }else {
+                if (!isLinuxPath(logPath)) {
+                    toastr.error("请填写正确的路径");
+                    return false;
+                }
             }
 
             if (isEmpty(threadHold)) {
@@ -323,9 +311,7 @@ function updateData(bean) {
         $("#threadHold").val(bean.item.threadHold);
     } else {
         $("#item").val(bean.item);
-        // $("#isCert").prop("checked", true);
     }
-    // isCert();
 
     let $confirmButton = $("<button class='btn btn-success'>保存</button>");
     addButton("monitorItemModal", "更新监控项", $confirmButton);
@@ -355,23 +341,22 @@ function updateData(bean) {
         //     return false;
         // }
 
-        // if (!isEmpty(item)) {
-        //     if (!isLinuxPath(item)) {
-        //         toastr.error("请填写正确的路径");
-        //         return false;
-        //     }
-        // }
+        if(monitorItemType === "NETWORK"){
+            if (!ipTest(item)) {
+                toastr.error("请输入正确的IP地址");
+                return false;
+            }
+        }
 
         if (monitorItemType === "CERT70" || monitorItemType === "CERT40") {
-            // if (!isEmpty(instanceName)) {
-            //     if (!isLinuxPath(instanceName)) {
-            //         toastr.error("请填写正确的路径");
-            //         return false;
-            //     }
-            // }
             if (isEmpty(instanceName)) {
                 toastr.error("请输入证书路径");
                 return false;
+            }else{
+                if (!isLinuxPath(instanceName)) {
+                    toastr.error("请填写正确的路径");
+                    return false;
+                }
             }
 
             if (isEmpty(nickname)) {
@@ -379,15 +364,14 @@ function updateData(bean) {
                 return false;
             }
         } else if (monitorItemType === "ACCESSLOG" || monitorItemType === "PROXYLOG") {
-            // if (!isEmpty(logPath)) {
-            //     if (!isLinuxPath(logPath)) {
-            //         toastr.error("请填写正确的路径");
-            //         return false;
-            //     }
-            // }
             if (isEmpty(logPath)) {
                 toastr.error("请输入日志路径");
                 return false;
+            }else {
+                if (!isLinuxPath(logPath)) {
+                    toastr.error("请填写正确的路径");
+                    return false;
+                }
             }
 
             if (isEmpty(threadHold)) {

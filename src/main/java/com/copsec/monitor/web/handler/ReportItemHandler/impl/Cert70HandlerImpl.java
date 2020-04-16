@@ -14,6 +14,7 @@ import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
 import com.copsec.monitor.web.utils.CommonUtils;
+import com.copsec.monitor.web.utils.FormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -29,10 +30,8 @@ public class Cert70HandlerImpl extends ReportBaseHandler implements ReportHandle
     private static final Logger logger = LoggerFactory.getLogger(Cert70HandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
-
         Status monitorItemType = new Status();
+
         ConcurrentHashMap<String, Status> CERT70Map = new ConcurrentHashMap<>();
 
         List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
@@ -40,34 +39,38 @@ public class Cert70HandlerImpl extends ReportBaseHandler implements ReportHandle
         List<CertInfoBean> list = JSON.parseArray(reportItem.getResult().toString(), CertInfoBean.class);
         list.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(certInfo -> {
             Status statusBean = new Status();
-
             //基本信息
             statusBean.setMessage(certInfo.getNickname());
             statusBean.setSubject(certInfo.getSubject());
             statusBean.setIssuer(certInfo.getIssuer());
-            statusBean.setStarTime(certInfo.getStarTime());
-            statusBean.setEndTime(certInfo.getEndTime());
+            statusBean.setStarTime(FormatUtils.getFormatDate(certInfo.getStarTime()));
+            statusBean.setEndTime(FormatUtils.getFormatDate(certInfo.getStarTime()));
             statusBean.setResult(certInfo.getMessage());
 
-            if (warningItemList.size() > 0) {
-                warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                    if (certInfo.getStatus() == 0) {
-                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                            warningEvent.setEventDetail("证书70[" + certInfo.getNickname() + "]异常[" + certInfo.getMessage() + "]");
+            if (reportItem.getStatus() == 0) {//信息异常
+                baseHandle(deviceStatus, monitorType, monitorItemType);
+                statusBean.setStatus(0);
 
-                            warningEvent.setId(null);
-                            warningService.insertWarningEvent(warningEvent);
+                WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+                warningEvent.setEventDetail("证书70[" + certInfo.getNickname() + "]异常[" + certInfo.getMessage() + "]");
+                if (warningItemList.size() > 0) {
+                    warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
+                        if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                            deviceStatus.setStatus(1);
+                            monitorType.setStatus(1);
+                            monitorItemType.setStatus(1);
+                        } else {
+                            if (certInfo.getStatus() == 0) {
+                                warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                                generateWarningEvent(warningService, reportItem, warningEvent);
+                            }
                         }
-
-                        deviceStatus.setStatus(0);
-                        monitorType.setStatus(0);
-                        monitorItemType.setStatus(0);
-                        statusBean.setStatus(0);
-                    }
-                });
+                    });
+                }else{
+                    generateWarningEvent(warningService, reportItem, warningEvent);
+                }
             }
-//            CERT70Map.putIfAbsent(certInfo.getNickname(), statusBean);
+
             CERT70Map.putIfAbsent(CommonUtils.generateString(6), statusBean);
         });
         monitorItemType.setMessage(CERT70Map);

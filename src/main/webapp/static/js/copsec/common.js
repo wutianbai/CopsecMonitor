@@ -32,15 +32,23 @@ function getWarningStatus() {
         dataType: "json",
         success: function (data) {
             if (data.iTotalDisplayRecords > 0) {
-                $("#badge").removeClass("badge-green");
-                $("#badge").addClass("badge-red");
+                $("#mobile-menu-badge").removeClass("badge-success");
+                $("#mobile-menu-badge").addClass("badge-danger");
+                $("#mobile-menu-badge").text(data.iTotalDisplayRecords);
+
+                $("#badge").removeClass("badge-success");
+                $("#badge").addClass("badge-danger");
                 $("#badge").text(data.iTotalDisplayRecords);
                 $("#warningStrong").text(data.iTotalDisplayRecords);
 
                 $("#jquery_jplayer").jPlayer("play");//播放告警音频
             } else {
-                $("#badge").removeClass("badge-red");
-                $("#badge").addClass("badge-green");
+                $("#mobile-menu-badge").removeClass("badge-danger");
+                $("#mobile-menu-badge").addClass("badge-success");
+                $("#mobile-menu-badge").text("");
+
+                $("#badge").removeClass("badge-danger");
+                $("#badge").addClass("badge-success");
                 $("#badge").text("");
                 $("#warningStrong").text("0");
 
@@ -409,7 +417,7 @@ function formatSize2(size, pointLength, units) {
 }
 
 function isLinuxPath(path) {
-    let reg = /^\/(\w+\/?)+$/;
+    let reg = /^\/([\w-]+\/?)+$/;
     return reg.test(path);
 }
 

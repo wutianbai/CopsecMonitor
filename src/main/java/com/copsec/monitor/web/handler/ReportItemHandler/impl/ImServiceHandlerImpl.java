@@ -30,10 +30,8 @@ public class ImServiceHandlerImpl extends ReportBaseHandler implements ReportHan
     private static final Logger logger = LoggerFactory.getLogger(ImServiceHandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
-
         Status monitorItemType = new Status();
+
         ConcurrentHashMap<String, Status> map = new ConcurrentHashMap<>();
 
         List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
@@ -44,28 +42,33 @@ public class ImServiceHandlerImpl extends ReportBaseHandler implements ReportHan
             Status statusBean = new Status();
 
             //基本信息
-            statusBean.setMessage("IM进程[" + next.getString("processorName") + "]");
+            statusBean.setMessage(next.getString("processorName"));
+            statusBean.setResult(next.getString("message"));
 
-            if (warningItemList.size() > 0) {
-                warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                    if (next.getString("message").equalsIgnoreCase("已停止")) {
-                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                            if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+            if (reportItem.getStatus() == 0) {//信息异常
+                baseHandle(deviceStatus, monitorType, monitorItemType);
+                statusBean.setStatus(0);
+
+                WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+                warningEvent.setEventDetail("IM进程[" + next.getString("processorName") + "][" + next.getString("message") + "]");
+                if (warningItemList.size() > 0) {
+                    warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
+                        if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                            deviceStatus.setStatus(1);
+                            monitorType.setStatus(1);
+                            monitorItemType.setStatus(1);
+                        } else {
+                            if (next.getString("message").contains("已停止")) {
                                 warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                                warningEvent.setEventDetail("IM进程[" + next.getString("processorName") + "]已停止");
-
-                                warningEvent.setId(null);
-                                warningService.insertWarningEvent(warningEvent);
+                                generateWarningEvent(warningService, reportItem, warningEvent);
                             }
                         }
-
-                        deviceStatus.setStatus(0);
-                        monitorType.setStatus(0);
-                        monitorItemType.setStatus(0);
-                        statusBean.setStatus(0);
-                    }
-                });
+                    });
+                } else {
+                    generateWarningEvent(warningService, reportItem, warningEvent);
+                }
             }
+
             map.put(next.getString("processorName"), statusBean);
         }
         monitorItemType.setMessage(map);

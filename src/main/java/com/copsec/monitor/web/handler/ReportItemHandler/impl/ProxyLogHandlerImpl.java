@@ -1,5 +1,7 @@
 package com.copsec.monitor.web.handler.ReportItemHandler.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.copsec.monitor.web.beans.UserInfoBean;
 import com.copsec.monitor.web.beans.monitor.MonitorEnum.MonitorItemEnum;
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
@@ -19,40 +21,38 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-/**
- * 监控Web70实例下日志
- */
 @Component
 public class ProxyLogHandlerImpl extends ReportBaseHandler implements ReportHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ProxyLogHandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
-
         Status monitorItemType = new Status();
         //基本信息
-        monitorItemType.setMessage("代理日志[" + reportItem.getItem() + "]");
-        monitorItemType.setResult("异常数[" + reportItem.getResult() + "]");
+        JSONObject log = JSON.parseObject(reportItem.getItem());
+        monitorItemType.setMessage("[路径" + log.getString("logPath") + "]阈值[" + log.getString("threadHold") + "]");
+        monitorItemType.setResult(reportItem.getResult().toString());
 
-        List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
-        if (warningItemList.size() > 0) {
-            warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                if (warningItem.getThreadHold() < Integer.parseInt(reportItem.getResult().toString())) {
-                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
+        if (reportItem.getStatus() == 0) {
+            baseHandle(deviceStatus, monitorType, monitorItemType);
+
+            WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+            List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
+            if (warningItemList.size() > 0) {
+                warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
+                    if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                        deviceStatus.setStatus(1);
+                        monitorType.setStatus(1);
+                    } else {
                         warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                        warningEvent.setEventDetail("代理日志[" + reportItem.getItem() + "]异常数[" + reportItem.getResult() + "]" + "超出阈值[" + warningItem.getThreadHold() + "]");
-
-                        warningEvent.setId(null);
-                        warningService.insertWarningEvent(warningEvent);
+                        warningEvent.setEventDetail("代理日志[" + log.getString("logPath") + "][" + reportItem.getResult() + "]" + "超出阈值[" + warningItem.getThreadHold() + "]");
+                        generateWarningEvent(warningService, reportItem, warningEvent);
                     }
-
-                    deviceStatus.setStatus(0);
-                    monitorType.setStatus(0);
-                    monitorItemType.setStatus(0);
-                }
-            });
+                });
+            } else {
+                warningEvent.setEventDetail("代理日志[" + log.getString("logPath") + "][" + reportItem.getResult() + "]");
+                generateWarningEvent(warningService, reportItem, warningEvent);
+            }
         }
 
         if (logger.isDebugEnabled()) {

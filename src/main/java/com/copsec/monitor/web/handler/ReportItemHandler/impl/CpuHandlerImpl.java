@@ -26,31 +26,33 @@ public class CpuHandlerImpl extends ReportBaseHandler implements ReportHandler {
     private static final Logger logger = LoggerFactory.getLogger(CpuHandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
-
         Status monitorItemType = new Status();
         //状态基本信息
         monitorItemType.setMessage("处理器" + reportItem.getItem());
         monitorItemType.setResult("使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "]");
 
-        List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
-        if (warningItemList.size() > 0) {
-            warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                if (warningItem.getThreadHold() < Integer.parseInt(reportItem.getResult().toString())) {
-                    if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                        warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                        warningEvent.setEventDetail("[处理器]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "][异常]" + "超出阈值[" + warningItem.getThreadHold() + Resources.PERCENTAGE + "]");
+        if (reportItem.getStatus() == 0) {
+            baseHandle(deviceStatus, monitorType, monitorItemType);
 
-                        warningEvent.setId(null);
-                        warningService.insertWarningEvent(warningEvent);
+            WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+            List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
+            if (warningItemList.size() > 0) {
+                warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
+                    if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                        deviceStatus.setStatus(1);
+                        monitorType.setStatus(1);
+                    } else {
+                        if (warningItem.getThreadHold() < Integer.parseInt(reportItem.getResult().toString())) {
+                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                            warningEvent.setEventDetail("[处理器]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "][异常]" + "超出阈值[" + warningItem.getThreadHold() + Resources.PERCENTAGE + "]");
+                            generateWarningEvent(warningService, reportItem, warningEvent);
+                        }
                     }
-
-                    deviceStatus.setStatus(0);
-                    monitorType.setStatus(0);
-                    monitorItemType.setStatus(0);
-                }
-            });
+                });
+            } else {
+                warningEvent.setEventDetail("[处理器]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "][异常]");
+                generateWarningEvent(warningService, reportItem, warningEvent);
+            }
         }
 
         if (logger.isDebugEnabled()) {

@@ -30,10 +30,8 @@ public class UserHandlerImpl extends ReportBaseHandler implements ReportHandler 
     private static final Logger logger = LoggerFactory.getLogger(UserHandlerImpl.class);
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
-        WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
-        baseHandle(deviceStatus, warningService, reportItem, warningEvent);
-
         Status monitorItemType = new Status();
+
         ConcurrentHashMap<String, Status> map = new ConcurrentHashMap<>();
 
         List<WarningItemBean> warningItemList = getWarningItemList(reportItem);
@@ -42,28 +40,34 @@ public class UserHandlerImpl extends ReportBaseHandler implements ReportHandler 
         for (Iterator<Object> iterator = jSONArray.iterator(); iterator.hasNext(); ) {
             JSONObject next = (JSONObject) iterator.next();
             Status statusBean = new Status();
-
             //基本信息
             statusBean.setMessage("用户[" + next.getString("userId") + "]");
 
-            if (warningItemList.size() > 0) {
-                warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
-                    if (Integer.parseInt(next.getString("status")) == 0) {
-                        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-                            warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                            warningEvent.setEventDetail("用户[" + next.getString("userId") + "]过期");
+            if (reportItem.getStatus() == 0) {//信息异常
+                baseHandle(deviceStatus, monitorType, monitorItemType);
+                statusBean.setStatus(0);
 
-                            warningEvent.setId(null);
-                            warningService.insertWarningEvent(warningEvent);
+                WarningEvent warningEvent = makeWarningEvent(reportItem, device, userInfo);
+                if (warningItemList.size() > 0) {
+                    warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
+                        if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                            deviceStatus.setStatus(1);
+                            monitorType.setStatus(1);
+                            monitorItemType.setStatus(1);
+                        } else {
+                            if (Integer.parseInt(next.getString("status")) == 0) {
+                                warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
+                                warningEvent.setEventDetail("用户[" + next.getString("userId") + "]已锁定");
+                                generateWarningEvent(warningService, reportItem, warningEvent);
+                            }
                         }
-
-                        deviceStatus.setStatus(0);
-                        monitorType.setStatus(0);
-                        monitorItemType.setStatus(0);
-                        statusBean.setStatus(0);
-                    }
-                });
+                    });
+                } else {
+                    warningEvent.setEventDetail("用户[" + next.getString("userId") + "]异常");
+                    generateWarningEvent(warningService, reportItem, warningEvent);
+                }
             }
+
             map.put(next.getString("userId"), statusBean);
         }
         monitorItemType.setMessage(map);
