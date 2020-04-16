@@ -12,7 +12,7 @@
 <script type="text/javascript" src="<%=basePath %>static/js/html5/respond.min.js"></script>
 <![endif]-->
 <script>
-    var contextPath = "<%=basePath %>";
+    let contextPath = "<%=basePath %>";
 </script>
 <link rel="stylesheet" href="<%=basePath %>static/assets/css/fonts/linecons/css/linecons.css">
 <link rel="stylesheet" href="<%=basePath %>static/assets/css/fonts/fontawesome/css/font-awesome.min.css">

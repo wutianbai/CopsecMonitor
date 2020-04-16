@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
@@ -159,7 +158,7 @@ public class SystemController {
 
     @PostMapping("/operateLog/export")
     @ResponseBody
-    public ResponseEntity<Resource> exportAllLogs(LogConditionBean condition, HttpServletResponse response) {
+    public ResponseEntity<Resource> exportAllLogs(LogConditionBean condition) {
         if (logger.isDebugEnabled()) {
             logger.debug("export current operateLog");
         }
@@ -167,7 +166,7 @@ public class SystemController {
         HttpStatus status = HttpStatus.CREATED;
         Page<LogConditionBean> logs = systemService.searchOperateLog(PageUtils.returnPageable(condition), condition);
         String fileName = config.getBackupFilePath() + File.separator + "logs-" + condition.getFileName() + ".xls";
-        ExportUtils.makeExcel(logs.getContent(), fileName, response);
+        ExportUtils.makeExcel(logs.getContent(), fileName);
 
         File file = new File(fileName);
         FileSystemResource fileSource = new FileSystemResource(file);

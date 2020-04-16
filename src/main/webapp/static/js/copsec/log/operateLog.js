@@ -70,10 +70,10 @@ function page(id, url) {
             "sZeroRecords": "没有检索到数据",
             "sSearch": "搜索",
             "oPaginate": {
-                "sFirst": "首页",
-                "sPrevious": "前一页",
-                "sNext": "后一页",
-                "sLast": "尾页"
+                "sFirst": "《",
+                "sPrevious": "<",
+                "sNext": ">",
+                "sLast": "》"
             }
         },
         "aoColumns": [//渲染每一列，其实就是配置表头和数据对应显示到哪一列中
@@ -234,7 +234,7 @@ function exportLog() {
         },
         httpMethod: 'POST',
         successCallback: function (url) {
-            $.ajax('<%=basePath%>system/operateLog/file/' + data.fileName);
+            $.ajax(contextPath + 'system/operateLog/file/' + data.fileName);
         }
     })
 }

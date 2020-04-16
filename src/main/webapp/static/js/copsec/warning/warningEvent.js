@@ -77,7 +77,7 @@ function page(id, url) {
                 "mData": "eventId",
                 "sClass": "text-center",
                 "sTitle": '选择',
-                "width": "7%",
+                "width": "5%",
                 "mRender": function (d, type, full, meta) {
                     return '<input type="checkbox" class="cbr" value="' + d + '">';
                 }
@@ -95,7 +95,8 @@ function page(id, url) {
             },
             {
                 "mData": "eventSource",
-                "sTitle": "来源"
+                "sTitle": "来源",
+                "width": "10%"
             },
             {
                 "mData": "eventTime",
@@ -109,7 +110,7 @@ function page(id, url) {
             {
                 "mData": "eventType",
                 "sTitle": "类型",
-                "width": "8%"
+                "width": "6%"
             },
             // {
             //     "mData": "deviceId",

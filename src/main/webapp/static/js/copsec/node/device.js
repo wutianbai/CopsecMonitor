@@ -1200,9 +1200,9 @@ jQuery(function () {
             dataType: 'json',
             success: function (data) {
                 if (data.code === 200) {
-                    let m = data.data;//statusMap
+                    let m = data.data;//所有设备状态
                     for (let k in m) {
-                        let v = m[k];//deviceStatusBean
+                        let v = m[k];//单个设备状态
                         let _text = "";
                         _text = getStatusText(v);
                         if (v.status === ERROR_STATUS) {
@@ -1228,6 +1228,7 @@ jQuery(function () {
                             updateEdges(cy.$id(k), "highlightedIn");
                         }
                     }
+                    movePoint();
                 }
             },
             error: function (ajq, status, error) {
@@ -1236,7 +1237,7 @@ jQuery(function () {
         });
     }
     getDeviceStatus();
-    setInterval(getDeviceStatus, 20000);
+    setInterval(getDeviceStatus, 8000);
 
     function getStatusText(status) {
         let str = '<table class="table table-condensed">';
@@ -1410,8 +1411,7 @@ jQuery(function () {
                 });
         });
     }
-    movePoint();
-    setInterval(movePoint, 5000);
+    // setInterval(movePoint, 2000);
 });
 
 function addOne(str, index, value) {

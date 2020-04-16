@@ -84,18 +84,18 @@
                         <button class="btn btn-danger" onclick="deleteCheck()">
                             <i class="fa fa-trash"></i>
                         </button>
-                        <button class="btn btn-red" onclick="deleteAll();">
-                            <i class="fa fa-trash-o"></i>
+                        <button class="btn btn-red" onclick="deleteAll()">
+                            <i class="fa fa-bank"></i>
                         </button>
-                        <button class="btn btn-success" onclick="exportLog();">
+                        <button class="btn btn-success" onclick="exportLog()">
                             <i class="fa fa-print"></i>
                         </button>
                     </div>
                     <div class="col-sm-offset-11 form-group">
-                        <button onclick="searchByCondition();" class="btn btn-success">
+                        <button onclick="searchByCondition()" class="btn btn-success">
                             <i class="fa-search"></i>
                         </button>
-                        <button onclick="clearCondition('operateLogPanel');" class="btn btn-gray">
+                        <button onclick="clearCondition('operateLogPanel')" class="btn btn-gray">
                             <i class="fa-refresh"></i>
                         </button>
                     </div>

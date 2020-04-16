@@ -1,24 +1,26 @@
 jQuery(function () {
-    getWarningStatus();
-    setInterval(getWarningStatus, 2000);
+    if ($("#userRole").text() !== "auditAdmin") {
+        getWarningStatus();
+        setInterval(getWarningStatus, 2000);
 
-    $("#jquery_jplayer").jPlayer({
-        ready: function () {
-            $(this).jPlayer("setMedia", {
-                title: "Warning",
-                mp3: contextPath + "static/audio/warning.mp3"
-            });
-        },
-        swfPath: contextPath + "static/jplayer/dist/jplayer",
-        supplied: "mp3",
-        wmode: "window",
-        useStateClassSkin: true,
-        autoBlur: false,
-        smoothPlayBar: true,
-        keyEnabled: true,
-        remainingDuration: true,
-        toggleDuration: true
-    });
+        $("#jquery_jplayer").jPlayer({
+            ready: function () {
+                $(this).jPlayer("setMedia", {
+                    title: "Warning",
+                    mp3: contextPath + "static/audio/warning.mp3"
+                });
+            },
+            swfPath: contextPath + "static/jplayer/dist/jplayer",
+            supplied: "mp3",
+            wmode: "window",
+            useStateClassSkin: true,
+            autoBlur: false,
+            smoothPlayBar: true,
+            keyEnabled: true,
+            remainingDuration: true,
+            toggleDuration: true
+        });
+    }
 });
 
 function getWarningStatus() {
@@ -81,7 +83,7 @@ function setScrollbar(data) {
         }
         str += '<a href="' + contextPath + 'system/warningEvent">';
         switch (value.eventSource) {
-            case "中央处理机":
+            case "CPU":
                 str += '<i class="fa fa-sitemap"></i>';
                 break;
             // case "磁盘":
@@ -132,6 +134,7 @@ function handleAllWarningEvent() {
     });
     getWarningStatus();
 }
+
 /**
  * _url:传入链接地址
  * _method:post or get

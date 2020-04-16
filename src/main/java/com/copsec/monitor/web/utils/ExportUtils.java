@@ -5,24 +5,17 @@ import org.apache.poi.hssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class ExportUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ExportUtils.class);
 
-    public static OutputStream makeExcel(List<LogConditionBean> list, String fileName, HttpServletResponse response) {
-        Date date = new Date();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
+    public static OutputStream makeExcel(List<LogConditionBean> list, String fileName) {
         try {
             fileName = new String(fileName.getBytes("GBK"), "iso8859-1");
         } catch (UnsupportedEncodingException e1) {
-
             e1.printStackTrace();
         }
 
@@ -82,39 +75,38 @@ public class ExportUtils {
         HSSFCell cell1 = row1.createCell(0);
 
         //第一行第一列
-
         cell1.setCellStyle(cellStyleTitle);
         cell1.setCellValue(new HSSFRichTextString(index));
-        //第一行第er列
+
+        //第一行第二列
         cell1 = row1.createCell(1);
         cell1.setCellStyle(cellStyleTitle);
         cell1.setCellValue(new HSSFRichTextString(user));
 
-        //第一行第san列
+        //第一行第三列
         cell1 = row1.createCell(2);
         cell1.setCellStyle(cellStyleTitle);
         cell1.setCellValue(new HSSFRichTextString(ip));
 
-        //第一行第si列
+        //第一行第四列
         cell1 = row1.createCell(3);
         cell1.setCellStyle(cellStyleTitle);
         cell1.setCellValue(new HSSFRichTextString(type));
 
-        //第一行第wu列
+        //第一行第五列
         cell1 = row1.createCell(4);
         cell1.setCellStyle(cellStyleTitle);
         cell1.setCellValue(new HSSFRichTextString(desc));
 
-        //第一行第liu列
+        //第一行第六列
         cell1 = row1.createCell(5);
         cell1.setCellStyle(cellStyleTitle);
         cell1.setCellValue(new HSSFRichTextString(result));
 
-        //第一行第qi列
+        //第一行第七列
         cell1 = row1.createCell(6);
         cell1.setCellStyle(cellStyleTitle);
         cell1.setCellValue(new HSSFRichTextString(time));
-
 
         //定义第二行
         HSSFRow row = sheet.createRow(2);
@@ -151,7 +143,6 @@ public class ExportUtils {
             cell = row.createCell(6);
             cell.setCellValue(new HSSFRichTextString(log.getDate()));
             cell.setCellStyle(cellStyle);
-
         }
         try {
             bufferedOutPut.flush();
