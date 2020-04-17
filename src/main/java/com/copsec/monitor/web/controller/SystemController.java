@@ -162,7 +162,7 @@ public class SystemController {
 
         HttpStatus status = HttpStatus.CREATED;
         Page<LogConditionBean> logs = systemService.searchOperateLog(PageUtils.returnPageable(condition), condition);
-        String fileName = config.getBackupFilePath() + File.separator + "operateLog[" + FormatUtils.getFormatDate(new Date()) + "].xls";
+        String fileName = config.getBasePath() + File.separator + "operateLog.xls";
         ExportUtils.makeExcel(logs.getContent(), fileName);
 
         File file = new File(fileName);
@@ -178,10 +178,10 @@ public class SystemController {
         return new ResponseEntity<>(fileSource, header, status);
     }
 
-    @GetMapping("/operateLog/file/{id}")
+    @PostMapping("/operateLog/file")
     @ResponseBody
-    public CopsecResult deleteExportFile(@PathVariable("id") String id) {
-        String fileName = config.getBackupFilePath() + File.separator + "logs-" + id + ".xls";
+    public CopsecResult deleteExportFile(LogConditionBean condition) {
+        String fileName = config.getBasePath() + File.separator + condition.getFileName() + ".xls";
         File file = new File(fileName);
         if (file.exists()) {
             file.delete();

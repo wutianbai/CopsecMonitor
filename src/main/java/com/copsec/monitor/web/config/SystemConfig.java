@@ -91,9 +91,6 @@ public class SystemConfig {
 	@Value("${system.config.base.path}")
 	private String basePath;
 
-	@Value("${system.config.backup.path}")
-	private String backupFilePath;
-
 	@Value("${system.user.path}")
 	private String userPath;
 
