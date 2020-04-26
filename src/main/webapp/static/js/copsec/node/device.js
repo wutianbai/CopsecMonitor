@@ -8,7 +8,8 @@ jQuery(function () {
         ERROR_STATUS = 0,
         ERROR_COLOR = "#cb5353",
         NORMAL_COLOR = "#5ab95d",
-        WARNING_COLOR = "#ffff00";
+        WARNING_COLOR = "#ffff00",
+        INFO_COLOR = "#0088CC";
 
     let SWITCH_NORMAL = contextPath + "static/images/server/switch/switch-32-n1.svg",
         SWITCH_WARNING = contextPath + "static/images/server/switch/switch-32-n1.svg",
@@ -1208,7 +1209,7 @@ jQuery(function () {
                         if (v.status === ERROR_STATUS) {
                             if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
                                 // toastr.error(cy.$id(k).data('deviceHostname') + " 设备状态异常!", "系统提示", opts);
-                                updateStatus(cy.$id(k), ERROR_COLOR, _text);
+                                updateStatus(cy.$id(k), INFO_COLOR, _text);
                                 updateNode(cy.$id(k), ERROR_STATUS);
                                 updateEdges(cy.$id(k), "highlightedError");
                             }
@@ -1218,12 +1219,12 @@ jQuery(function () {
                                 // updateStatus(cy.$id(k), WARNING_COLOR, _text);
                                 // updateNode(cy.$id(k), WARNING_STATUS);
                                 // updateEdges(cy.$id(k), "highlightedWarning");
-                                updateStatus(cy.$id(k), ERROR_COLOR, _text);
+                                updateStatus(cy.$id(k), INFO_COLOR, _text);
                                 updateNode(cy.$id(k), ERROR_STATUS);
                                 updateEdges(cy.$id(k), "highlightedError");
                             }
                         } else if (v.status === NORMAL_STATUS) {
-                            updateStatus(cy.$id(k), NORMAL_COLOR, _text);
+                            updateStatus(cy.$id(k), INFO_COLOR, _text);
                             updateNode(cy.$id(k), NORMAL_STATUS);
                             updateEdges(cy.$id(k), "highlightedIn");
                         }
