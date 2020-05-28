@@ -24,6 +24,21 @@ public class SystemConfig {
 	@Value("${mongo.db.log.listen.collection}")
 	private String logCollection;
 
+	@Value("${mongo.db.sysLog.listen.host}")
+	private String sysLogHost;
+
+	@Value("${mongo.db.sysLog.listen.port}")
+	private int sysLogPort;
+
+	@Value("${mongo.db.sysLog.listen.deviceVendor}")
+	private String deviceVendor;
+
+	@Value("${mongo.db.sysLog.listen.deviceProductType}")
+	private String deviceProductType;
+
+	@Value("${mongo.db.sysLog.listen.deviceSendProductName}")
+	private String deviceSendProductName;
+
 	@Value("${production.system.device.update.time}")
 	private int deviceUpdateTime;
 
@@ -147,4 +162,6 @@ public class SystemConfig {
 
 	@Value("${monitor.noWarningItem.path}")
 	private String noWarningItemPath;
+
+
 }

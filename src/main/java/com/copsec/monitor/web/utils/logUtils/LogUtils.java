@@ -62,12 +62,11 @@ public class LogUtils {
                 logger.error(e.getMessage(), e);
                 return;
             }
-            /*try {
-                //datagramSocket.send(new DatagramPacket(bytes, bytes.length, InetAddress.getByName(logHost), logPort));
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                return;
-            }*/
+//            try {
+//                datagramSocket.send(new DatagramPacket(bytes, bytes.length, InetAddress.getByName(logHost), logPort));
+//            } catch (IOException e) {
+//                logger.error(e.getMessage(), e);
+//            }
         } catch (Throwable t) {
             logger.error(t.getMessage(), t);
         }

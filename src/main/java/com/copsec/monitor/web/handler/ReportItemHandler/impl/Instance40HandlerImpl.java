@@ -13,6 +13,7 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
+import com.copsec.monitor.web.utils.logUtils.SysLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,9 @@ public class Instance40HandlerImpl extends ReportBaseHandler implements ReportHa
         //基本信息
         monitorItemType.setMessage(reportItem.getItem());
         monitorItemType.setResult(jSONObject.getString("ports"));
+
+        //发送SysLog日志
+        SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "WebProxy40实例", "WebProxy40实例[" + reportItem.getItem() + "][" + jSONObject.getString("ports") + "][" + jSONObject.getString("message") + "]");
 
         if (reportItem.getStatus() == 0) {
             baseHandle(deviceStatus, monitorType, monitorItemType);

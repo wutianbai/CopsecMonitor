@@ -14,6 +14,7 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
+import com.copsec.monitor.web.utils.logUtils.SysLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,9 @@ public class ImServiceHandlerImpl extends ReportBaseHandler implements ReportHan
             //基本信息
             statusBean.setMessage(next.getString("processorName"));
             statusBean.setResult(next.getString("message"));
+
+            //发送SysLog日志
+            SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "IM进程", "IM进程[" + next.getString("processorName") + "][" + next.getString("message") + "]");
 
             if (reportItem.getStatus() == 0) {//信息异常
                 baseHandle(deviceStatus, monitorType, monitorItemType);

@@ -15,6 +15,7 @@ import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
 import com.copsec.monitor.web.utils.CommonUtils;
 import com.copsec.monitor.web.utils.FormatUtils;
+import com.copsec.monitor.web.utils.logUtils.SysLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -46,6 +47,9 @@ public class Cert70HandlerImpl extends ReportBaseHandler implements ReportHandle
             statusBean.setStarTime(FormatUtils.getFormatDate(certInfo.getStarTime()));
             statusBean.setEndTime(FormatUtils.getFormatDate(certInfo.getStarTime()));
             statusBean.setResult(certInfo.getMessage());
+
+            //发送SysLog日志
+            SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "证书70", "证书70[" + certInfo.getNickname() + "][" + certInfo.getMessage() + "]");
 
             if (reportItem.getStatus() == 0) {//信息异常
                 baseHandle(deviceStatus, monitorType, monitorItemType);

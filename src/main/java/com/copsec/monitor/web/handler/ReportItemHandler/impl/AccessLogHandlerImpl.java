@@ -13,6 +13,7 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
+import com.copsec.monitor.web.utils.logUtils.SysLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,8 @@ public class AccessLogHandlerImpl extends ReportBaseHandler implements ReportHan
         JSONObject log = JSON.parseObject(reportItem.getItem());
         monitorItemType.setMessage("路径[" + log.getString("logPath") + "]阈值[" + log.getString("threadHold") + "]");
         monitorItemType.setResult(reportItem.getResult().toString());
+        //发送SysLog日志
+        SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "授权日志", "授权日志[" + log.getString("logPath") + "][" + reportItem.getResult() + "]阈值[" + log.getString("threadHold") + "]");
 
         if (reportItem.getStatus() == 0) {
             baseHandle(deviceStatus, monitorType, monitorItemType);

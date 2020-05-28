@@ -12,6 +12,7 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
+import com.copsec.monitor.web.utils.logUtils.SysLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -43,6 +44,9 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
             diskInfoStatus.setMessage("虚拟机[" + diskInfo.getId() + "]磁盘");
             diskInfoStatus.setResult("容量[" + diskInfo.getSize() + "]");
             diskInfoStatus.setState("剩余空间[" + diskInfo.getSpare() + "]");
+
+            //发送SysLog日志
+            SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "虚拟机", "虚拟机[" + diskInfo.getId() + "]磁盘 " + "容量[" + diskInfo.getSize() + "]" + "剩余空间[" + diskInfo.getSpare() + "]");
 
             if (reportItem.getStatus() == 0) {
                 baseHandle(deviceStatus, monitorType, monitorItemType);
@@ -82,6 +86,9 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
             domainInfoStatus.setResult("使用率[" + domainInfo.getUtil() + "]");
             domainInfoStatus.setState("CPU数[" + domainInfo.getMem() + "]");
 
+            //发送SysLog日志
+            SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "虚拟机", "虚拟机[" + domainInfo.getName() + "]域 " + "使用率[" + domainInfo.getUtil() + "]" + "CPU数[" + domainInfo.getMem() + "]");
+
             if (reportItem.getStatus() == 0) {
                 baseHandle(deviceStatus, monitorType, monitorItemType);
                 domainInfoStatusBean.setStatus(0);
@@ -119,6 +126,9 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
             volumeInfoStatus.setMessage("虚拟机[" + volumeInfo.getName() + "]卷");
             volumeInfoStatus.setResult("等级[" + volumeInfo.getLevel() + "]");
             volumeInfoStatus.setState("磁盘数[" + volumeInfo.getNumDisks() + "]");
+
+            //发送SysLog日志
+            SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "虚拟机", "虚拟机[" + volumeInfo.getName() + "]卷 " + "等级[" + volumeInfo.getLevel() + "]" + "磁盘数[" + volumeInfo.getNumDisks() + "]");
 
             if (reportItem.getStatus() == 0) {
                 baseHandle(deviceStatus, monitorType, monitorItemType);

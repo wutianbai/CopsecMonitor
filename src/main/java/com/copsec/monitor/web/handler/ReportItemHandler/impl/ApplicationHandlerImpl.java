@@ -11,6 +11,7 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
+import com.copsec.monitor.web.utils.logUtils.SysLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,9 @@ public class ApplicationHandlerImpl extends ReportBaseHandler implements ReportH
         //基本信息
         monitorItemType.setMessage(reportItem.getItem());
         monitorItemType.setResult(reportItem.getResult().toString());
+
+        //发送SysLog日志
+        SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "通道", "通道[" + reportItem.getItem() + "][" + reportItem.getResult().toString() + "]");
 
         if (reportItem.getStatus() == 0) {
             baseHandle(deviceStatus, monitorType, monitorItemType);

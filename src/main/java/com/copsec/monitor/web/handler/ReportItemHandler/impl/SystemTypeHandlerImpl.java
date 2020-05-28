@@ -9,6 +9,7 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
+import com.copsec.monitor.web.utils.logUtils.SysLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,9 @@ public class SystemTypeHandlerImpl extends ReportBaseHandler implements ReportHa
 
         Status monitorItemType = new Status();
         monitorItemType.setMessage(reportItem.getResult());
+
+        //发送SysLog日志
+        SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "系统类型", reportItem.getResult().toString());
 
         if (logger.isDebugEnabled()) {
             logger.debug("SystemTypeHandler return {}" + monitorItemType);

@@ -12,6 +12,7 @@ import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.service.WarningService;
+import com.copsec.monitor.web.utils.logUtils.SysLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,9 @@ public class CpuHandlerImpl extends ReportBaseHandler implements ReportHandler {
         //状态基本信息
         monitorItemType.setMessage("处理器" + reportItem.getItem());
         monitorItemType.setResult("使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "]");
+
+        //发送SysLog日志
+        SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "处理器", "[处理器]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "]");
 
         if (reportItem.getStatus() == 0) {
             baseHandle(deviceStatus, monitorType, monitorItemType);
