@@ -3,9 +3,7 @@ package com.copsec.monitor.web.utils;
 import java.util.Random;
 
 public class RondomCodeUtils {
-
     public static String getCode(int length) {
-
         String val = "";
         Random random = new Random();
         for (int i = 0; i < length; i++) {
@@ -19,5 +17,4 @@ public class RondomCodeUtils {
         }
         return val;
     }
-
 }
