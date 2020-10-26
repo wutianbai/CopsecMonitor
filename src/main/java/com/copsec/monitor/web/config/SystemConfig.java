@@ -25,6 +25,9 @@ public class SystemConfig {
     @Value("${mongo.db.log.listen.collection}")
     private String logCollection;
 
+    @Value("${mongo.db.sysLog.listen.enable}")
+    private boolean sysLogEnable;
+
     @Value("${mongo.db.sysLog.listen.host}")
     private String sysLogHost;
 

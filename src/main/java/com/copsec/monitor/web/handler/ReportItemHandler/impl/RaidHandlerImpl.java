@@ -7,6 +7,7 @@ import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.beans.node.Status;
 import com.copsec.monitor.web.beans.warning.ReportItem;
 import com.copsec.monitor.web.beans.warning.VmInfoBean;
+import com.copsec.monitor.web.config.SystemConfig;
 import com.copsec.monitor.web.entity.WarningEvent;
 import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
@@ -15,6 +16,7 @@ import com.copsec.monitor.web.service.WarningService;
 import com.copsec.monitor.web.utils.logUtils.SysLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -26,6 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(RaidHandlerImpl.class);
+
+    @Autowired
+    private SystemConfig config;
 
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
@@ -46,7 +51,7 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
             diskInfoStatus.setState("剩余空间[" + diskInfo.getSpare() + "]");
 
             //发送SysLog日志
-            SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "虚拟机", "虚拟机[" + diskInfo.getId() + "]磁盘 " + "容量[" + diskInfo.getSize() + "]" + "剩余空间[" + diskInfo.getSpare() + "]");
+            SysLogUtil.sendLog(config, device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "虚拟机", "虚拟机[" + diskInfo.getId() + "]磁盘 " + "容量[" + diskInfo.getSize() + "]" + "剩余空间[" + diskInfo.getSpare() + "]");
 
             if (reportItem.getStatus() == 0) {
                 baseHandle(deviceStatus, monitorType, monitorItemType);
@@ -58,6 +63,7 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
                 if (warningItemList.size() > 0) {
                     warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                         if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                            deviceStatus.setStatus(1);
                             monitorType.setStatus(1);
                             monitorItemType.setStatus(1);
                         } else {
@@ -87,7 +93,7 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
             domainInfoStatus.setState("CPU数[" + domainInfo.getMem() + "]");
 
             //发送SysLog日志
-            SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "虚拟机", "虚拟机[" + domainInfo.getName() + "]域 " + "使用率[" + domainInfo.getUtil() + "]" + "CPU数[" + domainInfo.getMem() + "]");
+            SysLogUtil.sendLog(config, device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "虚拟机", "虚拟机[" + domainInfo.getName() + "]域 " + "使用率[" + domainInfo.getUtil() + "]" + "CPU数[" + domainInfo.getMem() + "]");
 
             if (reportItem.getStatus() == 0) {
                 baseHandle(deviceStatus, monitorType, monitorItemType);
@@ -99,6 +105,7 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
                 if (warningItemList.size() > 0) {
                     warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                         if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                            deviceStatus.setStatus(1);
                             monitorType.setStatus(1);
                             monitorItemType.setStatus(1);
                         } else {
@@ -128,7 +135,7 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
             volumeInfoStatus.setState("磁盘数[" + volumeInfo.getNumDisks() + "]");
 
             //发送SysLog日志
-            SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "虚拟机", "虚拟机[" + volumeInfo.getName() + "]卷 " + "等级[" + volumeInfo.getLevel() + "]" + "磁盘数[" + volumeInfo.getNumDisks() + "]");
+            SysLogUtil.sendLog(config, device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "虚拟机", "虚拟机[" + volumeInfo.getName() + "]卷 " + "等级[" + volumeInfo.getLevel() + "]" + "磁盘数[" + volumeInfo.getNumDisks() + "]");
 
             if (reportItem.getStatus() == 0) {
                 baseHandle(deviceStatus, monitorType, monitorItemType);
@@ -140,6 +147,7 @@ public class RaidHandlerImpl extends ReportBaseHandler implements ReportHandler 
                 if (warningItemList.size() > 0) {
                     warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                         if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                            deviceStatus.setStatus(1);
                             monitorType.setStatus(1);
                             monitorItemType.setStatus(1);
                         } else {

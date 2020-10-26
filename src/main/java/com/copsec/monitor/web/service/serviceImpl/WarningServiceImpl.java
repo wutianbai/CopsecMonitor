@@ -323,10 +323,10 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
             deviceStatus.setUpdateTime(FormatUtils.getFormatDate(report.getReportTime()));
             errorStatus = System.currentTimeMillis() - report.getReportTime().getTime();
         } else {
-            errorStatus = config.getDeviceUpdateTime() * 30000 + 1;
+            errorStatus = config.getDeviceUpdateTime() + 1;
         }
 
-        if (errorStatus > (config.getDeviceUpdateTime() * 30000)) {//上报超时 并产生告警
+        if (errorStatus > config.getDeviceUpdateTime()) {//上报超时 并产生告警
             deviceStatus.setWarnMessage(Resources.ERROR_MESSAGE);
             deviceStatus.setStatus(2);
 

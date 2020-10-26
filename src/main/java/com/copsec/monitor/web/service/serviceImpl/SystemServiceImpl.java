@@ -50,7 +50,6 @@ public class SystemServiceImpl implements SystemService {
 
     @Override
     public CopsecResult login(UserBean userInfo, String ip) {
-
         UserBean userBean = UserPools.getInstances().get(userInfo.getId());
         if (ObjectUtils.isEmpty(userBean)) {
             LogUtils.sendFailLog(userInfo.getId(), ip, "登录失败,用户不存在", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "登录");

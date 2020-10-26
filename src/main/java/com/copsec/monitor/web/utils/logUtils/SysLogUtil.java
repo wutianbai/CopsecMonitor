@@ -3,7 +3,6 @@ package com.copsec.monitor.web.utils.logUtils;
 import com.copsec.monitor.web.config.SystemConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -14,11 +13,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+//@Component
 public class SysLogUtil {
     private static Logger logger = LoggerFactory.getLogger(SysLogUtil.class);
 
-    @Autowired
-    private static SystemConfig config;
+//    @Autowired
+//    private static SystemConfig config;
 
     private final static String encoding = "UTF-8";
 
@@ -45,43 +45,48 @@ public class SysLogUtil {
     public final static String result_failure = "失败";
 
     //    private static void sendLog(String address, String hostname, String rawEvent, String message, String result) {
-    public static void sendLog(String address, String hostname, String rawEvent, String message) {
-        try {
-            if (datagramSocket == null) {
-                try {
-                    datagramSocket = new DatagramSocket();
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                    closeSocket();
-                    return;
-                }
+    public static void sendLog(SystemConfig config, String address, String hostname, String rawEvent, String message) {
+        if (config.isSysLogEnable()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("send sys");
             }
-            StringBuffer sb = new StringBuffer();
-            sb.append(deviceVendorPre).append(config.getDeviceVendor()).append(exSeparator);
-            sb.append(deviceProductTypePre).append(config.getDeviceProductType()).append(separator);
-            sb.append(deviceSendProductNamePre).append(config.getDeviceSendProductName()).append(separator);
-            sb.append(deviceProtocolPre).append("syslog").append(separator);
-            sb.append(deviceAddressPre).append(address).append(separator);
-            sb.append(deviceHostnamePre).append(hostname).append(separator);
-            sb.append(rawEventPre).append(rawEvent).append(separator);
-            sb.append(messagePre).append(message).append(separator);
-            sb.append(collectorReceiptTimePre).append(format.format(new Date())).append(separator);
+            try {
+                if (datagramSocket == null) {
+                    try {
+                        datagramSocket = new DatagramSocket();
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
+                        closeSocket();
+                        return;
+                    }
+                }
+                StringBuffer sb = new StringBuffer();
+                sb.append(deviceVendorPre).append(config.getDeviceVendor()).append(exSeparator);
+                sb.append(deviceProductTypePre).append(config.getDeviceProductType()).append(separator);
+                sb.append(deviceSendProductNamePre).append(config.getDeviceSendProductName()).append(separator);
+                sb.append(deviceProtocolPre).append("syslog").append(separator);
+                sb.append(deviceAddressPre).append(address).append(separator);
+                sb.append(deviceHostnamePre).append(hostname).append(separator);
+                sb.append(rawEventPre).append(rawEvent).append(separator);
+                sb.append(messagePre).append(message).append(separator);
+                sb.append(collectorReceiptTimePre).append(format.format(new Date())).append(separator);
 //            sb.append(resultPre).append(result).append(separator);
 
-            byte[] bytes;
-            try {
-                bytes = sb.toString().getBytes(encoding);
-            } catch (UnsupportedEncodingException e) {
-                logger.error(e.getMessage(), e);
-                return;
+                byte[] bytes;
+                try {
+                    bytes = sb.toString().getBytes(encoding);
+                } catch (UnsupportedEncodingException e) {
+                    logger.error(e.getMessage(), e);
+                    return;
+                }
+                try {
+                    datagramSocket.send(new DatagramPacket(bytes, bytes.length, InetAddress.getByName(config.getSysLogHost()), config.getSysLogPort()));
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            } catch (Throwable t) {
+                logger.error(t.getMessage(), t);
             }
-            try {
-                datagramSocket.send(new DatagramPacket(bytes, bytes.length, InetAddress.getByName(config.getSysLogHost()), config.getSysLogPort()));
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
-        } catch (Throwable t) {
-            logger.error(t.getMessage(), t);
         }
     }
 

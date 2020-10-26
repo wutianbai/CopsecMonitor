@@ -26,7 +26,7 @@
 
                 <div class="panel-options">
                     <%--<a href="#">--%>
-                        <%--<i class="linecons-cog"></i>--%>
+                    <%--<i class="linecons-cog"></i>--%>
                     <%--</a>--%>
 
                     <a href="#" data-toggle="panel">
@@ -39,14 +39,16 @@
                     </a>
 
                     <%--<a href="#" data-toggle="remove">--%>
-                        <%--&times;--%>
+                    <%--&times;--%>
                     <%--</a>--%>
                 </div>
             </div>
             <div class="panel-body">
                 <button id="add" class="btn btn-success" onclick="addData();"><i class="fa fa-plus"></i></button>
-                <button class="btn btn-success" onclick="checkAll('warningItemTable')"><i class="fa fa-circle"></i></button>
-                <button class="btn btn-success" onclick="uncheckAll('warningItemTable')"><i class="fa fa-circle-o"></i></button>
+                <button class="btn btn-success" onclick="checkAll('warningItemTable')"><i class="fa fa-circle"></i>
+                </button>
+                <button class="btn btn-success" onclick="uncheckAll('warningItemTable')"><i class="fa fa-circle-o"></i>
+                </button>
                 <button class="btn btn-red" onclick="deleteCheck()"><i class="fa fa-trash-o"></i></button>
                 <table id="warningItemTable" class="table table-bordered table-striped"></table>
             </div>

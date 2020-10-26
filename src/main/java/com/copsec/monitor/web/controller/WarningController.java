@@ -21,6 +21,7 @@ import java.util.List;
 @RequestMapping(value = {"/warning"})
 @SessionAttributes(value = {"userInfo"})
 public class WarningController {
+
     private static final Logger logger = LoggerFactory.getLogger(WarningController.class);
 
     @Autowired

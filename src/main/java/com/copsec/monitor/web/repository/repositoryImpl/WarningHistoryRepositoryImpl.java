@@ -79,15 +79,15 @@ public class WarningHistoryRepositoryImpl extends BaseRepositoryImpl {
     }
 
     @Override
-    public void handleWarningHistory(WarningHistory status) {
+    public void handleWarningHistory(WarningHistory bean) {
         Query query = new Query();
         Criteria criteria = new Criteria();
-        criteria.andOperator(Criteria.where("_id").is(status.getId()));
+        criteria.andOperator(Criteria.where("_id").is(bean.getId()));
         Update update = new Update();
         update.set("status", 1);
-        update.set("userId", status.getUserId());
-        update.set("userName", status.getUserName());
-        update.set("dealTime", status.getDealTime());
+        update.set("userId", bean.getUserId());
+        update.set("userName", bean.getUserName());
+        update.set("dealTime", bean.getDealTime());
         query.addCriteria(criteria);
         this.mongoTemplate.findAndModify(query, update, WarningHistory.class);
     }

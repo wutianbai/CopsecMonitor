@@ -17,9 +17,9 @@ public class UserInfoReader extends BaseFileReader<UserInfoBean> {
         List<String> list = super.readContent(filePath);
         if (!ObjectUtils.isEmpty(list)) {
             list.stream().
-                    filter(d -> !ObjectUtils.isEmpty(d) && d.split(Resources.SPLITER,-1).length ==6)
-                    .forEach(item ->{
-                        String[] dataList = item.trim().split(Resources.SPLITER,-1);
+                    filter(d -> !ObjectUtils.isEmpty(d) && d.split(Resources.SPLITER, -1).length == 6)
+                    .forEach(item -> {
+                        String[] dataList = item.trim().split(Resources.SPLITER, -1);
                         UserInfoBean bean = new UserInfoBean();
                         bean.setUserId(dataList[0]);
                         bean.setUserName(dataList[1]);

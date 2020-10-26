@@ -49,13 +49,12 @@ public class CommonController {
             model.addAttribute("message", result.getMessage());
             return "login";
         }
-        
+
         UserBean userBean = (UserBean) result.getData();
         HttpSession session = request.getSession();
         session.setAttribute("userInfo", userBean);
 
-        switch (userBean.getRole())
-        {
+        switch (userBean.getRole()) {
             case "systemAdmin":
                 return "redirect:node/device";
             case "auditAdmin":
@@ -63,7 +62,7 @@ public class CommonController {
             case "monitorAdmin":
                 return "redirect:node/deviceMonitor";
         }
-        return "redirect:node/device";
+        return "login";
     }
 
     /**

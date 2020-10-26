@@ -22,6 +22,17 @@ public class UserBean {
 
     private String newCode;
 
+    public UserBean() {
+    }
+
+    public UserBean(String id, String password, String name, String role, String status) {
+        this.id = id;
+        this.password = password;
+        this.name = name;
+        this.role = role;
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer();

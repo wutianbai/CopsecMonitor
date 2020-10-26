@@ -26,7 +26,7 @@
 
                 <div class="panel-options">
                     <%--<a href="#">--%>
-                        <%--<i class="linecons-cog"></i>--%>
+                    <%--<i class="linecons-cog"></i>--%>
                     <%--</a>--%>
 
                     <a href="#" data-toggle="panel">
@@ -39,14 +39,16 @@
                     </a>
 
                     <%--<a href="#" data-toggle="remove">--%>
-                        <%--&times;--%>
+                    <%--&times;--%>
                     <%--</a>--%>
                 </div>
             </div>
             <div class="panel-body">
                 <button id="add" class="btn btn-success" onclick="addData();"><i class="fa fa-plus"></i></button>
-                <button class="btn btn-success" onclick="checkAll('monitorItemTable')"><i class="fa fa-circle"></i></button>
-                <button class="btn btn-success" onclick="uncheckAll('monitorItemTable')"><i class="fa fa-circle-o"></i></button>
+                <button class="btn btn-success" onclick="checkAll('monitorItemTable')"><i class="fa fa-circle"></i>
+                </button>
+                <button class="btn btn-success" onclick="uncheckAll('monitorItemTable')"><i class="fa fa-circle-o"></i>
+                </button>
                 <button class="btn btn-red" onclick="deleteCheck()"><i class="fa fa-trash-o"></i></button>
                 <table id="monitorItemTable" class="table table-bordered table-striped"></table>
             </div>
@@ -81,26 +83,26 @@
                     </div>
                 </div>
                 <%--<div class="row">--%>
-                    <%--<div class="col-md-12">--%>
-                        <%--<div class="form-group">--%>
-                            <%--<label class="control-label">监控项类别</label>--%>
-                            <%--<select class="form-control" id="monitorType"></select>--%>
-                        <%--</div>--%>
-                    <%--</div>--%>
+                <%--<div class="col-md-12">--%>
+                <%--<div class="form-group">--%>
+                <%--<label class="control-label">监控项类别</label>--%>
+                <%--<select class="form-control" id="monitorType"></select>--%>
+                <%--</div>--%>
+                <%--</div>--%>
                 <%--</div>--%>
                 <%--<div class="row">--%>
-                    <%--<div class="col-md-6">--%>
-                        <%--<div class="form-group">--%>
-                            <%--<label class="control-label">是否为证书</label>--%>
-                            <%--&lt;%&ndash;<input type="checkbox" class="iswitch iswitch-success" id="isCert" onclick="isCert()">&ndash;%&gt;--%>
-                        <%--</div>--%>
-                    <%--</div>--%>
-                    <%--<div class="col-md-6">--%>
-                        <%--<div class="form-group">--%>
-                            <%--<label class="control-label">是否为日志</label>--%>
-                            <%--<input type="checkbox" class="iswitch iswitch-success" id="isLog" onclick="isLog()">--%>
-                        <%--</div>--%>
-                    <%--</div>--%>
+                <%--<div class="col-md-6">--%>
+                <%--<div class="form-group">--%>
+                <%--<label class="control-label">是否为证书</label>--%>
+                <%--&lt;%&ndash;<input type="checkbox" class="iswitch iswitch-success" id="isCert" onclick="isCert()">&ndash;%&gt;--%>
+                <%--</div>--%>
+                <%--</div>--%>
+                <%--<div class="col-md-6">--%>
+                <%--<div class="form-group">--%>
+                <%--<label class="control-label">是否为日志</label>--%>
+                <%--<input type="checkbox" class="iswitch iswitch-success" id="isLog" onclick="isLog()">--%>
+                <%--</div>--%>
+                <%--</div>--%>
                 <%--</div>--%>
                 <div class="row" id="itemRow">
                     <div class="col-md-12">
@@ -135,6 +137,22 @@
                         <div class="form-group">
                             <label class="control-label">阈值</label>
                             <input type="text" class="form-control" id="threadHold">
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="display: none" id="userRow">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="control-label">密码过期时间(单位:天)</label>
+                            <%--<input type="text" class="form-control" id="pwdAgingTime">--%>
+                            <div class="input-group spinner col-sm-12" data-min="1" data-step="1">
+                                <span class="input-group-btn"><button class="btn btn-info btn-single"
+                                                                      data-type="decrement">-</button></span>
+                                <input id="pwdAgingTime" type="text" class="form-control text-center no-left-border"
+                                       value="1" readonly/>
+                                <span class="input-group-btn"><button class="btn btn-info btn-single"
+                                                                      data-type="increment">+</button></span>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -7,6 +7,7 @@ import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.beans.node.Status;
 import com.copsec.monitor.web.beans.warning.ReportItem;
 import com.copsec.monitor.web.config.Resources;
+import com.copsec.monitor.web.config.SystemConfig;
 import com.copsec.monitor.web.entity.WarningEvent;
 import com.copsec.monitor.web.handler.ReportHandlerPools;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
@@ -15,6 +16,7 @@ import com.copsec.monitor.web.service.WarningService;
 import com.copsec.monitor.web.utils.logUtils.SysLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -26,6 +28,9 @@ public class MemoryHandlerImpl extends ReportBaseHandler implements ReportHandle
 
     private static final Logger logger = LoggerFactory.getLogger(MemoryHandlerImpl.class);
 
+    @Autowired
+    private SystemConfig config;
+
     public Status handle(Status deviceStatus, Device device, UserInfoBean userInfo, WarningService warningService, ReportItem reportItem, Status monitorType) {
         Status monitorItemType = new Status();
         //状态基本信息
@@ -33,7 +38,7 @@ public class MemoryHandlerImpl extends ReportBaseHandler implements ReportHandle
         monitorItemType.setResult("使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "]");
 
         //发送SysLog日志
-        SysLogUtil.sendLog(device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "内存", "[内存]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "]");
+        SysLogUtil.sendLog(config, device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "内存", "[内存]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "]");
 
         if (reportItem.getStatus() == 0) {
             baseHandle(deviceStatus, monitorType, monitorItemType);
@@ -44,6 +49,7 @@ public class MemoryHandlerImpl extends ReportBaseHandler implements ReportHandle
                 warningItemList.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(warningItem -> {
                     if (warningItem.getThreadHold() < Integer.parseInt(reportItem.getResult().toString())) {
                         if (warningItem.getWarningLevel().name().equals("NORMAL")) {
+                            deviceStatus.setStatus(1);
                             monitorType.setStatus(1);
                         } else {
                             warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别

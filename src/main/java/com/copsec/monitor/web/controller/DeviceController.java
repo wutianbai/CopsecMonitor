@@ -6,8 +6,8 @@ import com.copsec.monitor.web.beans.node.Link;
 import com.copsec.monitor.web.beans.node.LinkBean;
 import com.copsec.monitor.web.beans.node.PositionBeans;
 import com.copsec.monitor.web.commons.CopsecResult;
-import com.copsec.monitor.web.config.SystemConfig;
 import com.copsec.monitor.web.service.DeviceService;
+import com.copsec.monitor.web.utils.FormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Controller
 @RequestMapping("/node")
@@ -23,15 +24,12 @@ import java.util.ArrayList;
 public class DeviceController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceController.class);
-    @Autowired
-    private SystemConfig config;
 
     @Autowired
     private DeviceService deviceService;
 
     @GetMapping(value = {"/{pageId}"})
     public String toPage(@SessionAttribute UserBean userInfo, @PathVariable("pageId") String pageId) {
-
         return "nodes/" + pageId;
     }
 
@@ -221,6 +219,10 @@ public class DeviceController {
     @GetMapping("/status/{time}")
     @ResponseBody
     public CopsecResult getStatusInfo(@PathVariable("time") String time) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("getDeviceStatus {} ", FormatUtils.getFormatDate(new Date(Long.parseLong(time))));
+        }
+
         return deviceService.getDeviceStatus();
     }
 

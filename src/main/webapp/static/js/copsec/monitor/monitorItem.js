@@ -164,6 +164,7 @@ function changeItemLabel() {
         $('#itemRow').css("display", 'none');
         $('#certRow').css("display", 'block');
         $('#logRow').css("display", 'none');
+        $('#userRow').css("display", 'none');
         $("#item").val("");
         $("#logPath").val("");
         $("#threadHold").val("");
@@ -172,14 +173,26 @@ function changeItemLabel() {
         $('#itemRow').css("display", 'none');
         $('#certRow').css("display", 'none');
         $('#logRow').css("display", 'block');
+        $('#userRow').css("display", 'none');
         $("#item").val("");
         $("#instanceName").val("");
         $("#nickname").val("");
+    } else if (m === "USER") {
+        $("#itemLabel").text("监控数据(" + monitorItemType[m] + ")");
+        $('#itemRow').css("display", 'block');
+        $('#certRow').css("display", 'none');
+        $('#logRow').css("display", 'none');
+        $('#userRow').css("display", 'block');
+        $("#instanceName").val("");
+        $("#nickname").val("");
+        $("#logPath").val("");
+        $("#threadHold").val("");
     } else {
         $("#itemLabel").text("监控数据(" + monitorItemType[m] + ")");
         $('#itemRow').css("display", 'block');
         $('#certRow').css("display", 'none');
         $('#logRow').css("display", 'none');
+        $('#userRow').css("display", 'none');
         $("#instanceName").val("");
         $("#nickname").val("");
         $("#logPath").val("");
@@ -225,7 +238,7 @@ function addData() {
         //     return false;
         // }
 
-        if(monitorItemType === "NETWORK"){
+        if (monitorItemType === "NETWORK") {
             if (!ipTest(item)) {
                 toastr.error("请输入正确的IP地址");
                 return false;
@@ -236,7 +249,7 @@ function addData() {
             if (isEmpty(instanceName)) {
                 toastr.error("请输入证书路径");
                 return false;
-            }else{
+            } else {
                 if (!isLinuxPath(instanceName)) {
                     toastr.error("请填写正确的路径");
                     return false;
@@ -251,7 +264,7 @@ function addData() {
             if (isEmpty(logPath)) {
                 toastr.error("请输入日志路径");
                 return false;
-            }else {
+            } else {
                 if (!isLinuxPath(logPath)) {
                     toastr.error("请填写正确的路径");
                     return false;
@@ -341,7 +354,7 @@ function updateData(bean) {
         //     return false;
         // }
 
-        if(monitorItemType === "NETWORK"){
+        if (monitorItemType === "NETWORK") {
             if (!ipTest(item)) {
                 toastr.error("请输入正确的IP地址");
                 return false;
@@ -352,7 +365,7 @@ function updateData(bean) {
             if (isEmpty(instanceName)) {
                 toastr.error("请输入证书路径");
                 return false;
-            }else{
+            } else {
                 if (!isLinuxPath(instanceName)) {
                     toastr.error("请填写正确的路径");
                     return false;
@@ -367,7 +380,7 @@ function updateData(bean) {
             if (isEmpty(logPath)) {
                 toastr.error("请输入日志路径");
                 return false;
-            }else {
+            } else {
                 if (!isLinuxPath(logPath)) {
                     toastr.error("请填写正确的路径");
                     return false;
