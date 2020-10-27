@@ -1,6 +1,7 @@
 package com.copsec.monitor.web.config;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.ServerAddress;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,20 +22,14 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 public class MongoConfiguration extends AbstractMongoConfiguration {
 
 
-    @Value("${mongo.db.host}")
-    private String host;
-
-    @Value("${mongo.db.port}")
-    private int port;
+    @Value("${mongo.db.url}")
+    private String mongoDBUrl;
 
     @Value("${mongo.db.name}")
     private String dataBaseName;
 
-    @Value("${mongo.db.log.host}")
-    private String logHost;
-
-    @Value("${mongo.db.log.port}")
-    private int logPort;
+    @Value("${mongo.db.log.url}")
+	private String mongoLogUrl;
 
     @Value("${mongo.db.log.name}")
     private String logCollectionName;
@@ -67,13 +62,13 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
     @Bean
     public MongoClient mongoClient() {
 
-        return new MongoClient(new ServerAddress(this.host, this.port));
+        return new MongoClient(new MongoClientURI(this.mongoDBUrl));
     }
 
     @Bean
     public MongoClient logMongoClient() {
 
-        MongoClient logMongoClient = new MongoClient(new ServerAddress(this.logHost, this.logPort));
+        MongoClient logMongoClient = new MongoClient(new MongoClientURI(this.mongoLogUrl));
         return logMongoClient;
     }
 

@@ -1,6 +1,9 @@
 package com.copsec.monitor.web.pools;
 
 import com.copsec.monitor.web.beans.monitor.MonitorItemBean;
+import com.copsec.monitor.web.entity.MonitorItemEntity;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -79,4 +82,15 @@ public class MonitorItemPools {
     public synchronized void clean() {
         map.clear();
     }
+
+    public void save(MongoRepository repository){
+
+    	repository.deleteAll();
+    	getAll().stream().forEach(m -> {
+
+			MonitorItemEntity monitorItemEntity = new MonitorItemEntity();
+			monitorItemEntity.setMonitorItemInfo(m.toString());
+			repository.save(monitorItemEntity);
+		});
+	}
 }

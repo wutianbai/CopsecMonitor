@@ -1,6 +1,9 @@
 package com.copsec.monitor.web.pools;
 
 import com.copsec.monitor.web.beans.monitor.WarningItemBean;
+import com.copsec.monitor.web.entity.WarningItemEntity;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -80,4 +83,15 @@ public class WarningItemPools {
     public synchronized void clean() {
         map.clear();
     }
+
+    public void save(MongoRepository repository){
+
+    	repository.deleteAll();
+    	getAll().stream().forEach(warningItemBean ->  {
+
+			WarningItemEntity warningItemEntity = new WarningItemEntity();
+			warningItemEntity.setWarningItemInfo(warningItemBean.toString());
+			repository.save(warningItemEntity);
+		});
+	}
 }

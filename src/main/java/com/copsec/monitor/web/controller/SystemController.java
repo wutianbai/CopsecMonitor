@@ -84,8 +84,7 @@ public class SystemController {
             logger.debug("add userInfo config {}", bean);
         }
 
-        String filePath = config.getBasePath() + config.getUserInfoPath();
-        return systemService.addUserInfo(userInfo, request.getRemoteHost(), bean, filePath);
+        return systemService.addUserInfo(userInfo, request.getRemoteHost(), bean, "");
     }
 
     @NonNull
@@ -96,8 +95,7 @@ public class SystemController {
             logger.debug("update userInfo config {}", bean);
         }
 
-        String filePath = config.getBasePath() + config.getUserInfoPath();
-        return systemService.updateUserInfo(userInfo, request.getRemoteHost(), bean, filePath);
+        return systemService.updateUserInfo(userInfo, request.getRemoteHost(), bean, "");
     }
 
     @NonNull
@@ -108,8 +106,7 @@ public class SystemController {
             logger.debug("delete userInfo config {}", bean);
         }
 
-        String filePath = config.getBasePath() + config.getUserInfoPath();
-        return systemService.deleteUserInfo(userInfo, request.getRemoteHost(), bean.getUserId(), filePath);
+        return systemService.deleteUserInfo(userInfo, request.getRemoteHost(), bean.getUserId(), "");
     }
 
     @NonNull
@@ -121,8 +118,7 @@ public class SystemController {
         }
         List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
-        String filePath = config.getBasePath() + config.getUserInfoPath();
-        return systemService.deleteUserInfoList(userInfo, request.getRemoteHost(), idArray, filePath);
+        return systemService.deleteUserInfoList(userInfo, request.getRemoteHost(), idArray, "");
     }
 
     @PostMapping("/operateLog/search")

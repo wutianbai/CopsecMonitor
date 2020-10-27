@@ -1,11 +1,14 @@
 package com.copsec.monitor.web.pools;
 
 import com.copsec.monitor.web.beans.node.Device;
+import com.copsec.monitor.web.entity.ZoneEntity;
 import com.google.common.collect.Maps;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 
 public class ZonePools {
@@ -47,7 +50,9 @@ public class ZonePools {
     public synchronized void update(Device zone) {
         if (map.containsKey(zone.getData().getId())) {
             map.replace(zone.getData().getId(), zone);
-        }
+        }else{
+        	map.put(zone.getData().getId(), zone);
+		}
     }
 
     public synchronized void delete(String zoneId) {
@@ -62,5 +67,16 @@ public class ZonePools {
     public synchronized void clean() {
         map.clear();
     }
+
+    public void save(MongoRepository repository){
+
+    	repository.deleteAll();
+    	getAll().stream().forEach(zone -> {
+
+			ZoneEntity zoneEntity = new ZoneEntity();
+			zoneEntity.setZoneInfo(zone.toString());
+			repository.save(zoneEntity);
+		});
+	}
 }
 

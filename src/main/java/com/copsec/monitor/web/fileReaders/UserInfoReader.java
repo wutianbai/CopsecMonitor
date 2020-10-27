@@ -31,4 +31,17 @@ public class UserInfoReader extends BaseFileReader<UserInfoBean> {
                     });
         }
     }
+
+	@Override
+	public void getDataByInfos(String info) {
+		String[] dataList = info.trim().split(Resources.SPLITER, -1);
+		UserInfoBean bean = new UserInfoBean();
+		bean.setUserId(dataList[0]);
+		bean.setUserName(dataList[1]);
+		bean.setPassword(dataList[2]);
+		bean.setManufacturerInfo(dataList[3]);
+		bean.setMobile(dataList[4]);
+		bean.setProductionName(dataList[5]);
+		UserInfoPools.getInstances().update(bean);
+	}
 }

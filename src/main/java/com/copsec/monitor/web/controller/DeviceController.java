@@ -51,9 +51,6 @@ public class DeviceController {
     @GetMapping("/get")
     @ResponseBody
     public CopsecResult getData() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("get all date");
-        }
         return deviceService.getData();
     }
 
@@ -219,9 +216,6 @@ public class DeviceController {
     @GetMapping("/status/{time}")
     @ResponseBody
     public CopsecResult getStatusInfo(@PathVariable("time") String time) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("getDeviceStatus {} ", FormatUtils.getFormatDate(new Date(Long.parseLong(time))));
-        }
 
         return deviceService.getDeviceStatus();
     }

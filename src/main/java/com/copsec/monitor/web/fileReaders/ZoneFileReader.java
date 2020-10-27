@@ -29,4 +29,14 @@ public class ZoneFileReader extends BaseFileReader<Device> {
                     });
         }
     }
+
+	@Override
+	public void getDataByInfos(String info) {
+
+		String[] datalist = info.trim().split(Resources.SPLITER, -1);
+		Device zone = new Device();
+		zone.setData(JSON.parseObject(datalist[0], Data.class));
+		zone.setPosition(JSON.parseObject(datalist[1], Position.class));
+		ZonePools.getInstance().update(zone);
+	}
 }

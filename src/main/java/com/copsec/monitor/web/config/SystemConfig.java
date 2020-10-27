@@ -113,23 +113,6 @@ public class SystemConfig {
     @Value("${system.user.path}")
     private String userPath;
 
-    @Value("${system.userInfo.path}")
-    private String userInfoPath;
-
-    @Value("${system.node.device.path}")
-    private String devicePath;
-
-    @Value("${system.node.link.path}")
-    private String linkPath;
-
-    @Value("${system.node.zone.path}")
-    private String zonePath;
-
-    @Value("${mongo.db.host}")
-    private String host;
-
-    @Value("${mongo.db.port}")
-    private int port;
 
     /**
      * 监控配置菜单与文件路径
@@ -155,15 +138,4 @@ public class SystemConfig {
     @Value("${monitor.monitorItem.path}")
     private String monitorItemPath;
 
-    @Value("${monitor.monitorGroup.path}")
-    private String monitorGroupPath;
-
-    @Value("${monitor.monitorTask.path}")
-    private String monitorTaskPath;
-
-    @Value("${monitor.warningItem.path}")
-    private String warningItemPath;
-
-    @Value("${monitor.noWarningItem.path}")
-    private String noWarningItemPath;
 }

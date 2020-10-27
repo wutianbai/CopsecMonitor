@@ -15,6 +15,7 @@ import com.copsec.monitor.web.fileReaders.fileReaderEnum.FileReaderType;
 import com.copsec.monitor.web.pools.UserInfoPools;
 import com.copsec.monitor.web.pools.UserPools;
 import com.copsec.monitor.web.repository.LogRepository;
+import com.copsec.monitor.web.repository.UserInfoEntityRepository;
 import com.copsec.monitor.web.service.SystemService;
 import com.copsec.monitor.web.utils.FormatUtils;
 import com.copsec.monitor.web.utils.MD5Utils.MD5Util;
@@ -47,6 +48,9 @@ public class SystemServiceImpl implements SystemService {
 
     @Autowired
     private LogRepository logRepository;
+
+    @Autowired
+	private UserInfoEntityRepository userInfoEntityRepository;
 
     @Override
     public CopsecResult login(UserBean userInfo, String ip) {
@@ -150,96 +154,42 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public CopsecResult getAllUserInfo() {
         UserInfoPools.getInstances().clean();
-        try {
-            userInfoReader.getData(config.getBasePath() + config.getUserInfoPath());
-        } catch (CopsecException e) {
-            logger.error(e.getMessage(), e);
-            return CopsecResult.failed(e.getMessage());
-        }
-
-        List<UserInfoBean> userInfoList = UserInfoPools.getInstances().getAll();
-
-        return CopsecResult.success(userInfoList);
+        userInfoEntityRepository.findAll().stream().forEach(m -> userInfoReader.getDataByInfos(m.getUserInfo()));
+        return CopsecResult.success(UserInfoPools.getInstances().getAll());
     }
 
     @Override
     public CopsecResult addUserInfo(UserBean userInfo, String ip, UserInfoBean bean, String filePath) {
-        try {
-            UserInfoPools.getInstances().add(bean);
 
-            UserInfoReader reader = (UserInfoReader) FileReaderFactory.getFileReader(FileReaderType.USERINFO);
-
-            reader.writeDate(UserInfoPools.getInstances().getAll(), filePath);
-
-            LogUtils.sendSuccessLog(userInfo.getId(), ip, "添加运维用户成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.USERINFO_ADD);
-
-            return CopsecResult.success("添加成功", bean);
-        } catch (Throwable e) {
-            logger.error(e.getMessage(), e);
-            UserInfoPools.getInstances().delete(bean.getUserId());
-            LogUtils.sendFailLog(userInfo.getId(), ip, "添加运维用户失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.USERINFO_ADD);
-            return CopsecResult.failed("添加失败", "文件写入异常，请稍后重试");
-        }
+		UserInfoPools.getInstances().add(bean);
+		UserInfoPools.getInstances().save(userInfoEntityRepository);
+		LogUtils.sendSuccessLog(userInfo.getId(), ip, "添加运维用户成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.USERINFO_ADD);
+		return CopsecResult.success("添加成功", bean);
     }
 
     @Override
     public CopsecResult updateUserInfo(UserBean userInfo, String ip, UserInfoBean bean, String filePath) {
-        UserInfoBean oldBean = UserInfoPools.getInstances().get(bean.getUserId());
-        try {
-            UserInfoPools.getInstances().update(bean);
-
-            UserInfoReader reader = (UserInfoReader) FileReaderFactory.getFileReader(FileReaderType.USERINFO);
-
-            reader.writeDate(UserInfoPools.getInstances().getAll(), filePath);
-
-            LogUtils.sendSuccessLog(userInfo.getId(), ip, "更新运维用户成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.USERINFO_UPDATE);
-
-            return CopsecResult.success("更新成功");
-        } catch (Throwable e) {
-            logger.error(e.getMessage(), e);
-            UserInfoPools.getInstances().update(oldBean);
-            LogUtils.sendFailLog(userInfo.getId(), ip, "更新运维用户失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.USERINFO_UPDATE);
-            return CopsecResult.failed("更新失败", "文件写入异常，请稍后重试");
-        }
+		UserInfoPools.getInstances().update(bean);
+		UserInfoPools.getInstances().save(userInfoEntityRepository);
+		LogUtils.sendSuccessLog(userInfo.getId(), ip, "更新运维用户成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.USERINFO_UPDATE);
+		return CopsecResult.success("更新成功");
     }
 
     @Override
     public CopsecResult deleteUserInfo(UserBean userInfo, String ip, String userId, String filePath) {
-        UserInfoBean oldBean = UserInfoPools.getInstances().get(userId);
-        try {
-            UserInfoPools.getInstances().delete(userId);
-
-            UserInfoReader reader = (UserInfoReader) FileReaderFactory.getFileReader(FileReaderType.USERINFO);
-
-            reader.writeDate(UserInfoPools.getInstances().getAll(), filePath);
-
-            LogUtils.sendSuccessLog(userInfo.getId(), ip, "删除运维用户成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.USERINFO_DELETE);
-
-            return CopsecResult.success("删除成功");
-        } catch (Throwable e) {
-            logger.error(e.getMessage(), e);
-            UserInfoPools.getInstances().add(oldBean);
-            LogUtils.sendFailLog(userInfo.getId(), ip, "删除运维用户失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.USERINFO_DELETE);
-            return CopsecResult.failed("删除失败", "文件写入异常，请稍后重试");
-        }
+		UserInfoPools.getInstances().delete(userId);
+		UserInfoPools.getInstances().save(userInfoEntityRepository);
+		LogUtils.sendSuccessLog(userInfo.getId(), ip, "删除运维用户成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.USERINFO_DELETE);
+		return CopsecResult.success("删除成功");
     }
 
     @Override
     public CopsecResult deleteUserInfoList(UserBean monitorItem, String ip, List<String> idArray, String filePath) {
         List<UserInfoBean> oldBeanList = UserInfoPools.getInstances().get(idArray);
         UserInfoPools.getInstances().delete(idArray);
-
-        try {
-            UserInfoReader reader = (UserInfoReader) FileReaderFactory.getFileReader(FileReaderType.USERINFO);
-            reader.writeDate(UserInfoPools.getInstances().getAll(), filePath);
-            LogUtils.sendSuccessLog(monitorItem.getId(), ip, "删除所选用户成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "删除所选用户");
-            return CopsecResult.success("删除成功");
-        } catch (Throwable e) {
-            logger.error(e.getMessage(), e);
-            UserInfoPools.getInstances().add(oldBeanList);
-            LogUtils.sendFailLog(monitorItem.getId(), ip, "删除所选用户失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), "删除所选用户");
-            return CopsecResult.failed("删除失败", "文件写入异常，请稍后重试");
-        }
+		UserInfoPools.getInstances().save(userInfoEntityRepository);
+		LogUtils.sendSuccessLog(monitorItem.getId(), ip, "删除所选用户成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "删除所选用户");
+		return CopsecResult.success("删除成功");
     }
 
     @Override

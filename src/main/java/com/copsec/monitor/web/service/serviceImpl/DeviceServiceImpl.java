@@ -1,11 +1,16 @@
 package com.copsec.monitor.web.service.serviceImpl;
 
 import com.copsec.monitor.web.beans.UserBean;
+import com.copsec.monitor.web.beans.UserInfoBean;
 import com.copsec.monitor.web.beans.monitor.MonitorTaskBean;
 import com.copsec.monitor.web.beans.node.*;
 import com.copsec.monitor.web.commons.CopsecResult;
 import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.config.SystemConfig;
+import com.copsec.monitor.web.entity.DeviceEntity;
+import com.copsec.monitor.web.entity.LinkEntity;
+import com.copsec.monitor.web.entity.MonitorTaskEntity;
+import com.copsec.monitor.web.entity.UserInfoEntity;
 import com.copsec.monitor.web.exception.CopsecException;
 import com.copsec.monitor.web.fileReaders.DeviceFileReader;
 import com.copsec.monitor.web.fileReaders.LinkFileReader;
@@ -13,10 +18,17 @@ import com.copsec.monitor.web.fileReaders.UserInfoReader;
 import com.copsec.monitor.web.fileReaders.ZoneFileReader;
 import com.copsec.monitor.web.pools.*;
 import com.copsec.monitor.web.pools.deviceStatus.DeviceStatusPools;
+import com.copsec.monitor.web.repository.DeviceRepository;
+import com.copsec.monitor.web.repository.LinkRepository;
+import com.copsec.monitor.web.repository.MonitorTaskRepository;
+import com.copsec.monitor.web.repository.UserInfoEntityRepository;
+import com.copsec.monitor.web.repository.ZoneRepository;
 import com.copsec.monitor.web.service.DeviceService;
 import com.copsec.monitor.web.utils.logUtils.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -43,47 +55,55 @@ public class DeviceServiceImpl implements DeviceService {
     @Autowired
     private UserInfoReader userInfoReader;
 
+    @Autowired
+	private DeviceRepository deviceRepository;
+
+    @Autowired
+	private LinkRepository linkRepository;
+
+    @Autowired
+	private UserInfoEntityRepository userInfoRepository;
+
+    @Autowired
+	private ZoneRepository zoneRepository;
+
+    @Autowired
+	private MonitorTaskRepository monitorTaskRepository;
+
     @Override
     public CopsecResult getData() {
         DevicePools.getInstance().clean();
         LinkPools.getInstance().clean();
         ZonePools.getInstance().clean();
         UserInfoPools.getInstances().clean();
-        try {
-            deviceReader.getData(config.getBasePath() + config.getDevicePath());
-            linkReader.getData(config.getBasePath() + config.getLinkPath());
-            zoneReader.getData(config.getBasePath() + config.getZonePath());
-            userInfoReader.getData(config.getBasePath() + config.getUserInfoPath());
-        } catch (CopsecException e) {
-            logger.error(e.getMessage(), e);
-            return CopsecResult.failed(e.getMessage());
-        }
-
         List list = new ArrayList<>();
-        list.add(DevicePools.getInstance().getAll());
-        list.add(LinkPools.getInstance().getAll());
-        list.add(ZonePools.getInstance().getAll());
-        list.add(UserInfoPools.getInstances().getAll());
+		deviceRepository.findAll().stream().forEach(d -> deviceReader.getDataByInfos(d.getDeviceInfo()));
+		zoneRepository.findAll().stream().forEach(zone -> zoneReader.getDataByInfos(zone.getZoneInfo()));
+      	linkRepository.findAll().stream().forEach(l -> linkReader.getDataByInfos(l.getLinkInfo()));
+       	userInfoRepository.findAll().stream().forEach(u -> userInfoReader.getDataByInfos(u.getUserInfo()));
+		list.add(DevicePools.getInstance().getAll());
+		list.add(LinkPools.getInstance().getAll());
+		list.add(ZonePools.getInstance().getAll());
+		list.add(UserInfoPools.getInstances().getAll());
         return CopsecResult.success(list);
     }
 
     @Override
     public CopsecResult addDevice(UserBean userInfo, String ip, Device device) {
-        try {
-            if (!ObjectUtils.isEmpty(DevicePools.getInstance().getDevice(device.getData().getId()))) {
-                return CopsecResult.failed("设备ID已存在");
+
+            if (!ObjectUtils.isEmpty(DevicePools.getInstance().getDevice(device.getData().getDeviceId()))) {
+
+            	LogUtils.sendSuccessLog(userInfo.getId(), ip, "添加设备失败", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_ADDDEVICE);
+
+				return CopsecResult.failed("设备ID已存在");
             }
 
             DevicePools.getInstance().addDevice(device);
-            deviceReader.writeDate(DevicePools.getInstance().getAll(), config.getBasePath() + config.getDevicePath());
+           	DeviceEntity deviceEntity = new DeviceEntity();
+			deviceEntity.setDeviceInfo(device.toString());
+           	deviceRepository.save(deviceEntity);
             LogUtils.sendSuccessLog(userInfo.getId(), ip, "添加设备成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_ADDDEVICE);
             return CopsecResult.success("添加成功", device);
-        } catch (CopsecException e) {
-            DevicePools.getInstance().delete(device.getData().getDeviceId());
-            LogUtils.sendFailLog(userInfo.getId(), ip, "添加设备失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_ADDDEVICE);
-            logger.error(e.getMessage(), e);
-            return CopsecResult.failed("添加失败", "系统异常");
-        }
     }
 
     @Override
@@ -100,31 +120,23 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public synchronized CopsecResult updateDevice(UserBean userInfo, String ip, Device device) {
-        Device oldBean = DevicePools.getInstance().getDevice(device.getData().getDeviceId());
-        try {
-            DevicePools.getInstance().updateDevice(device);
-            deviceReader.writeDate(DevicePools.getInstance().getAll(), config.getBasePath() + config.getDevicePath());
-            LogUtils.sendSuccessLog(userInfo.getId(), ip, "更新设备成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_UPDATEDEVICE);
-            return CopsecResult.success("更新成功", device);
-        } catch (CopsecException e) {
-            DevicePools.getInstance().updateDevice(oldBean);
-            LogUtils.sendFailLog(userInfo.getId(), ip, "更新设备失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_UPDATEDEVICE);
-            logger.error(e.getMessage(), e);
-            return CopsecResult.failed("更新失败", "系统异常");
-        }
+		DevicePools.getInstance().updateDevice(device);
+		DevicePools.getInstance().save(deviceRepository);
+		LogUtils.sendSuccessLog(userInfo.getId(), ip, "更新设备成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_UPDATEDEVICE);
+		return CopsecResult.success("更新成功", device);
     }
 
     private StringBuilder checkMonitorTask(String deviceId) {
         //检查是否有对应监控组
-        StringBuilder str = new StringBuilder();
-        List<MonitorTaskBean> monitorTaskList = MonitorTaskPools.getInstances().getAll();
-        monitorTaskList.forEach(monitorTask -> {
-            List<String> deviceIdList = Arrays.asList(monitorTask.getDeviceId().split(",", -1));
-            if (deviceIdList.contains(deviceId)) {
-                str.append("[" + monitorTask.getTaskName() + "]");
-            }
-        });
-        return str;
+		StringBuilder str = new StringBuilder();
+		List<MonitorTaskBean> monitorTaskList = MonitorTaskPools.getInstances().getAll();
+		monitorTaskList.forEach(monitorTask -> {
+			List<String> deviceIdList = Arrays.asList(monitorTask.getDeviceId().split(",", -1));
+			if (deviceIdList.contains(deviceId)) {
+				str.append("[" + monitorTask.getTaskName() + "]");
+			}
+		});
+		return str;
     }
 
     @Override
@@ -138,17 +150,10 @@ public class DeviceServiceImpl implements DeviceService {
         if (!ObjectUtils.isEmpty(device)) {
             DevicePools.getInstance().delete(deviceId);
             LinkPools.getInstance().deleteLinksByDeviceId(deviceId);
-            try {
-                deviceReader.writeDate(DevicePools.getInstance().getAll(), config.getBasePath() + config.getDevicePath());
-                linkReader.writeDate(LinkPools.getInstance().getAll(), config.getBasePath() + config.getLinkPath());
-                LogUtils.sendSuccessLog(userInfo.getId(), ip, "删除设备成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_DELETEDEVICE);
-                return CopsecResult.success("删除成功");
-            } catch (CopsecException e) {
-                DevicePools.getInstance().addDevice(device);
-                LogUtils.sendFailLog(userInfo.getId(), ip, "删除设备失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_DELETEDEVICE);
-                logger.error(e.getMessage(), e);
-                return CopsecResult.failed("删除失败", "系统异常");
-            }
+			DevicePools.getInstance().save(deviceRepository);
+			LinkPools.getInstance().save(linkRepository);
+			LogUtils.sendSuccessLog(userInfo.getId(), ip, "删除设备成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_DELETEDEVICE);
+			return CopsecResult.success("删除成功");
         }
         return CopsecResult.failed();
     }
@@ -157,35 +162,19 @@ public class DeviceServiceImpl implements DeviceService {
     public CopsecResult addLink(UserBean userInfo, String ip, LinkBean bean) {
         List<Link> list = new ArrayList<>();
         saveLink(list, bean);
-        try {
-            linkReader.writeDate(LinkPools.getInstance().getAll(), config.getBasePath() + config.getLinkPath());
-            LogUtils.sendSuccessLog(userInfo.getId(), ip, "添加连接成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_ADDLINK);
-            return CopsecResult.success(list);
-        } catch (CopsecException e) {
-            LinkPools.getInstance().delete(list);
-            logger.error(e.getMessage(), e);
-            LogUtils.sendFailLog(userInfo.getId(), ip, "添加连接失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_ADDLINK);
-            return CopsecResult.failed();
-        }
+		LinkPools.getInstance().save(linkRepository);
+		LogUtils.sendSuccessLog(userInfo.getId(), ip, "添加连接成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_ADDLINK);
+		return CopsecResult.success(list);
     }
 
     @Override
     public CopsecResult updateLink(UserBean userInfo, String ip, LinkBean bean) {
         List<Link> list = new ArrayList<>();
-        Link oldBean = LinkPools.getInstance().get(bean.getId());
         LinkPools.getInstance().delete(bean.getId());
         saveLink(list, bean);
-        try {
-            linkReader.writeDate(LinkPools.getInstance().getAll(), config.getBasePath() + config.getLinkPath());
-            LogUtils.sendSuccessLog(userInfo.getId(), ip, "更新连接成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_UPDATELINK);
-            return CopsecResult.success(list);
-        } catch (CopsecException e) {
-            LinkPools.getInstance().delete(list);
-            LinkPools.getInstance().add(oldBean);
-            logger.error(e.getMessage(), e);
-            LogUtils.sendFailLog(userInfo.getId(), ip, "更新连接失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_UPDATELINK);
-            return CopsecResult.failed();
-        }
+		LinkPools.getInstance().save(linkRepository);
+		LogUtils.sendSuccessLog(userInfo.getId(), ip, "更新连接成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_UPDATELINK);
+		return CopsecResult.success(list);
     }
 
     private void saveLink(List<Link> list, LinkBean bean) {
@@ -211,15 +200,9 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public CopsecResult deleteLink(UserBean userInfo, String ip, String linkId) {
         LinkPools.getInstance().delete(linkId);
-        try {
-            linkReader.writeDate(LinkPools.getInstance().getAll(), config.getBasePath() + config.getLinkPath());
-            LogUtils.sendSuccessLog(userInfo.getId(), ip, "更新连接成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_DELETELINK);
-            return CopsecResult.success();
-        } catch (CopsecException e) {
-            LogUtils.sendFailLog(userInfo.getId(), ip, "删除连接失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_DELETELINK);
-            logger.error(e.getMessage(), e);
-            return CopsecResult.failed("删除连接失败，系统异常");
-        }
+		LinkPools.getInstance().save(linkRepository);
+		LogUtils.sendSuccessLog(userInfo.getId(), ip, "更新连接成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_DELETELINK);
+		return CopsecResult.success();
     }
 
     @Override
@@ -230,51 +213,27 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public CopsecResult addZone(UserBean userInfo, String ip, Device zone) {
         ZonePools.getInstance().add(zone);
-        try {
-            zoneReader.writeDate(ZonePools.getInstance().getAll(), config.getBasePath() + config.getZonePath());
-            LogUtils.sendSuccessLog(userInfo.getId(), ip, "添加网络区域成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_ADDZONE);
-            return CopsecResult.success("添加成功", zone);
-        } catch (CopsecException e) {
-            ZonePools.getInstance().delete(zone.getData().getId());
-            LogUtils.sendFailLog(userInfo.getId(), ip, "添加网络区域失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_ADDZONE);
-            logger.error(e.getMessage(), e);
-            return CopsecResult.failed("添加失败", "系统异常");
-        }
+        ZonePools.getInstance().save(zoneRepository);
+		LogUtils.sendSuccessLog(userInfo.getId(), ip, "添加网络区域成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_ADDZONE);
+		return CopsecResult.success("添加成功", zone);
     }
 
     @Override
     public CopsecResult updateZone(UserBean userInfo, String ip, Device zone) {
         Device oldBean = ZonePools.getInstance().get(zone.getData().getId());
-        try {
-            ZonePools.getInstance().update(zone);
-            zoneReader.writeDate(ZonePools.getInstance().getAll(), config.getBasePath() + config.getZonePath());
-            LogUtils.sendSuccessLog(userInfo.getId(), ip, "更新网络区域成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_UPDATEZONE);
-            return CopsecResult.success("更新成功", zone);
-        } catch (CopsecException e) {
-            ZonePools.getInstance().update(oldBean);
-            LogUtils.sendFailLog(userInfo.getId(), ip, "更新网络区域失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_UPDATEZONE);
-            logger.error(e.getMessage(), e);
-            return CopsecResult.failed("更新失败", "系统异常");
-        }
+		ZonePools.getInstance().update(zone);
+		ZonePools.getInstance().save(zoneRepository);
+		LogUtils.sendSuccessLog(userInfo.getId(), ip, "更新网络区域成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_UPDATEZONE);
+		return CopsecResult.success("更新成功", zone);
     }
 
     @Override
     public CopsecResult deleteZone(UserBean userInfo, String ip, String zoneId) {
         Device zone = ZonePools.getInstance().get(zoneId);
-        if (!ObjectUtils.isEmpty(zone)) {
-            ZonePools.getInstance().delete(zoneId);
-            try {
-                zoneReader.writeDate(ZonePools.getInstance().getAll(), config.getBasePath() + config.getZonePath());
-                LogUtils.sendSuccessLog(userInfo.getId(), ip, "删除网络区域成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_DELETEZONE);
-                return CopsecResult.success("删除成功");
-            } catch (CopsecException e) {
-                ZonePools.getInstance().add(zone);
-                LogUtils.sendFailLog(userInfo.getId(), ip, "删除网络区域失败" + e.getMessage(), config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_DELETEZONE);
-                logger.error(e.getMessage(), e);
-                return CopsecResult.failed("删除失败", "系统异常");
-            }
-        }
-        return CopsecResult.failed();
+		ZonePools.getInstance().delete(zoneId);
+		ZonePools.getInstance().save(zoneRepository);
+		LogUtils.sendSuccessLog(userInfo.getId(), ip, "删除网络区域成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_DELETEZONE);
+		return CopsecResult.success("删除成功");
     }
 
     @Override
@@ -297,14 +256,8 @@ public class DeviceServiceImpl implements DeviceService {
             }
         });
 
-        try {
-            deviceReader.writeDate(DevicePools.getInstance().getAll(), config.getBasePath() + config.getDevicePath());
-            zoneReader.writeDate(ZonePools.getInstance().getAll(), config.getBasePath() + config.getZonePath());
-        } catch (CopsecException e) {
-            logger.error("error happened {}", e.getMessage());
-            return CopsecResult.failed("系统异常，请稍后重试");
-        }
-
+        DevicePools.getInstance().save(deviceRepository);
+        ZonePools.getInstance().save(zoneRepository);
         return CopsecResult.success("更新成功");
     }
 

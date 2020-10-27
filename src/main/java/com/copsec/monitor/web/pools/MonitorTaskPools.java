@@ -1,9 +1,12 @@
 package com.copsec.monitor.web.pools;
 
 import com.copsec.monitor.web.beans.monitor.MonitorTaskBean;
+import com.copsec.monitor.web.entity.MonitorTaskEntity;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 public class MonitorTaskPools {
     private static MonitorTaskPools pool;
@@ -94,4 +97,15 @@ public class MonitorTaskPools {
     public synchronized void clean() {
         map.clear();
     }
+
+    public void save(MongoRepository repository){
+
+    	repository.deleteAll();
+    	getAll().stream().forEach(monitorTaskBean -> {
+
+			MonitorTaskEntity monitorTaskEntity = new MonitorTaskEntity();
+			monitorTaskEntity.setMonitorTaskInfo(monitorTaskBean.toString());
+			repository.save(monitorTaskEntity);
+		});
+	}
 }

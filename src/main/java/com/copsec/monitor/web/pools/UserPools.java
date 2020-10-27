@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.copsec.monitor.web.beans.UserBean;
+import com.copsec.monitor.web.entity.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 public class UserPools {
 
@@ -57,5 +60,16 @@ public class UserPools {
             list.add(v);
         });
         return list;
+    }
+
+    public void save(MongoRepository repository){
+
+    	repository.deleteAll();
+    	getAll().stream().forEach(u -> {
+
+			UserEntity userEntity = new UserEntity();
+			userEntity.setUserInfo(u.toString());
+			repository.save(userEntity);
+		});
     }
 }

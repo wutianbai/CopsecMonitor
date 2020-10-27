@@ -29,4 +29,15 @@ public class MonitorGroupReader extends BaseFileReader<MonitorGroupBean> {
                     });
         }
     }
+
+	@Override
+	public void getDataByInfos(String info) {
+		String[] dataList = info.trim().split(Resources.SPLITER, -1);
+		MonitorGroupBean bean = new MonitorGroupBean();
+		bean.setId(dataList[0]);
+		bean.setName(dataList[1]);
+//                        bean.setMonitorItems(JSONArray.parseArray(dataList[2], MonitorItemBean.class));
+		bean.setMonitorItems(dataList[2].trim());
+		MonitorGroupPools.getInstances().update(bean);
+	}
 }

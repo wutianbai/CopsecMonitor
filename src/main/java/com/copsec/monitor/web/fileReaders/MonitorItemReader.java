@@ -47,4 +47,27 @@ public class MonitorItemReader extends BaseFileReader<MonitorItemBean> {
                     });
         }
     }
+
+	@Override
+	public void getDataByInfos(String info) {
+		String[] dataList = info.trim().split(Resources.SPLITER, -1);
+		MonitorItemBean bean = new MonitorItemBean();
+		bean.setMonitorId(dataList[0]);
+		bean.setMonitorName(dataList[1]);
+		bean.setMonitorItemType(MonitorItemEnum.valueOf(dataList[2]));
+		bean.setMonitorType(MonitorTypeEnum.valueOf(dataList[3]));
+		if (CommonUtils.isJSONValid(dataList[4]) && !"".equals(dataList[4])) {
+			CertConfig certConfig = JSON.parseObject(dataList[4], CertConfig.class);
+			LogConfig logConfig = JSON.parseObject(dataList[4], LogConfig.class);
+			if (ObjectUtils.isEmpty(certConfig) || "".equals(certConfig.getInstanceName())) {
+				bean.setItem(logConfig);
+			} else {
+				bean.setItem(certConfig);
+			}
+//                            bean.setItem(JSON.parseObject(dataList[4], CertConfig.class));
+		} else {
+			bean.setItem(dataList[4]);
+		}
+		MonitorItemPools.getInstances().update(bean);
+	}
 }

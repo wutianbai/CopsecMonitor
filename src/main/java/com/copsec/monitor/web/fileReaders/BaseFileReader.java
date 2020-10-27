@@ -56,6 +56,11 @@ public class BaseFileReader<T> {
 
     }
 
+    public void getDataByInfos(String info){
+
+
+	}
+
     public void writeDate(List<T> list, String filePath) throws CopsecException {
         if (!CopsecFileUtils.isExist(filePath)) {
             CopsecFileUtils.mkFile(filePath);

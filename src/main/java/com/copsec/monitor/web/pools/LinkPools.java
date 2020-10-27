@@ -1,8 +1,12 @@
 package com.copsec.monitor.web.pools;
 
 import com.copsec.monitor.web.beans.node.Link;
+import com.copsec.monitor.web.entity.LinkEntity;
+import com.copsec.monitor.web.repository.BaseRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
@@ -53,8 +57,11 @@ public class LinkPools {
         if (map.containsKey(link.getData().getId())) {
             map.replace(link.getData().getId(), link);
             return link;
-        }
-        return null;
+        }else{
+
+        	map.put(link.getData().getId(), link);
+        	return link;
+		}
     }
 
     public synchronized void update(List<Link> linkList) {
@@ -104,4 +111,15 @@ public class LinkPools {
     public synchronized void clean() {
         map.clear();
     }
+
+    public void save(MongoRepository repository){
+
+    	repository.deleteAll();
+    	getAll().stream().forEach(entity -> {
+
+			LinkEntity linkEntity = new LinkEntity();
+			linkEntity.setLinkInfo(entity.toString());
+			repository.save(linkEntity);
+		});
+	}
 }

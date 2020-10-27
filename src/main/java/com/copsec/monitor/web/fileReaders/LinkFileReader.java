@@ -26,4 +26,11 @@ public class LinkFileReader extends BaseFileReader<Link> {
             });
         }
     }
+
+	@Override
+	public void getDataByInfos(String info) {
+
+		Link link = JSON.parseObject(info.trim(), Link.class);
+		LinkPools.getInstance().update(link);
+	}
 }

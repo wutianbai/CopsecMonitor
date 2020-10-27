@@ -6,9 +6,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Link extends BaseNode {
+public class Link{
     private String group = "edges";
     private String classes;
+	private Data data;
 
     @Override
     public String toString() {

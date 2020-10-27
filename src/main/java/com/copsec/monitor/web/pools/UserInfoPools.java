@@ -1,6 +1,9 @@
 package com.copsec.monitor.web.pools;
 
 import com.copsec.monitor.web.beans.UserInfoBean;
+import com.copsec.monitor.web.entity.UserInfoEntity;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -79,4 +82,15 @@ public class UserInfoPools {
     public synchronized void clean() {
         map.clear();
     }
+
+    public void save(MongoRepository repository){
+
+    	repository.deleteAll();
+    	getAll().stream().forEach(userInfoBean -> {
+
+			UserInfoEntity userInfoEntity = new UserInfoEntity();
+			userInfoEntity.setUserInfo(userInfoBean.toString());
+			repository.save(userInfoEntity);
+		});
+	}
 }

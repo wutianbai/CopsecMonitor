@@ -120,8 +120,7 @@ public class MonitorController {
         }
 //        List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
-        String filePath = config.getBasePath() + config.getMonitorGroupPath();
-        return monitorService.addMonitorGroup(userInfo, request.getRemoteHost(), bean, filePath);
+        return monitorService.addMonitorGroup(userInfo, request.getRemoteHost(), bean, "");
     }
 
     @NonNull
@@ -133,8 +132,7 @@ public class MonitorController {
         }
 //        List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
-        String filePath = config.getBasePath() + config.getMonitorGroupPath();
-        return monitorService.updateMonitorGroup(userInfo, request.getRemoteHost(), bean, filePath);
+        return monitorService.updateMonitorGroup(userInfo, request.getRemoteHost(), bean, "");
     }
 
     @NonNull
@@ -145,8 +143,7 @@ public class MonitorController {
             logger.debug("delete monitorGroup config {}", bean);
         }
 
-        String filePath = config.getBasePath() + config.getMonitorGroupPath();
-        return monitorService.deleteMonitorGroup(userInfo, request.getRemoteHost(), bean.getId(), filePath);
+        return monitorService.deleteMonitorGroup(userInfo, request.getRemoteHost(), bean.getId(), "");
     }
 
     @NonNull
@@ -158,8 +155,7 @@ public class MonitorController {
         }
         List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
-        String filePath = config.getBasePath() + config.getMonitorGroupPath();
-        return monitorService.deleteMonitorGroupList(userInfo, request.getRemoteHost(), idArray, filePath);
+        return monitorService.deleteMonitorGroupList(userInfo, request.getRemoteHost(), idArray, "");
     }
 
     @PostMapping("/warningItem/get")
@@ -179,8 +175,7 @@ public class MonitorController {
             logger.debug("add warningItem config {}", bean);
         }
 
-        String filePath = config.getBasePath() + config.getWarningItemPath();
-        return monitorService.addWarningItem(userInfo, request.getRemoteHost(), bean, filePath);
+        return monitorService.addWarningItem(userInfo, request.getRemoteHost(), bean, "");
     }
 
     @NonNull
@@ -191,8 +186,7 @@ public class MonitorController {
             logger.debug("update warningItem config {}", bean);
         }
 
-        String filePath = config.getBasePath() + config.getWarningItemPath();
-        return monitorService.updateWarningItem(userInfo, request.getRemoteHost(), bean, filePath);
+        return monitorService.updateWarningItem(userInfo, request.getRemoteHost(), bean, "");
     }
 
     @NonNull
@@ -203,8 +197,7 @@ public class MonitorController {
             logger.debug("delete warningItem config {}", bean);
         }
 
-        String filePath = config.getBasePath() + config.getWarningItemPath();
-        return monitorService.deleteWarningItem(userInfo, request.getRemoteHost(), bean.getWarningId(), filePath);
+        return monitorService.deleteWarningItem(userInfo, request.getRemoteHost(), bean.getWarningId(), "");
     }
 
     @NonNull
@@ -216,8 +209,7 @@ public class MonitorController {
         }
         List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
-        String filePath = config.getBasePath() + config.getWarningItemPath();
-        return monitorService.deleteWarningItemList(userInfo, request.getRemoteHost(), idArray, filePath);
+        return monitorService.deleteWarningItemList(userInfo, request.getRemoteHost(), idArray, "");
     }
 
     @PostMapping("/monitorTask/get")
@@ -237,8 +229,7 @@ public class MonitorController {
             logger.debug("add monitorTask config {}", bean);
         }
 
-        String filePath = config.getBasePath() + config.getMonitorTaskPath();
-        return monitorService.addMonitorTask(userInfo, request.getRemoteHost(), bean, filePath);
+        return monitorService.addMonitorTask(userInfo, request.getRemoteHost(), bean, "");
     }
 
     @NonNull
@@ -249,8 +240,7 @@ public class MonitorController {
             logger.debug("update monitorTask config {}", bean);
         }
 
-        String filePath = config.getBasePath() + config.getMonitorTaskPath();
-        return monitorService.updateMonitorTask(userInfo, request.getRemoteHost(), bean, filePath);
+        return monitorService.updateMonitorTask(userInfo, request.getRemoteHost(), bean, "");
     }
 
     @NonNull
@@ -261,8 +251,7 @@ public class MonitorController {
             logger.debug("delete monitorTask config {}", bean);
         }
 
-        String filePath = config.getBasePath() + config.getMonitorTaskPath();
-        return monitorService.deleteMonitorTask(userInfo, request.getRemoteHost(), bean.getTaskId(), filePath);
+        return monitorService.deleteMonitorTask(userInfo, request.getRemoteHost(), bean.getTaskId(), "");
     }
 
     @NonNull
@@ -274,7 +263,6 @@ public class MonitorController {
         }
         List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
-        String filePath = config.getBasePath() + config.getMonitorTaskPath();
-        return monitorService.deleteMonitorTaskList(userInfo, request.getRemoteHost(), idArray, filePath);
+        return monitorService.deleteMonitorTaskList(userInfo, request.getRemoteHost(), idArray, "");
     }
 }

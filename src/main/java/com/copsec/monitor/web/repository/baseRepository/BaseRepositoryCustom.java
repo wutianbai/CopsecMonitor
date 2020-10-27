@@ -40,4 +40,5 @@ public interface BaseRepositoryCustom {
     void handleWarningHistory(WarningHistory status);
 
     void insertWarningHistory(WarningHistory bean);
+
 }

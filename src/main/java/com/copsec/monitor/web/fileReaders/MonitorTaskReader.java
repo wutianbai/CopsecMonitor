@@ -36,4 +36,16 @@ public class MonitorTaskReader extends BaseFileReader<MonitorTaskBean> {
                     });
         }
     }
+
+	@Override
+	public void getDataByInfos(String info) {
+		String[] dataList = info.trim().split(Resources.SPLITER, -1);
+		MonitorTaskBean bean = new MonitorTaskBean();
+		bean.setTaskId(dataList[0]);
+		bean.setTaskName(dataList[1]);
+		bean.setDeviceId(dataList[2]);
+		bean.setGroupId(dataList[3]);
+		bean.setWarningItems(dataList[4]);
+		MonitorTaskPools.getInstances().update(bean);
+	}
 }
