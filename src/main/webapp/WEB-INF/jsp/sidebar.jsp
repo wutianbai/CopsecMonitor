@@ -4,7 +4,8 @@
         <ul id="main-menu" class="main-menu">
             <li>
                 <a href="#">
-                    <i class="el-desktop"></i>
+                    <%--<i class="el-desktop"></i>--%>
+                    <i class="fa fa-desktop"></i>
                     <span class="title">${system.deviceTitle}</span>
                 </a>
                 <ul>

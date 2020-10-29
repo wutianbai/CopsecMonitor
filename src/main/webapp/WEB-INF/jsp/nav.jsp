@@ -112,7 +112,8 @@
             <c:if test="${userInfo.role ne 'auditAdmin'}">
                 <li>
                     <a href="#">
-                        <i class="el-laptop"></i>
+                            <%--<i class="el-laptop"></i>--%>
+                        <i class="fa fa-eye"></i>
                         <span class="title">监控</span>
                     </a>
                     <ul>
@@ -208,89 +209,89 @@
 
                         <li>
                             <ul class="dropdown-menu-list list-unstyled ps-scrollbar" id="scrollbar">
-                                <%--<li class="active notification-success">--%>
+                                    <%--<li class="active notification-success">--%>
                                     <%--<a href="#">--%>
-                                        <%--<i class="fa-user"></i>--%>
+                                    <%--<i class="fa-user"></i>--%>
 
-                                        <%--<span class="line">--%>
-												<%--<strong>New user registered</strong>--%>
-											<%--</span>--%>
+                                    <%--<span class="line">--%>
+                                    <%--<strong>New user registered</strong>--%>
+                                    <%--</span>--%>
 
-                                        <%--<span class="line small time">--%>
-												<%--30 seconds ago--%>
-											<%--</span>--%>
+                                    <%--<span class="line small time">--%>
+                                    <%--30 seconds ago--%>
+                                    <%--</span>--%>
                                     <%--</a>--%>
-                                <%--</li>--%>
+                                    <%--</li>--%>
 
-                                <%--<li class="active notification-secondary">--%>
+                                    <%--<li class="active notification-secondary">--%>
                                     <%--<a href="#">--%>
-                                        <%--<i class="fa-lock"></i>--%>
+                                    <%--<i class="fa-lock"></i>--%>
 
-                                        <%--<span class="line">--%>
-												<%--<strong>Privacy settings have been changed</strong>--%>
-											<%--</span>--%>
+                                    <%--<span class="line">--%>
+                                    <%--<strong>Privacy settings have been changed</strong>--%>
+                                    <%--</span>--%>
 
-                                        <%--<span class="line small time">--%>
-												<%--3 hours ago--%>
-											<%--</span>--%>
+                                    <%--<span class="line small time">--%>
+                                    <%--3 hours ago--%>
+                                    <%--</span>--%>
                                     <%--</a>--%>
-                                <%--</li>--%>
+                                    <%--</li>--%>
 
-                                <%--<li class="notification-primary">--%>
+                                    <%--<li class="notification-primary">--%>
                                     <%--<a href="#">--%>
-                                        <%--<i class="fa-thumbs-up"></i>--%>
+                                    <%--<i class="fa-thumbs-up"></i>--%>
 
-                                        <%--<span class="line">--%>
-												<%--<strong>Someone special liked this</strong>--%>
-											<%--</span>--%>
+                                    <%--<span class="line">--%>
+                                    <%--<strong>Someone special liked this</strong>--%>
+                                    <%--</span>--%>
 
-                                        <%--<span class="line small time">--%>
-												<%--2 minutes ago--%>
-											<%--</span>--%>
+                                    <%--<span class="line small time">--%>
+                                    <%--2 minutes ago--%>
+                                    <%--</span>--%>
                                     <%--</a>--%>
-                                <%--</li>--%>
+                                    <%--</li>--%>
 
-                                <%--<li class="notification-danger">--%>
+                                    <%--<li class="notification-danger">--%>
                                     <%--<a href="#">--%>
-                                        <%--<i class="fa-calendar"></i>--%>
+                                    <%--<i class="fa-calendar"></i>--%>
 
-                                        <%--<span class="line">--%>
-												<%--John cancelled the event--%>
-											<%--</span>--%>
+                                    <%--<span class="line">--%>
+                                    <%--John cancelled the event--%>
+                                    <%--</span>--%>
 
-                                        <%--<span class="line small time">--%>
-												<%--9 hours ago--%>
-											<%--</span>--%>
+                                    <%--<span class="line small time">--%>
+                                    <%--9 hours ago--%>
+                                    <%--</span>--%>
                                     <%--</a>--%>
-                                <%--</li>--%>
+                                    <%--</li>--%>
 
-                                <%--<li class="notification-info">--%>
+                                    <%--<li class="notification-info">--%>
                                     <%--<a href="#">--%>
-                                        <%--<i class="fa-database"></i>--%>
+                                    <%--<i class="fa-database"></i>--%>
 
-                                        <%--<span class="line">--%>
-												<%--The server is status is stable--%>
-											<%--</span>--%>
+                                    <%--<span class="line">--%>
+                                    <%--The server is status is stable--%>
+                                    <%--</span>--%>
 
-                                        <%--<span class="line small time">--%>
-												<%--yesterday at 10:30am--%>
-											<%--</span>--%>
+                                    <%--<span class="line small time">--%>
+                                    <%--yesterday at 10:30am--%>
+                                    <%--</span>--%>
                                     <%--</a>--%>
-                                <%--</li>--%>
+                                    <%--</li>--%>
 
-                                <%--<li class="notification-warning">--%>
+                                    <%--<li class="notification-warning">--%>
                                     <%--<a href="#">--%>
-                                        <%--<i class="fa-envelope-o"></i>--%>
+                                    <%--<i class="fa-envelope-o"></i>--%>
 
-                                        <%--<span class="line">--%>
-												<%--New comments waiting approval--%>
-											<%--</span>--%>
+                                    <%--<span class="line">--%>
+                                    <%--New comments waiting approval--%>
+                                    <%--</span>--%>
 
-                                        <%--<span class="line small time">--%>
-												<%--last week--%>
-											<%--</span>--%>
+                                    <%--<span class="line small time">--%>
+                                    <%--last week--%>
+                                    <%--</span>--%>
                                     <%--</a>--%>
-                                <%--</li>--%>
+                                    <%--</li>--%>
                             </ul>
                         </li>
 

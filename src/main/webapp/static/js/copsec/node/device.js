@@ -1207,14 +1207,14 @@ jQuery(function () {
                         let _text = "";
                         _text = getStatusText(v);
                         if (v.status === ERROR_STATUS) {
-                            if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
+                            // if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
                                 // toastr.error(cy.$id(k).data('deviceHostname') + " 设备状态异常!", "系统提示", opts);
                                 updateStatus(cy.$id(k), INFO_COLOR, _text);
                                 updateNode(cy.$id(k), ERROR_STATUS);
                                 updateEdges(cy.$id(k), "highlightedError");
-                            }
+                            // }
                         } else if (v.status === WARNING_STATUS) {
-                            if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
+                            // if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
                                 // toastr.error(cy.$id(k).data('deviceHostname') + " 设备上报超时!", "系统提示", opts);
                                 // updateStatus(cy.$id(k), WARNING_COLOR, _text);
                                 // updateNode(cy.$id(k), WARNING_STATUS);
@@ -1222,7 +1222,7 @@ jQuery(function () {
                                 updateStatus(cy.$id(k), INFO_COLOR, _text);
                                 updateNode(cy.$id(k), ERROR_STATUS);
                                 updateEdges(cy.$id(k), "highlightedError");
-                            }
+                            // }
                         } else if (v.status === NORMAL_STATUS) {
                             updateStatus(cy.$id(k), INFO_COLOR, _text);
                             updateNode(cy.$id(k), NORMAL_STATUS);
