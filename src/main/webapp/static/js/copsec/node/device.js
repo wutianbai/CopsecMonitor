@@ -1208,20 +1208,20 @@ jQuery(function () {
                         _text = getStatusText(v);
                         if (v.status === ERROR_STATUS) {
                             // if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
-                                // toastr.error(cy.$id(k).data('deviceHostname') + " 设备状态异常!", "系统提示", opts);
-                                updateStatus(cy.$id(k), INFO_COLOR, _text);
-                                updateNode(cy.$id(k), ERROR_STATUS);
-                                updateEdges(cy.$id(k), "highlightedError");
+                            // toastr.error(cy.$id(k).data('deviceHostname') + " 设备状态异常!", "系统提示", opts);
+                            updateStatus(cy.$id(k), INFO_COLOR, _text);
+                            updateNode(cy.$id(k), ERROR_STATUS);
+                            updateEdges(cy.$id(k), "highlightedError");
                             // }
                         } else if (v.status === WARNING_STATUS) {
                             // if (typeof (cy.$id(k).data('deviceHostname')) !== "undefined") {
-                                // toastr.error(cy.$id(k).data('deviceHostname') + " 设备上报超时!", "系统提示", opts);
-                                // updateStatus(cy.$id(k), WARNING_COLOR, _text);
-                                // updateNode(cy.$id(k), WARNING_STATUS);
-                                // updateEdges(cy.$id(k), "highlightedWarning");
-                                updateStatus(cy.$id(k), INFO_COLOR, _text);
-                                updateNode(cy.$id(k), ERROR_STATUS);
-                                updateEdges(cy.$id(k), "highlightedError");
+                            // toastr.error(cy.$id(k).data('deviceHostname') + " 设备上报超时!", "系统提示", opts);
+                            // updateStatus(cy.$id(k), WARNING_COLOR, _text);
+                            // updateNode(cy.$id(k), WARNING_STATUS);
+                            // updateEdges(cy.$id(k), "highlightedWarning");
+                            updateStatus(cy.$id(k), INFO_COLOR, _text);
+                            updateNode(cy.$id(k), ERROR_STATUS);
+                            updateEdges(cy.$id(k), "highlightedError");
                             // }
                         } else if (v.status === NORMAL_STATUS) {
                             updateStatus(cy.$id(k), INFO_COLOR, _text);
@@ -1237,6 +1237,7 @@ jQuery(function () {
             }
         });
     }
+
     getDeviceStatus();
     setInterval(getDeviceStatus, 8000);
 
@@ -1412,6 +1413,7 @@ jQuery(function () {
                 });
         });
     }
+
     // setInterval(movePoint, 2000);
 });
 
@@ -1609,61 +1611,61 @@ function showTable(monitorType) {
             let s = '';
             switch (index) {
                 case "CPU":
-                    s += addOne(s, index, value);
+                    s += addOne(s, "CPU", value);
                     break;
                 case "DISK":
-                    s += addDisk(s, index, value);
+                    s += addDisk(s, "磁盘", value);
                     break;
                 case "MEMORY":
-                    s += addOne(s, index, value);
+                    s += addOne(s, "内存", value);
                     break;
                 case "USER":
-                    s += addTwo(s, index, value);
+                    s += addTwo(s, "用户", value);
                     break;
                 case "RAID":
-                    s += addThree(s, index, value);
+                    s += addThree(s, "磁盘阵列", value);
                     break;
                 case "SYSTEMTYPE":
-                    s += addSystem(s, index, value);
+                    s += addSystem(s, "系统类型", value);
                     break;
                 case "SYSTEMVERSION":
-                    s += addSystem(s, index, value);
+                    s += addSystem(s, "系统版本", value);
                     break;
                 case "SYSTEMPATCH":
-                    s += addSystem(s, index, value);
+                    s += addSystem(s, "系统补丁", value);
                     break;
                 case "APPLICATION":
-                    s += addApplication(s, index, value);
+                    s += addApplication(s, "应用程序", value);
                     break;
                 case "INSTANCES_WEB70":
-                    s += addInstances(s, index, value);
+                    s += addInstances(s, "Web70实例", value);
                     break;
                 case "INSTANCES_WEBPROXY40":
-                    s += addInstances(s, index, value);
+                    s += addInstances(s, "WebProxy40实例", value);
                     break;
                 case "INSTANCES_CONFIG":
-                    s += addInstances(s, index, value);
+                    s += addInstances(s, "配置储存库", value);
                     break;
                 case "INSTANCES_USER":
-                    s += addInstances(s, index, value);
+                    s += addInstances(s, "用户储存库", value);
                     break;
                 case "NETWORK":
-                    s += addApplication(s, index, value);
+                    s += addApplication(s, "网络", value);
                     break;
                 case "ACCESSLOG":
-                    s += addOne(s, index, value);
+                    s += addOne(s, "授权日志", value);
                     break;
                 case "PROXYLOG":
-                    s += addOne(s, index, value);
+                    s += addOne(s, "代理日志", value);
                     break;
                 case "CERT70":
-                    s += addCert(s, index, value);
+                    s += addCert(s, "Web70证书", value);
                     break;
                 case "CERT40":
-                    s += addCert(s, index, value);
+                    s += addCert(s, "WebProxy40证书", value);
                     break;
                 case "IMSERVICE":
-                    s += addTwo(s, index, value);
+                    s += addTwo(s, "IM服务", value);
                     break;
             }
             body += s;
