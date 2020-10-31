@@ -8,9 +8,7 @@ public class DeviceStatusPools {
     private static DeviceStatusPools pool;
     private static ConcurrentHashMap<String, Status> map = new ConcurrentHashMap<>();
 
-    private DeviceStatusPools() {
-
-    }
+    private DeviceStatusPools() {}
 
     public static synchronized DeviceStatusPools getInstances() {
         if (pool == null) {

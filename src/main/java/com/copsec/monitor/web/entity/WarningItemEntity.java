@@ -16,5 +16,6 @@ public class WarningItemEntity {
 
 	@Id
 	private ObjectId id;
+	private String warningItemId;
 	private String warningItemInfo;
 }

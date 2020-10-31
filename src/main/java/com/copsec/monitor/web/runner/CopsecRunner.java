@@ -84,7 +84,5 @@ public class CopsecRunner implements CommandLineRunner {
         monitorItemRepository.findAll().stream().forEach((m -> monitorItemReader.getDataByInfos(m.getMonitorItemInfo())));
 		monitorTaskRepository.findAll().stream().forEach(m -> monitorTaskReader.getDataByInfos(m.getMonitorTaskInfo()));
         warningItemRepository.findAll().stream().forEach(m -> warningItemReader.getDataByInfos(m.getWarningItemInfo()));
-		TimeoutWarningEventThread timeoutWarningEventThread = new TimeoutWarningEventThread();
-        new Thread(timeoutWarningEventThread, "timeoutWarningEvent-thread").start();
     }
 }

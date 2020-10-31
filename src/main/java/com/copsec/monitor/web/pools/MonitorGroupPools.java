@@ -90,7 +90,8 @@ public class MonitorGroupPools {
     	getAll().stream().forEach(m -> {
 
 			MonitorGroupEntity monitorGroupEntity = new MonitorGroupEntity();
-			monitorGroupEntity.setMonitorGroupInfo(m.getMonitorItems());
+			monitorGroupEntity.setMonitorGroupId(m.getId());
+			monitorGroupEntity.setMonitorGroupInfo(m.toString());
 			repository.save(monitorGroupEntity);
 		});
 	}

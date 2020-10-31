@@ -995,6 +995,7 @@ jQuery(function () {
                 data: {
                     'data.id': node.data("id"),
                     'data.name': zoneName,
+                    'data.zone':"yes",
                     'data.backgroundColor': zoneColor,
                     'position.x': node.position('x'),
                     'position.y': node.position('y')

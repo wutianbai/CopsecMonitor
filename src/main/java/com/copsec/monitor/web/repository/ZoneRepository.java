@@ -7,4 +7,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ZoneRepository extends MongoRepository<ZoneEntity,ObjectId>,BaseRepositoryCustom {
+
+	Long deleteByZoneId(String zoneId);
+
+	ZoneEntity findByZoneId(String zoneId);
 }

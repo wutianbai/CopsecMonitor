@@ -14,5 +14,6 @@ public class DeviceEntity{
 
 	@Id
 	private ObjectId id;
+	private String deviceId;
 	private String deviceInfo;
 }

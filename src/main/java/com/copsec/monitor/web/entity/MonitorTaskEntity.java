@@ -14,5 +14,6 @@ public class MonitorTaskEntity {
 
 	@Id
 	private ObjectId id;
+	private String monitorTaskId;
 	private String monitorTaskInfo;
 }

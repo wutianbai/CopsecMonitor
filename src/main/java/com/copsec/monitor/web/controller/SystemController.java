@@ -69,9 +69,6 @@ public class SystemController {
     @PostMapping("/userInfo/get")
     @ResponseBody
     public CopsecResult gatAllUserInfo() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("get all userInfo");
-        }
 
         return systemService.getAllUserInfo();
     }
@@ -80,9 +77,6 @@ public class SystemController {
     @PostMapping("/userInfo/add")
     @ResponseBody
     public CopsecResult addUserInfo(@SessionAttribute UserBean userInfo, HttpServletRequest request, UserInfoBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("add userInfo config {}", bean);
-        }
 
         return systemService.addUserInfo(userInfo, request.getRemoteHost(), bean, "");
     }
@@ -91,9 +85,6 @@ public class SystemController {
     @PostMapping("/userInfo/update")
     @ResponseBody
     public CopsecResult updateUserInfo(@SessionAttribute UserBean userInfo, HttpServletRequest request, UserInfoBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("update userInfo config {}", bean);
-        }
 
         return systemService.updateUserInfo(userInfo, request.getRemoteHost(), bean, "");
     }
@@ -102,9 +93,6 @@ public class SystemController {
     @PostMapping("/userInfo/delete")
     @ResponseBody
     public CopsecResult deleteUserInfo(@SessionAttribute UserBean userInfo, HttpServletRequest request, UserInfoBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete userInfo config {}", bean);
-        }
 
         return systemService.deleteUserInfo(userInfo, request.getRemoteHost(), bean.getUserId(), "");
     }
@@ -113,9 +101,7 @@ public class SystemController {
     @PostMapping("/userInfo/deleteCheck")
     @ResponseBody
     public CopsecResult deleteUserInfoList(@SessionAttribute UserBean userInfo, HttpServletRequest request, @RequestParam("jsonStr") String jsonStr) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete userInfoList config {}", jsonStr);
-        }
+
         List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
         return systemService.deleteUserInfoList(userInfo, request.getRemoteHost(), idArray, "");
@@ -124,9 +110,6 @@ public class SystemController {
     @PostMapping("/operateLog/search")
     @ResponseBody
     public Object searchOperateLog(LogConditionBean condition) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("search operateLog by condition {}", condition);
-        }
 
         return PageUtils.returnResult(condition, systemService.searchOperateLog(PageUtils.returnPageable(condition), condition));
     }
@@ -134,27 +117,20 @@ public class SystemController {
     @PostMapping(value = "/operateLog/deleteCheck")
     @ResponseBody
     public CopsecResult deleteCheckOperateLog(@SessionAttribute UserBean userInfo, HttpServletRequest request, @RequestBody List<String> idArray) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleteCheck operateLog by {}", idArray);
-        }
+
         return systemService.deleteCheckOperateLog(userInfo, request.getRemoteHost(), idArray);
     }
 
     @PostMapping("/operateLog/deleteAll")
     @ResponseBody
     public CopsecResult deleteAllLog(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete all audit log by user {}", userInfo.getId());
-        }
+
         return systemService.deleteAllLog(userInfo, request.getRemoteHost());
     }
 
     @PostMapping("/operateLog/export")
     @ResponseBody
     public ResponseEntity<Resource> exportAllLogs(LogConditionBean condition) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("export current operateLog");
-        }
 
         HttpStatus status = HttpStatus.CREATED;
         Page<LogConditionBean> logs = systemService.searchOperateLog(PageUtils.returnPageable(condition), condition);

@@ -104,6 +104,7 @@ public class MonitorTaskPools {
     	getAll().stream().forEach(monitorTaskBean -> {
 
 			MonitorTaskEntity monitorTaskEntity = new MonitorTaskEntity();
+			monitorTaskEntity.setMonitorTaskId(monitorTaskBean.getTaskId());
 			monitorTaskEntity.setMonitorTaskInfo(monitorTaskBean.toString());
 			repository.save(monitorTaskEntity);
 		});

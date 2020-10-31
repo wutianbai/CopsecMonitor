@@ -18,5 +18,6 @@ public class MonitorItemEntity {
 
 	@Id
 	private ObjectId id;
+	private String monitorId;
 	private String monitorItemInfo;
 }

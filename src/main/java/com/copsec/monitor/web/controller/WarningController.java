@@ -30,9 +30,6 @@ public class WarningController {
     @PostMapping(value = "/event/search")
     @ResponseBody
     public Object searchWarningEvent(@SessionAttribute UserBean userInfo, HttpServletRequest request, WarningEventBean condition) {
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("search warningEvent by {}", condition);
-//        }
 
         return PageUtils.returnResult(condition, warningService.searchWarningEvent(userInfo, request.getRemoteHost(), PageUtils.returnPageable(condition), condition));
     }
@@ -40,54 +37,41 @@ public class WarningController {
     @PostMapping(value = "/event/handle")
     @ResponseBody
     public CopsecResult handleWarningEvent(@SessionAttribute UserBean userInfo, HttpServletRequest request, WarningEventBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("handle warningEvent by {}", bean);
-        }
+
         return warningService.handleWarningEvent(userInfo, request.getRemoteHost(), bean);
     }
 
     @PostMapping(value = "/event/delete")
     @ResponseBody
     public CopsecResult deleteWarningEvent(@SessionAttribute UserBean userInfo, HttpServletRequest request, WarningEventBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete warningEvent by {}", bean);
-        }
+
         return warningService.deleteWarningEvent(userInfo, request.getRemoteHost(), bean);
     }
 
     @PostMapping(value = "/event/handleCheck")
     @ResponseBody
     public CopsecResult handleCheckWarningEvent(@SessionAttribute UserBean userInfo, HttpServletRequest request, @RequestBody List<String> idArray) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("handleCheck warningEvent by {}", idArray);
-        }
+
         return warningService.handleCheckWarningEvent(userInfo, request.getRemoteHost(), idArray);
     }
 
     @PostMapping(value = "/event/deleteCheck")
     @ResponseBody
     public CopsecResult deleteCheckWarningEvent(@SessionAttribute UserBean userInfo, HttpServletRequest request, @RequestBody List<String> idArray) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleteCheck warningEvent by {}", idArray);
-        }
+
         return warningService.deleteCheckWarningEvent(userInfo, request.getRemoteHost(), idArray);
     }
 
     @PostMapping(value = "/event/handleAll")
     @ResponseBody
     public CopsecResult handleAllWarningEvent(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("handle all warningEvent");
-        }
+
         return warningService.handleAllWarningEvent(userInfo, request.getRemoteHost());
     }
 
     @PostMapping(value = "/history/search")
     @ResponseBody
     public Object searchWarningHistory(@SessionAttribute UserBean userInfo, HttpServletRequest request, WarningHistoryBean condition) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("search warningHistory by {}", condition);
-        }
 
         return PageUtils.returnResult(condition, warningService.searchWarningHistory(userInfo, request.getRemoteHost(), PageUtils.returnPageable(condition), condition));
     }
@@ -95,27 +79,21 @@ public class WarningController {
     @PostMapping(value = "/history/delete")
     @ResponseBody
     public CopsecResult deleteWarningHistory(@SessionAttribute UserBean userInfo, HttpServletRequest request, WarningHistoryBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete warningHistory by {}", bean);
-        }
+
         return warningService.deleteWarningHistory(userInfo, request.getRemoteHost(), bean);
     }
 
     @PostMapping(value = "/history/deleteCheck")
     @ResponseBody
     public CopsecResult deleteCheckWarningHistory(@SessionAttribute UserBean userInfo, HttpServletRequest request, @RequestBody List<String> idArray) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleteCheck warningHistory by {}", idArray);
-        }
+
         return warningService.deleteCheckWarningHistory(userInfo, request.getRemoteHost(), idArray);
     }
 
     @PostMapping(value = "/history/deleteAll")
     @ResponseBody
     public CopsecResult deleteAllWarningHistory(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete all warningHistory");
-        }
+
         return warningService.deleteAllWarningHistory(userInfo, request.getRemoteHost());
     }
 
@@ -123,9 +101,7 @@ public class WarningController {
     @ResponseBody
     public CopsecResult receiveWarningEvent(String report) {
         Report reports = JSON.parseObject(report, Report.class);
-        if (logger.isDebugEnabled()) {
-            logger.debug("receive warningEvent by {}", report);
-        }
+
         warningService.receiveWarningEvent(reports);
         return CopsecResult.success();
     }

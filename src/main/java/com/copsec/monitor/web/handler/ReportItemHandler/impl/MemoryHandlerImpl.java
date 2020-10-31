@@ -38,7 +38,7 @@ public class MemoryHandlerImpl extends ReportBaseHandler implements ReportHandle
         monitorItemType.setResult("使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "]");
 
         //发送SysLog日志
-        SysLogUtil.sendLog(config, device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "内存", "[内存]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "]");
+        SysLogUtil.sendLog(config, device.getData().getDeviceIP(), device.getData().getDeviceHostname(), "内存", "[内存阈值]" + reportItem.getItem()+ Resources.PERCENTAGE + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "]");
 
         if (reportItem.getStatus() == 0) {
             baseHandle(deviceStatus, monitorType, monitorItemType);
@@ -53,13 +53,13 @@ public class MemoryHandlerImpl extends ReportBaseHandler implements ReportHandle
                             monitorType.setStatus(1);
                         } else {
                             warningEvent.setEventType(warningItem.getWarningLevel());//设置告警级别
-                            warningEvent.setEventDetail("[内存]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "][异常]" + "超出阈值[" + warningItem.getThreadHold() + Resources.PERCENTAGE + "]");
+                            warningEvent.setEventDetail("[内存阈值]" + reportItem.getItem() + Resources.PERCENTAGE+ "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "][超出阈值]");
                             generateWarningEvent(warningService, reportItem, warningEvent);
                         }
                     }
                 });
             } else {
-                warningEvent.setEventDetail("[内存]" + reportItem.getItem() + "使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "][异常]");
+                warningEvent.setEventDetail("[内存阈值]" + reportItem.getItem() + Resources.PERCENTAGE+"使用率[" + reportItem.getResult() + Resources.PERCENTAGE + "][超出阈值]");
                 generateWarningEvent(warningService, reportItem, warningEvent);
             }
         }

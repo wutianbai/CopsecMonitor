@@ -7,4 +7,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface MonitorTaskRepository extends MongoRepository<MonitorTaskEntity,ObjectId>,BaseRepositoryCustom {
+
+	Long deleteByMonitorTaskId(String monitorTaskId);
+
+	MonitorTaskEntity findByMonitorTaskId(String monitorTaskId);
 }

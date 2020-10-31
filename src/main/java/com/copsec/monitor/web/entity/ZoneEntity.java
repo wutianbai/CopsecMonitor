@@ -12,5 +12,6 @@ public class ZoneEntity {
 
 	@Id
 	private ObjectId id;
+	private String zoneId;
 	private String zoneInfo;
 }

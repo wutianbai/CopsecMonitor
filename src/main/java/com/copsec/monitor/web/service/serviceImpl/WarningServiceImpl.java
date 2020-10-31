@@ -19,6 +19,7 @@ import com.copsec.monitor.web.handler.ReportItemHandler.ReportBaseHandler;
 import com.copsec.monitor.web.handler.ReportItemHandler.ReportHandler;
 import com.copsec.monitor.web.pools.DevicePools;
 import com.copsec.monitor.web.pools.UserInfoPools;
+import com.copsec.monitor.web.pools.WarningEventPools;
 import com.copsec.monitor.web.pools.deviceStatus.DeviceStatusPools;
 import com.copsec.monitor.web.pools.deviceStatus.MonitorItemListPools;
 import com.copsec.monitor.web.pools.deviceStatus.MonitorTypePools;
@@ -52,19 +53,14 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
 
     @Autowired
     private SystemConfig config;
-
     @Autowired
     private WarningEventRepository warningEventRepository;
-
     @Autowired
     private WarningHistoryRepository warningHistoryRepository;
-
     @Autowired
     private DeviceService deviceService;
-
     @Autowired
     private WarningService warningService;
-
     @Override
     public Page<WarningEventBean> searchWarningEvent(UserBean userInfo, String ip, Pageable pageable, WarningEventBean condition) {
 
@@ -75,7 +71,6 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
         content.forEach(item -> {
             WarningEventBean bean = new WarningEventBean();
             bean.setEventId(item.getId().toHexString());
-//            bean.setEventSource(MonitorItemEnum.valueOf(item.getEventSource()));
             if (ObjectUtils.isEmpty(item.getEventSource())) {
                 bean.setEventSource("");
             } else {
@@ -84,7 +79,6 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
 
             bean.setEventTime(FormatUtils.getFormatDate(item.getEventTime()));
             bean.setEventDetail(item.getEventDetail());
-//            bean.setEventType(WarningLevel.valueOf(item.getEventType()));
             bean.setEventType(item.getEventType().getName());
             bean.setDeviceId(item.getDeviceId());
             bean.setDeviceName(item.getDeviceName());
@@ -120,6 +114,7 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
             warningHistory.setStatus(1);
             warningHistoryRepository.insert(warningHistory);
             warningEventRepository.deleteById(status.getId());
+            WarningEventPools.getInstances().remove(status);
         }
     }
 
@@ -135,6 +130,7 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
         Optional<WarningEvent> status = warningEventRepository.findById(new ObjectId((bean.getEventId())));
         if (status.isPresent()) {
             warningEventRepository.deleteById(new ObjectId(bean.getEventId()));
+			WarningEventPools.getInstances().remove(status.get());
         }
         LogUtils.sendSuccessLog(userInfo.getId(), ip, "删除告警事件", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_WARNING);
         return CopsecResult.success("删除告警事件成功");
@@ -153,6 +149,7 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
             Optional<WarningEvent> status = warningEventRepository.findById(new ObjectId((id)));
             if (status.isPresent()) {
                 warningEventRepository.deleteById(new ObjectId(id));
+				WarningEventPools.getInstances().remove(status.get());
             }
         });
         LogUtils.sendSuccessLog(userInfo.getId(), ip, "删除所选告警事件", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_WARNING);
@@ -169,7 +166,10 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
 
     @Override
     public void insertWarningEvent(WarningEvent bean) {
-        warningEventRepository.insertWarningEvent(bean);
+		if(!WarningEventPools.getInstances().exists(bean)){
+			warningEventRepository.insertWarningEvent(bean);
+			WarningEventPools.getInstances().add(bean);
+		}
     }
 
     @Override
@@ -255,23 +255,22 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
 
     @Override
     public synchronized void receiveWarningEvent(Report report) {
-//        LocalCache.putValue(report.getDeviceId(), report, -1);
-//        ConcurrentMap<String, CacheEntity> cache = LocalCache.getCache();//获取本地缓存
-//        for (Iterator it = cache.entrySet().iterator(); it.hasNext(); ) {
-//            Map.Entry entry = (Map.Entry) it.next();
-//            CacheEntity cacheEntity = (CacheEntity) entry.getValue();
-//            Report report = (Report) cacheEntity.getValue();//取出上报数据
-//            LocalCache.remove(report.getDeviceId());//清除缓存
 
         Device device = DevicePools.getInstance().getDevice(report.getDeviceId());//设备信息
+		if(ObjectUtils.isEmpty(device)){
+
+			return ;
+		}
         //更新设备上报时间
         device.getData().setReportTime(report.getReportTime());
         deviceService.updateDevice(new UserBean(), "127.0.0.1", device);
         UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());//运维用户信息
 
         Status deviceStatus = new Status();
-        ConcurrentHashMap<String, Status> monitorTypeMap = MonitorTypePools.getInstances().getMap();
 
+        deviceStatus.setReportUpdateTime(report.getReportTime());
+        ConcurrentHashMap<String, Status> monitorTypeMap = MonitorTypePools.getInstances().getMap();
+		deviceStatus.setUpdateTime(FormatUtils.getFormatDate(report.getReportTime()));
         List<ReportItem> reportItems = report.getReportItems();//获取上报项
         if (!ObjectUtils.isEmpty(reportItems)) {
             reportItems.stream().filter(d -> !ObjectUtils.isEmpty(d)).forEach(reportItem -> {
@@ -280,13 +279,6 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
                     monitorType = new Status();
                     MonitorTypePools.getInstances().add(reportItem.getMonitorType().name(), monitorType);
                 }
-
-//                        String title = monitorType.getWarnMessage();//标题
-//                        if (ObjectUtils.isEmpty(title)) {
-//                            title = "";
-//                        }
-//                        title += "[" + reportItem.getMonitorItemType().name() + "]";
-
                 ConcurrentHashMap<String, List<Status>> monitorItemListMap = (ConcurrentHashMap<String, List<Status>>) monitorType.getMessage();
                 if (ObjectUtils.isEmpty(monitorItemListMap)) {
                     monitorItemListMap = MonitorItemListPools.getInstances().getMap();
@@ -304,21 +296,27 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
                     Status status = optional.get().handle(deviceStatus, device, userInfo, warningService, reportItem, monitorType);
                     monitorItemList.add(status);
                 }
-
                 //根据监控类型更新
                 monitorType.setDeviceId(reportItem.getMonitorType().getName() + "状态");
-//                        monitorType.setWarnMessage(title);
                 monitorItemListMap.replace(reportItem.getMonitorItemType().name(), monitorItemList);
                 monitorType.setMessage(monitorItemListMap);
-
                 MonitorTypePools.getInstances().update(reportItem.getMonitorType().name(), monitorType);
             });
-//            }
         }
         deviceStatus.setDeviceId(report.getDeviceId());
         deviceStatus.setMessage(monitorTypeMap);
+		if (deviceStatus.getStatus() == 0) {
+			deviceStatus.setWarnMessage(Resources.WARNING_MESSAGE);
+			warningEventRepository.handleDeviceOutTimeWarning(report.getDeviceId());
+		} else {
+			deviceStatus.setWarnMessage(Resources.NORMAL_MESSAGE);
+			warningEventRepository.handleDeviceOutTimeWarning(report.getDeviceId());
+		}
 
-        long errorStatus;
+		/**
+		 * 设备上报超时判断不对
+		 */
+        /*long errorStatus;
         if (!ObjectUtils.isEmpty(report.getReportTime())) {
             deviceStatus.setUpdateTime(FormatUtils.getFormatDate(report.getReportTime()));
             errorStatus = System.currentTimeMillis() - report.getReportTime().getTime();
@@ -329,7 +327,6 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
         if (errorStatus > config.getDeviceUpdateTime()) {//上报超时 并产生告警
             deviceStatus.setWarnMessage(Resources.ERROR_MESSAGE);
             deviceStatus.setStatus(2);
-
             WarningEvent warningEvent = new WarningEvent();
             warningEvent.setMonitorId(report.getDeviceId());//设置监控ID为设备ID
             warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
@@ -352,7 +349,7 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
         } else {
             deviceStatus.setWarnMessage(Resources.NORMAL_MESSAGE);
             warningService.handleDeviceOutTimeWarning(report.getDeviceId());
-        }
+        }*/
 
         DeviceStatusPools.getInstances().update(report.getDeviceId(), deviceStatus);//更新设备状态缓存池
     }

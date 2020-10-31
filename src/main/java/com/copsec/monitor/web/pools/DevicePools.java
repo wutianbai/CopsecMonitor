@@ -85,6 +85,7 @@ public class DevicePools {
     	getAll().stream().forEach(device -> {
 
 			DeviceEntity deviceEntity = new DeviceEntity();
+			deviceEntity.setDeviceId(device.getData().getDeviceId());
 			deviceEntity.setDeviceInfo(device.toString());
 			repository.save(deviceEntity);
 		});

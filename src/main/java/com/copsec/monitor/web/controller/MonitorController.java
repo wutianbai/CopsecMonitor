@@ -41,9 +41,7 @@ public class MonitorController {
     @PostMapping("/monitorItem/get")
     @ResponseBody
     public CopsecResult gatAllMonitorItem() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("get all monitorItem");
-        }
+
         return monitorService.getAllMonitorItem();
     }
 
@@ -57,9 +55,6 @@ public class MonitorController {
     @PostMapping("/monitorItem/add")
     @ResponseBody
     public CopsecResult addMonitorItem(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorItemBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("add monitorItem config {}", bean);
-        }
 
         String filePath = config.getBasePath() + config.getMonitorItemPath();
         return monitorService.addMonitorItem(userInfo, request.getRemoteHost(), bean, filePath);
@@ -69,9 +64,6 @@ public class MonitorController {
     @PostMapping("/monitorItem/update")
     @ResponseBody
     public CopsecResult updateMonitorItem(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorItemBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("update monitorItem config {}", bean);
-        }
 
         String filePath = config.getBasePath() + config.getMonitorItemPath();
         return monitorService.updateMonitorItem(userInfo, request.getRemoteHost(), bean, filePath);
@@ -81,9 +73,6 @@ public class MonitorController {
     @PostMapping("/monitorItem/delete")
     @ResponseBody
     public CopsecResult deleteMonitorItem(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorItemBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete monitorItem config {}", bean);
-        }
 
         String filePath = config.getBasePath() + config.getMonitorItemPath();
         return monitorService.deleteMonitorItem(userInfo, request.getRemoteHost(), bean.getMonitorId(), filePath);
@@ -93,9 +82,6 @@ public class MonitorController {
     @PostMapping("/monitorItem/deleteCheck")
     @ResponseBody
     public CopsecResult deleteMonitorItemList(@SessionAttribute UserBean userInfo, HttpServletRequest request, @RequestParam("jsonStr") String jsonStr) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete monitorItemList config {}", jsonStr);
-        }
         List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
         String filePath = config.getBasePath() + config.getMonitorItemPath();
@@ -115,11 +101,6 @@ public class MonitorController {
     @PostMapping("/monitorGroup/add")
     @ResponseBody
     public CopsecResult addMonitorGroup(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorGroupBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("add monitorGroup config {}", bean);
-        }
-//        List<String> idArray = JSON.parseArray(jsonStr, String.class);
-
         return monitorService.addMonitorGroup(userInfo, request.getRemoteHost(), bean, "");
     }
 
@@ -127,10 +108,6 @@ public class MonitorController {
     @PostMapping("/monitorGroup/update")
     @ResponseBody
     public CopsecResult updateMonitorGroup(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorGroupBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("update monitorGroup config {}", bean);
-        }
-//        List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
         return monitorService.updateMonitorGroup(userInfo, request.getRemoteHost(), bean, "");
     }
@@ -139,9 +116,6 @@ public class MonitorController {
     @PostMapping("/monitorGroup/delete")
     @ResponseBody
     public CopsecResult deleteMonitorGroup(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorGroupBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete monitorGroup config {}", bean);
-        }
 
         return monitorService.deleteMonitorGroup(userInfo, request.getRemoteHost(), bean.getId(), "");
     }
@@ -150,9 +124,7 @@ public class MonitorController {
     @PostMapping("/monitorGroup/deleteCheck")
     @ResponseBody
     public CopsecResult deleteMonitorGroupList(@SessionAttribute UserBean userInfo, HttpServletRequest request, @RequestParam("jsonStr") String jsonStr) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete monitorGroupList config {}", jsonStr);
-        }
+
         List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
         return monitorService.deleteMonitorGroupList(userInfo, request.getRemoteHost(), idArray, "");
@@ -161,9 +133,7 @@ public class MonitorController {
     @PostMapping("/warningItem/get")
     @ResponseBody
     public CopsecResult gatAllWarningItem() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("get all warningItem");
-        }
+
         return monitorService.getAllWarningItem();
     }
 
@@ -171,9 +141,6 @@ public class MonitorController {
     @PostMapping("/warningItem/add")
     @ResponseBody
     public CopsecResult addWarningItem(@SessionAttribute UserBean userInfo, HttpServletRequest request, WarningItemBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("add warningItem config {}", bean);
-        }
 
         return monitorService.addWarningItem(userInfo, request.getRemoteHost(), bean, "");
     }
@@ -182,9 +149,6 @@ public class MonitorController {
     @PostMapping("/warningItem/update")
     @ResponseBody
     public CopsecResult updateWarningItem(@SessionAttribute UserBean userInfo, HttpServletRequest request, WarningItemBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("update warningItem config {}", bean);
-        }
 
         return monitorService.updateWarningItem(userInfo, request.getRemoteHost(), bean, "");
     }
@@ -193,9 +157,6 @@ public class MonitorController {
     @PostMapping("/warningItem/delete")
     @ResponseBody
     public CopsecResult deleteWarningItem(@SessionAttribute UserBean userInfo, HttpServletRequest request, WarningItemBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete warningItem config {}", bean);
-        }
 
         return monitorService.deleteWarningItem(userInfo, request.getRemoteHost(), bean.getWarningId(), "");
     }
@@ -204,9 +165,7 @@ public class MonitorController {
     @PostMapping("/warningItem/deleteCheck")
     @ResponseBody
     public CopsecResult deleteWarningItemList(@SessionAttribute UserBean userInfo, HttpServletRequest request, @RequestParam("jsonStr") String jsonStr) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete warningItemList config {}", jsonStr);
-        }
+
         List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
         return monitorService.deleteWarningItemList(userInfo, request.getRemoteHost(), idArray, "");
@@ -215,9 +174,7 @@ public class MonitorController {
     @PostMapping("/monitorTask/get")
     @ResponseBody
     public CopsecResult gatAllMonitorTask() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("get all monitorTask");
-        }
+
         return monitorService.getAllMonitorTask();
     }
 
@@ -225,9 +182,6 @@ public class MonitorController {
     @PostMapping("/monitorTask/add")
     @ResponseBody
     public CopsecResult addMonitorTask(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorTaskBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("add monitorTask config {}", bean);
-        }
 
         return monitorService.addMonitorTask(userInfo, request.getRemoteHost(), bean, "");
     }
@@ -236,9 +190,6 @@ public class MonitorController {
     @PostMapping("/monitorTask/update")
     @ResponseBody
     public CopsecResult updateMonitorTask(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorTaskBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("update monitorTask config {}", bean);
-        }
 
         return monitorService.updateMonitorTask(userInfo, request.getRemoteHost(), bean, "");
     }
@@ -247,9 +198,6 @@ public class MonitorController {
     @PostMapping("/monitorTask/delete")
     @ResponseBody
     public CopsecResult deleteMonitorTask(@SessionAttribute UserBean userInfo, HttpServletRequest request, MonitorTaskBean bean) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete monitorTask config {}", bean);
-        }
 
         return monitorService.deleteMonitorTask(userInfo, request.getRemoteHost(), bean.getTaskId(), "");
     }
@@ -258,9 +206,7 @@ public class MonitorController {
     @PostMapping("/monitorTask/deleteCheck")
     @ResponseBody
     public CopsecResult deleteMonitorTaskList(@SessionAttribute UserBean userInfo, HttpServletRequest request, @RequestParam("jsonStr") String jsonStr) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete monitorTaskList config {}", jsonStr);
-        }
+
         List<String> idArray = JSON.parseArray(jsonStr, String.class);
 
         return monitorService.deleteMonitorTaskList(userInfo, request.getRemoteHost(), idArray, "");

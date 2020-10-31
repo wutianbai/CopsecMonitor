@@ -1,5 +1,7 @@
 package com.copsec.monitor.web.beans.node;
 
+import java.util.Date;
+
 import lombok.Data;
 
 @Data
@@ -19,6 +21,7 @@ public class Status {
 
     private String state;
 
+    private Date reportUpdateTime;
     //证书信息
     private String nickname;//证书名称
     private String subject;//证书主体

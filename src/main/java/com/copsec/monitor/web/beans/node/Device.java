@@ -10,7 +10,6 @@ import org.springframework.util.ObjectUtils;
 @Getter
 @Setter
 public class Device{
-	private ObjectId id;
     private String group = "nodes";//区分连接\节点标志
     private Position position;//坐标
 	private Data data;

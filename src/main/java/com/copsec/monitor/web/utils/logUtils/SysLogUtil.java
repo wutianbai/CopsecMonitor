@@ -47,9 +47,7 @@ public class SysLogUtil {
     //    private static void sendLog(String address, String hostname, String rawEvent, String message, String result) {
     public static void sendLog(SystemConfig config, String address, String hostname, String rawEvent, String message) {
         if (config.isSysLogEnable()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("send sys");
-            }
+
             try {
                 if (datagramSocket == null) {
                     try {

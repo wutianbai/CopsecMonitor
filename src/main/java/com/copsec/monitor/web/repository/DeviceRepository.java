@@ -8,5 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface DeviceRepository extends MongoRepository<DeviceEntity,ObjectId>,BaseRepositoryCustom {
 
+	Long deleteByDeviceId(String deviceId);
 
+	DeviceEntity findByDeviceId(String deviceId);
 }

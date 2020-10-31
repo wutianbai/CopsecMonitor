@@ -14,5 +14,6 @@ public class MonitorGroupEntity {
 
 	@Id
 	private ObjectId id;
+	private String monitorGroupId;
 	private String monitorGroupInfo;
 }

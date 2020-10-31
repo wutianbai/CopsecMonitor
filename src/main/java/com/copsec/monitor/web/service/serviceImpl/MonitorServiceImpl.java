@@ -13,7 +13,11 @@ import com.copsec.monitor.web.beans.node.Device;
 import com.copsec.monitor.web.commons.CopsecResult;
 import com.copsec.monitor.web.config.Resources;
 import com.copsec.monitor.web.config.SystemConfig;
+import com.copsec.monitor.web.entity.MonitorGroupEntity;
+import com.copsec.monitor.web.entity.MonitorItemEntity;
+import com.copsec.monitor.web.entity.MonitorTaskEntity;
 import com.copsec.monitor.web.entity.WarningEvent;
+import com.copsec.monitor.web.entity.WarningItemEntity;
 import com.copsec.monitor.web.exception.CopsecException;
 import com.copsec.monitor.web.fileReaders.*;
 import com.copsec.monitor.web.fileReaders.fileReaderEnum.FileReaderType;
@@ -66,10 +70,9 @@ public class MonitorServiceImpl implements MonitorService {
 
     @Override
     public CopsecResult getAllMonitorItem() {
-        MonitorItemPools.getInstances().clean();
-        monitorItemRepository.findAll().stream().forEach(m -> monitorItemReader.getDataByInfos(m.getMonitorItemInfo()));
-
-        ArrayList<Object> list = new ArrayList<>();
+		MonitorItemPools.getInstances().clean();
+		monitorItemRepository.findAll().stream().forEach(m -> monitorItemReader.getDataByInfos(m.getMonitorItemInfo()));
+		ArrayList<Object> list = new ArrayList<>();
         list.add(MonitorItemPools.getInstances().getAll());
         list.add(MonitorItemEnum.containVal());
         list.add(MonitorItemEnum.containMessage());
@@ -85,7 +88,6 @@ public class MonitorServiceImpl implements MonitorService {
             Device device = DevicePools.getInstance().getDevice(deviceId);
 
             WarningEvent warningEvent = new WarningEvent();
-//            warningEvent.setMonitorId(deviceId);//设置监控ID为设备ID
             warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
             warningEvent.setEventDetail("监控任务不存在");
             warningEvent.setEventTime(new Date());
@@ -98,10 +100,7 @@ public class MonitorServiceImpl implements MonitorService {
                 warningEvent.setUserName(userInfo.getUserName());
                 warningEvent.setUserMobile(userInfo.getMobile());
             }
-
-//            if (!warningService.checkIsWarningByTime(warningEvent.getMonitorId())) {
             warningService.insertWarningEvent(warningEvent);
-//            }
             return CopsecResult.failed("此设备无监控任务");
         }
 
@@ -117,7 +116,10 @@ public class MonitorServiceImpl implements MonitorService {
     public CopsecResult addMonitorItem(UserBean user, String ip, MonitorItemBean bean, String filePath) {
 		bean.setMonitorType(bean.getMonitorItemType().getType());
 		MonitorItemPools.getInstances().add(bean);
-		MonitorItemPools.getInstances().save(monitorItemRepository);
+		MonitorItemEntity monitorItemEntity=new MonitorItemEntity();
+		monitorItemEntity.setMonitorId(bean.getMonitorId());
+		monitorItemEntity.setMonitorItemInfo(bean.toString());
+		monitorItemRepository.save(monitorItemEntity);
 		LogUtils.sendSuccessLog(user.getId(), ip, "添加监控项成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "添加监控项");
 		return CopsecResult.success("添加成功", bean);
     }
@@ -126,14 +128,15 @@ public class MonitorServiceImpl implements MonitorService {
     public CopsecResult updateMonitorItem(UserBean user, String ip, MonitorItemBean bean, String filePath) {
 		bean.setMonitorType(bean.getMonitorItemType().getType());
 		MonitorItemPools.getInstances().update(bean);
-		MonitorItemPools.getInstances().save(monitorItemRepository);
+		MonitorItemEntity monitorItemEntity=monitorItemRepository.findByMonitorId(bean.getMonitorId());
+		monitorItemEntity.setMonitorItemInfo(bean.toString());
+		monitorItemRepository.save(monitorItemEntity);
 		LogUtils.sendSuccessLog(user.getId(), ip, "更新监控项成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "更新监控项");
 		return CopsecResult.success("更新成功");
     }
 
     @Override
     public CopsecResult deleteMonitorItem(UserBean user, String ip, String monitorId, String filePath) {
-        MonitorItemBean oldBean = MonitorItemPools.getInstances().get(monitorId);
 		StringBuilder groupStr = checkMonitorGroup(monitorId);
 		if (!"".equals(groupStr.toString())) {
 			return CopsecResult.failed("不可删除", "监控组" + groupStr.toString() + "包含此项");
@@ -145,7 +148,7 @@ public class MonitorServiceImpl implements MonitorService {
 		}
 
 		MonitorItemPools.getInstances().delete(monitorId);
-		MonitorItemPools.getInstances().save(monitorItemRepository);
+		monitorItemRepository.deleteByMonitorId(monitorId);
 		LogUtils.sendSuccessLog(user.getId(), ip, "删除监控项成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "删除监控项");
 		return CopsecResult.success("删除成功");
     }
@@ -178,7 +181,6 @@ public class MonitorServiceImpl implements MonitorService {
 
     @Override
     public CopsecResult deleteMonitorItemList(UserBean user, String ip, List<String> idArray, String filePath) {
-        List<MonitorItemBean> oldBeanList = MonitorItemPools.getInstances().get(idArray);
 
         final StringBuilder groupStr = new StringBuilder();
         final StringBuilder warningStr = new StringBuilder();
@@ -205,30 +207,34 @@ public class MonitorServiceImpl implements MonitorService {
 
     @Override
     public CopsecResult getAllMonitorGroup() {
-        MonitorGroupPools.getInstances().clean();
-        monitorGroupRepository.findAll().stream().forEach(monitorGroupEntity -> monitorGroupReader.getDataByInfos(monitorGroupEntity.getMonitorGroupInfo()));
-        monitorItemRepository.findAll().stream().forEach(monitorItemEntity -> monitorItemReader.getDataByInfos(monitorItemEntity.getMonitorItemInfo()));
 
-        ArrayList<Object> list = new ArrayList<>();
+		MonitorGroupPools.getInstances().clean();
+		MonitorItemPools.getInstances().clean();
+		monitorGroupRepository.findAll().stream().forEach(monitorGroupEntity -> monitorGroupReader.getDataByInfos(monitorGroupEntity.getMonitorGroupInfo()));
+		monitorItemRepository.findAll().stream().forEach(monitorItemEntity -> monitorItemReader.getDataByInfos(monitorItemEntity.getMonitorItemInfo()));
+		ArrayList<Object> list = new ArrayList<>();
         list.add(MonitorGroupPools.getInstances().getAll());
         list.add(MonitorItemPools.getInstances().getAll());
-
         return CopsecResult.success(list);
     }
 
     @Override
     public CopsecResult addMonitorGroup(UserBean user, String ip, MonitorGroupBean bean, String filePath) {
 		MonitorGroupPools.getInstances().add(bean);
-		MonitorGroupPools.getInstances().save(monitorGroupRepository);
+		MonitorGroupEntity monitorGroupEntity=new MonitorGroupEntity();
+		monitorGroupEntity.setMonitorGroupId(bean.getId());
+		monitorGroupEntity.setMonitorGroupInfo(bean.toString());
+		monitorGroupRepository.save(monitorGroupEntity);
 		LogUtils.sendSuccessLog(user.getId(), ip, "添加监控组成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "添加监控组");
 		return CopsecResult.success("添加成功", bean);
     }
 
     @Override
     public CopsecResult updateMonitorGroup(UserBean user, String ip, MonitorGroupBean bean, String filePath) {
-        MonitorGroupBean oldBean = MonitorGroupPools.getInstances().get(bean.getId());
 		MonitorGroupPools.getInstances().update(bean);
-		MonitorGroupPools.getInstances().save(monitorGroupRepository);
+		MonitorGroupEntity monitorGroupEntity=monitorGroupRepository.findByMonitorGroupId(bean.getId());
+		monitorGroupEntity.setMonitorGroupInfo(bean.toString());
+		monitorGroupRepository.save(monitorGroupEntity);
 		LogUtils.sendSuccessLog(user.getId(), ip, "更新监控组成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "更新监控组");
 		return CopsecResult.success("更新成功");
     }
@@ -252,7 +258,7 @@ public class MonitorServiceImpl implements MonitorService {
             return CopsecResult.failed("不可删除", "监控任务" + taskStr.toString() + "包含此项");
         }
 		MonitorGroupPools.getInstances().delete(id);
-		MonitorGroupPools.getInstances().save(monitorGroupRepository);
+		monitorGroupRepository.deleteByMonitorGroupId(id);
 		LogUtils.sendSuccessLog(user.getId(), ip, "删除监控组成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "删除监控组");
 		return CopsecResult.success("删除成功");
     }
@@ -273,9 +279,11 @@ public class MonitorServiceImpl implements MonitorService {
 
     @Override
     public CopsecResult getAllWarningItem() {
-        WarningItemPools.getInstances().clean();
-        warningItemRepository.findAll().stream().forEach(warningItemEntity -> warningItemReader.getDataByInfos(warningItemEntity.getWarningItemInfo()));
-        monitorItemRepository.findAll().stream().forEach(monitorItemEntity -> monitorItemReader.getDataByInfos(monitorItemEntity.getMonitorItemInfo()));
+
+		WarningItemPools.getInstances().clean();
+		MonitorItemPools.getInstances().clean();
+		warningItemRepository.findAll().stream().forEach(warningItemEntity -> warningItemReader.getDataByInfos(warningItemEntity.getWarningItemInfo()));
+		monitorItemRepository.findAll().stream().forEach(monitorItemEntity -> monitorItemReader.getDataByInfos(monitorItemEntity.getMonitorItemInfo()));
         ArrayList<Object> list = new ArrayList<>();
         list.add(WarningItemPools.getInstances().getAll());
         list.add(MonitorItemEnum.containVal());
@@ -289,7 +297,10 @@ public class MonitorServiceImpl implements MonitorService {
     public CopsecResult addWarningItem(UserBean user, String ip, WarningItemBean bean, String filePath) {
 
 		WarningItemPools.getInstances().add(bean);
-		WarningItemPools.getInstances().save(warningItemRepository);
+		WarningItemEntity warningItemEntity = new WarningItemEntity();
+		warningItemEntity.setWarningItemId(bean.getWarningId());
+		warningItemEntity.setWarningItemInfo(bean.toString());
+		warningItemRepository.save(warningItemEntity);
 		LogUtils.sendSuccessLog(user.getId(), ip, "添加告警项成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "添加告警项");
 		return CopsecResult.success("添加成功", bean);
     }
@@ -297,7 +308,9 @@ public class MonitorServiceImpl implements MonitorService {
     @Override
     public CopsecResult updateWarningItem(UserBean user, String ip, WarningItemBean bean, String filePath) {
 		WarningItemPools.getInstances().update(bean);
-		WarningItemPools.getInstances().save(warningItemRepository);
+		WarningItemEntity warningItemEntity=new WarningItemEntity();
+		warningItemEntity.setWarningItemInfo(bean.toString());
+		warningItemRepository.save(warningItemEntity);
 		LogUtils.sendSuccessLog(user.getId(), ip, "更新告警项成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "更新告警项");
 		return CopsecResult.success("更新成功");
     }
@@ -323,7 +336,7 @@ public class MonitorServiceImpl implements MonitorService {
         }
 
 		WarningItemPools.getInstances().delete(id);
-		WarningItemPools.getInstances().save(warningItemRepository);
+		warningItemRepository.deleteByWarningItemId(id);
 		LogUtils.sendSuccessLog(user.getId(), ip, "删除告警项成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "删除告警项");
 		return CopsecResult.success("删除成功");
     }
@@ -336,7 +349,6 @@ public class MonitorServiceImpl implements MonitorService {
             return CopsecResult.failed("不可删除", "监控任务包含其中告警项");
         }
 
-        List<WarningItemBean> oldBeanList = WarningItemPools.getInstances().get(idArray);
         WarningItemPools.getInstances().delete(idArray);
         WarningItemPools.getInstances().save(warningItemRepository);
 		LogUtils.sendSuccessLog(user.getId(), ip, "删除所选告警项成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "删除所选告警项");
@@ -345,17 +357,18 @@ public class MonitorServiceImpl implements MonitorService {
 
     @Override
     public CopsecResult getAllMonitorTask() {
-        MonitorTaskPools.getInstances().clean();
-		monitorGroupRepository.findAll().stream().forEach(m -> monitorGroupReader.getDataByInfos(m.getMonitorGroupInfo()));
-		monitorTaskRepository.findAll().stream().forEach(m -> monitorTaskReader.getDataByInfos(m.getMonitorTaskInfo()));
-		warningItemRepository.findAll().stream().forEach(m -> warningItemReader.getDataByInfos(m.getWarningItemInfo()));
 
+		MonitorTaskPools.getInstances().clean();
+		MonitorGroupPools.getInstances().clean();
+		WarningItemPools.getInstances().clean();
+		monitorTaskRepository.findAll().stream().forEach(m -> monitorTaskReader.getDataByInfos(m.getMonitorTaskInfo()));
+		monitorGroupRepository.findAll().stream().forEach(m -> monitorGroupReader.getDataByInfos(m.getMonitorGroupInfo()));
+		warningItemRepository.findAll().stream().forEach(m -> warningItemReader.getDataByInfos(m.getWarningItemInfo()));
         ArrayList<Object> list = new ArrayList<>();
         list.add(MonitorTaskPools.getInstances().getAll());
         list.add(DevicePools.getInstance().getAll());
         list.add(MonitorGroupPools.getInstances().getAll());
         list.add(WarningItemPools.getInstances().getAll());
-
         return CopsecResult.success(list);
     }
 
@@ -363,16 +376,20 @@ public class MonitorServiceImpl implements MonitorService {
     public CopsecResult addMonitorTask(UserBean user, String ip, MonitorTaskBean bean, String filePath) {
 
 		MonitorTaskPools.getInstances().add(bean);
-		MonitorTaskPools.getInstances().save(monitorTaskRepository);
+		MonitorTaskEntity monitorTaskEntity = new MonitorTaskEntity();
+		monitorTaskEntity.setMonitorTaskId(bean.getTaskId());
+		monitorTaskEntity.setMonitorTaskInfo(bean.toString());
+		monitorTaskRepository.save(monitorTaskEntity);
 		LogUtils.sendSuccessLog(user.getId(), ip, "添加监控任务成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "添加监控任务");
 		return CopsecResult.success("添加成功", bean);
     }
 
     @Override
     public CopsecResult updateMonitorTask(UserBean user, String ip, MonitorTaskBean bean, String filePath) {
-        MonitorTaskBean oldBean = MonitorTaskPools.getInstances().get(bean.getTaskId());
 		MonitorTaskPools.getInstances().update(bean);
-		MonitorTaskPools.getInstances().save(monitorTaskRepository);
+		MonitorTaskEntity monitorTaskEntity = monitorTaskRepository.findByMonitorTaskId(bean.getTaskId());
+		monitorTaskEntity.setMonitorTaskInfo(bean.toString());
+		monitorTaskRepository.save(monitorTaskEntity);
 		LogUtils.sendSuccessLog(user.getId(), ip, "更新监控任务成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "更新监控任务");
 		return CopsecResult.success("更新成功");
     }
@@ -380,14 +397,13 @@ public class MonitorServiceImpl implements MonitorService {
     @Override
     public CopsecResult deleteMonitorTask(UserBean user, String ip, String monitorId, String filePath) {
 		MonitorTaskPools.getInstances().delete(monitorId);
-		MonitorTaskPools.getInstances().save(monitorTaskRepository);
+		monitorTaskRepository.deleteByMonitorTaskId(monitorId);
 		LogUtils.sendSuccessLog(user.getId(), ip, "删除监控任务成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "删除监控任务");
 		return CopsecResult.success("删除成功");
     }
 
     @Override
     public CopsecResult deleteMonitorTaskList(UserBean user, String ip, List<String> idArray, String filePath) {
-        List<MonitorTaskBean> oldBeanList = MonitorTaskPools.getInstances().get(idArray);
         MonitorTaskPools.getInstances().delete(idArray);
 		MonitorTaskPools.getInstances().save(monitorTaskRepository);
 		LogUtils.sendSuccessLog(user.getId(), ip, "删除所选监控任务成功", config.getLogHost(), config.getLogPort(), config.getLogCollection(), "删除所选监控任务");

@@ -89,6 +89,8 @@ public class MonitorItemPools {
     	getAll().stream().forEach(m -> {
 
 			MonitorItemEntity monitorItemEntity = new MonitorItemEntity();
+			monitorItemEntity.setMonitorId(m.getMonitorId());
+			monitorItemEntity.setMonitorId(m.getMonitorId());
 			monitorItemEntity.setMonitorItemInfo(m.toString());
 			repository.save(monitorItemEntity);
 		});

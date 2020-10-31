@@ -74,6 +74,7 @@ public class ZonePools {
     	getAll().stream().forEach(zone -> {
 
 			ZoneEntity zoneEntity = new ZoneEntity();
+			zoneEntity.setZoneId(zone.getData().getId());
 			zoneEntity.setZoneInfo(zone.toString());
 			repository.save(zoneEntity);
 		});

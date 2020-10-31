@@ -90,6 +90,7 @@ public class WarningItemPools {
     	getAll().stream().forEach(warningItemBean ->  {
 
 			WarningItemEntity warningItemEntity = new WarningItemEntity();
+			warningItemEntity.setWarningItemId(warningItemBean.getWarningId());
 			warningItemEntity.setWarningItemInfo(warningItemBean.toString());
 			repository.save(warningItemEntity);
 		});

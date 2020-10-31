@@ -42,9 +42,8 @@ public class ReportBaseHandler {
     }
 
     public static void generateWarningEvent(WarningService warningService, ReportItem reportItem, WarningEvent warningEvent) {
-        if (!warningService.checkIsWarningByTime(reportItem.getMonitorId())) {
-            warningService.insertWarningEvent(warningEvent);
-        }
+
+    	warningService.insertWarningEvent(warningEvent);
     }
 
     public static List<WarningItemBean> getWarningItemList(ReportItem reportItem) {

@@ -7,4 +7,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface WarningItemRepository extends MongoRepository<WarningItemEntity,ObjectId>,BaseRepositoryCustom {
+
+	Long deleteByWarningItemId(String warningItemId);
+
+	WarningItemEntity findByWarningItemId(String warningItemId);
 }

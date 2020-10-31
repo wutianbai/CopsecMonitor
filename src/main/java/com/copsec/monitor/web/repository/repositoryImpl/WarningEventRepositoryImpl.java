@@ -132,7 +132,6 @@ public class WarningEventRepositoryImpl extends BaseRepositoryImpl {
             warningEventList.forEach(warningEvent -> {
                 WarningHistory warningHistory = new WarningHistory();
                 warningHistory.setId(warningEvent.getId());
-//                warningHistory.setEventSource(warningEvent.getEventSource());
                 warningHistory.setEventTime(warningEvent.getEventTime());
                 warningHistory.setEventDetail(warningEvent.getEventDetail());
                 warningHistory.setEventType(warningEvent.getEventType());

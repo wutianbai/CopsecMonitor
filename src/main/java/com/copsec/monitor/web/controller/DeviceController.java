@@ -33,18 +33,6 @@ public class DeviceController {
         return "nodes/" + pageId;
     }
 
-//    @GetMapping("/device")
-//    public String deviceManager(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
-//
-//        return "nodes/device";
-//    }
-//
-//    @GetMapping("/deviceInfo")
-//    public String deviceInfo(@SessionAttribute UserBean userInfo, HttpServletRequest request) {
-//
-//        return "nodes/deviceInfo";
-//    }
-
     /**
      * 获取所有节点数据
      */
@@ -64,9 +52,7 @@ public class DeviceController {
     @PostMapping("/device/add")
     @ResponseBody
     public CopsecResult addDevice(Device device, @SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("add device " + device);
-        }
+
         return deviceService.addDevice(userInfo, request.getRemoteHost(), device);
     }
 
@@ -78,9 +64,7 @@ public class DeviceController {
     @PostMapping("/device/update")
     @ResponseBody
     public CopsecResult updateDevice(Device device, @SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("update device {} ", device);
-        }
+
         return deviceService.updateDevice(userInfo, request.getRemoteHost(), device);
     }
 
@@ -92,18 +76,14 @@ public class DeviceController {
     @PostMapping("/device/delete")
     @ResponseBody
     public CopsecResult deleteDevice(Device device, @SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete device {} ", device);
-        }
+
         return deviceService.deleteDevice(userInfo, request.getRemoteHost(), device.getData().getDeviceId());
     }
 
     @PostMapping("/link/add")
     @ResponseBody
     public CopsecResult addLink(@RequestBody LinkBean link, @SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("add link {} ", link);
-        }
+
         return deviceService.addLink(userInfo, request.getRemoteHost(), link);
     }
 
@@ -115,9 +95,7 @@ public class DeviceController {
     @PostMapping("/link/update")
     @ResponseBody
     public CopsecResult updateLink(@RequestBody LinkBean link, @SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("update link {} ", link);
-        }
+
         return deviceService.updateLink(userInfo, request.getRemoteHost(), link);
     }
 
@@ -129,9 +107,7 @@ public class DeviceController {
     @PostMapping("/link/delete")
     @ResponseBody
     public CopsecResult deleteLink(Link link, @SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete link {} ", link);
-        }
+
         return deviceService.deleteLink(userInfo, request.getRemoteHost(), link.getData().getId());
     }
 
@@ -143,9 +119,7 @@ public class DeviceController {
     @GetMapping(value = "/zone/get")
     @ResponseBody
     public CopsecResult getAllZone() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("get all zone");
-        }
+
         return deviceService.getAllZone();
     }
 
@@ -160,9 +134,7 @@ public class DeviceController {
     @PostMapping(value = "/zone/add")
     @ResponseBody
     public CopsecResult addZone(@SessionAttribute UserBean userInfo, HttpServletRequest request, Device zone) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("add zone {}" + zone);
-        }
+
         return deviceService.addZone(userInfo, request.getRemoteHost(), zone);
     }
 
@@ -177,9 +149,7 @@ public class DeviceController {
     @PostMapping("/zone/delete")
     @ResponseBody
     public CopsecResult deleteZone(Device zone, @SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("delete zone {} ", zone);
-        }
+
         return deviceService.deleteZone(userInfo, request.getRemoteHost(), zone.getData().getId());
     }
 
@@ -194,18 +164,13 @@ public class DeviceController {
     @PostMapping("/zone/update")
     @ResponseBody
     public CopsecResult updateZone(Device zone, @SessionAttribute UserBean userInfo, HttpServletRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("update zone {} ", zone);
-        }
+
         return deviceService.updateZone(userInfo, request.getRemoteHost(), zone);
     }
 
     @PostMapping("/topology/update")
     @ResponseBody
     public CopsecResult updateTopology(@SessionAttribute UserBean userInfo, @RequestBody ArrayList<PositionBeans> positions) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("update topology {}", positions);
-        }
 
         if (!userInfo.getRole().equals("monitor")) {
             return deviceService.updateTopology(positions);
@@ -219,10 +184,4 @@ public class DeviceController {
 
         return deviceService.getDeviceStatus();
     }
-
-//    @GetMapping(value = "/typeNames/get")
-//    @ResponseBody
-//    public CopsecResult getDeviceTypeNames() {
-//        return CopsecResult.success(SnmpMibPools.getInstances().getTypeNames());
-//    }
 }
