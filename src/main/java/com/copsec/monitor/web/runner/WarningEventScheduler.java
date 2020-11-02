@@ -7,6 +7,12 @@ import com.copsec.monitor.web.fileReaders.MonitorTaskReader;
 import com.copsec.monitor.web.fileReaders.UserFileReader;
 import com.copsec.monitor.web.fileReaders.UserInfoReader;
 import com.copsec.monitor.web.fileReaders.WarningItemReader;
+import com.copsec.monitor.web.pools.DevicePools;
+import com.copsec.monitor.web.pools.MonitorGroupPools;
+import com.copsec.monitor.web.pools.MonitorItemPools;
+import com.copsec.monitor.web.pools.MonitorTaskPools;
+import com.copsec.monitor.web.pools.UserInfoPools;
+import com.copsec.monitor.web.pools.UserPools;
 import com.copsec.monitor.web.pools.WarningEventPools;
 import com.copsec.monitor.web.repository.DeviceRepository;
 import com.copsec.monitor.web.repository.MonitorGroupRepository;
@@ -71,12 +77,41 @@ public class WarningEventScheduler {
 	public void updateCache(){
 
 		userRepository.findAll().stream().forEach(u -> userReader.getDataByInfos(u.getUserInfo()));
+		if(deviceRepository.findAll().size() == 0){
+
+			DevicePools.getInstance().clean();
+		}
 		deviceRepository.findAll().stream().forEach(d -> deviceReader.getDataByInfos(d.getDeviceInfo()));
+
+		if(userRepository.findAll().size()== 0){
+
+			UserPools.getInstances().clean();
+		}
 		userRepository.findAll().stream().forEach(u -> userReader.getDataByInfos(u.getUserInfo()));
+		if(userInfoEntityRepository.findAll().size() == 0){
+
+			UserInfoPools.getInstances().clean();
+		}
 		userInfoEntityRepository.findAll().stream().forEach(u -> userInfoReader.getDataByInfos(u.getUserInfo()));
+		if(monitorGroupRepository.findAll().size() == 0){
+
+			MonitorGroupPools.getInstances().clean();
+		}
 		monitorGroupRepository.findAll().stream().forEach(m -> monitorGroupReader.getDataByInfos(m.getMonitorGroupInfo()));
+		if(monitorItemRepository.findAll().size() == 0){
+
+			MonitorItemPools.getInstances().clean();
+		}
 		monitorItemRepository.findAll().stream().forEach((m -> monitorItemReader.getDataByInfos(m.getMonitorItemInfo())));
+		if(monitorTaskRepository.findAll().size() == 0){
+
+			MonitorTaskPools.getInstances().clean();
+		}
 		monitorTaskRepository.findAll().stream().forEach(m -> monitorTaskReader.getDataByInfos(m.getMonitorTaskInfo()));
+		if(warningItemRepository.findAll().size() == 0){
+
+			WarningEventPools.getInstances().clean();
+		}
 		warningItemRepository.findAll().stream().forEach(m -> warningItemReader.getDataByInfos(m.getWarningItemInfo()));
 	}
 }

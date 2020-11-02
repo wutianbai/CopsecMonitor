@@ -286,36 +286,37 @@ public class DeviceServiceImpl implements DeviceService {
 
 			Status status = entry.getValue();
 			DeviceEntity deviceEntity = deviceRepository.findByDeviceId(entry.getKey());
-			Device device = getDeviceInfo(deviceEntity.getDeviceInfo());
-			if(!ObjectUtils.isEmpty(device)){
+			if(!ObjectUtils.isEmpty(deviceEntity)){
 
-				if(System.currentTimeMillis() - device.getData().getReportTime().getTime() > config.getDeviceUpdateTime()){
+				Device device = getDeviceInfo(deviceEntity.getDeviceInfo());
+				if(!ObjectUtils.isEmpty(device)){
 
-					status.setStatus(2);
-					WarningEvent warningEvent = new WarningEvent();
-					warningEvent.setMonitorId(entry.getKey());//设置监控ID为设备ID
-					warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
-					warningEvent.setEventDetail("上报超时 设备失去连接");
-					warningEvent.setEventTime(new Date());
-					warningEvent.setDeviceId(entry.getKey());
-					warningEvent.setDeviceName(device.getData().getDeviceHostname());
-					UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());//运维用户信息
-					if (!ObjectUtils.isEmpty(userInfo)) {
-						warningEvent.setUserId(userInfo.getUserId());
-						warningEvent.setUserName(userInfo.getUserName());
-						warningEvent.setUserMobile(userInfo.getMobile());
+					if(System.currentTimeMillis() - device.getData().getReportTime().getTime() > config.getDeviceUpdateTime()){
+
+						status.setStatus(2);
+						WarningEvent warningEvent = new WarningEvent();
+						warningEvent.setMonitorId(entry.getKey());//设置监控ID为设备ID
+						warningEvent.setEventType(WarningLevel.ERROR);//初始告警级别
+						warningEvent.setEventDetail("上报超时 设备失去连接");
+						warningEvent.setEventTime(new Date());
+						warningEvent.setDeviceId(entry.getKey());
+						warningEvent.setDeviceName(device.getData().getDeviceHostname());
+						UserInfoBean userInfo = UserInfoPools.getInstances().get(device.getData().getMonitorUserId());//运维用户信息
+						if (!ObjectUtils.isEmpty(userInfo)) {
+							warningEvent.setUserId(userInfo.getUserId());
+							warningEvent.setUserName(userInfo.getUserName());
+							warningEvent.setUserMobile(userInfo.getMobile());
+						}
+						if(!WarningEventPools.getInstances().exists(warningEvent)){
+
+							WarningEventPools.getInstances().add(warningEvent);
+							warningEventRepository.save(warningEvent);
+						}
+					}else{
+						status.setStatus(1);
 					}
-					if(!WarningEventPools.getInstances().exists(warningEvent)){
-
-						WarningEventPools.getInstances().add(warningEvent);
-						warningEventRepository.save(warningEvent);
-					}
-
-				}else{
-
-					status.setStatus(0);
+					DeviceStatusPools.getInstances().update(entry.getKey(),status);
 				}
-				DeviceStatusPools.getInstances().update(entry.getKey(),status);
 			}
 		});
         return CopsecResult.success(DeviceStatusPools.getInstances().getMap());

@@ -72,4 +72,9 @@ public class UserPools {
 			repository.save(userEntity);
 		});
     }
+
+    public void clean(){
+
+    	map.clear();
+	}
 }
