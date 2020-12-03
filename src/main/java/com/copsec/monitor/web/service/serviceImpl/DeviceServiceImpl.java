@@ -312,8 +312,6 @@ public class DeviceServiceImpl implements DeviceService {
 							WarningEventPools.getInstances().add(warningEvent);
 							warningEventRepository.save(warningEvent);
 						}
-					}else{
-						status.setStatus(1);
 					}
 					DeviceStatusPools.getInstances().update(entry.getKey(),status);
 				}

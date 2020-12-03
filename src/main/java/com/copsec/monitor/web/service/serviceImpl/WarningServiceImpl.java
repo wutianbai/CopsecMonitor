@@ -160,6 +160,7 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
     public CopsecResult handleAllWarningEvent(UserBean userInfo, String ip) {
         List<WarningEvent> list = warningEventRepository.findAll();
         list.forEach(bean -> handle(userInfo, bean.getId().toString()));
+		WarningEventPools.getInstances().clean();
         LogUtils.sendSuccessLog(userInfo.getId(), ip, "处理所有告警事件", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_WARNING);
         return CopsecResult.success("处理所有告警事件成功");
     }
@@ -244,6 +245,7 @@ public class WarningServiceImpl extends ReportBaseHandler implements WarningServ
     @Override
     public CopsecResult deleteAllWarningHistory(UserBean userInfo, String ip) {
         warningHistoryRepository.deleteAll();
+		WarningEventPools.getInstances().clean();
         LogUtils.sendSuccessLog(userInfo.getId(), ip, "处理所有告警历史", config.getLogHost(), config.getLogPort(), config.getLogCollection(), Resources.OPERATETYPE_WARNING);
         return CopsecResult.success("处理所有告警历史成功");
     }
