@@ -12,6 +12,15 @@ import java.util.List;
 @Component
 public class UserFileReader extends BaseFileReader<UserBean> {
 
+    @Override
+    public void getData(String filePath) throws CopsecException {
+
+        List<String> list = readContent(filePath);
+        if(!ObjectUtils.isEmpty(list)){
+
+            list.stream().forEach(line -> getDataByInfos(line));
+        }
+    }
 	@Override
 	public void getDataByInfos(String info) {
 

@@ -21,7 +21,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order
+@Order(value = Integer.MAX_VALUE)
 public class CopsecRunner implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(CopsecRunner.class);

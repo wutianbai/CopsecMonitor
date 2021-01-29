@@ -2,6 +2,7 @@ package com.copsec.monitor.web.pools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.copsec.monitor.web.beans.UserBean;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.util.ObjectUtils;
 
 public class UserPools {
 
@@ -47,6 +49,7 @@ public class UserPools {
     }
 
     public synchronized void update(UserBean userBean) {
+
         if (map.containsKey(userBean.getId())) {
             map.replace(userBean.getId(), userBean);
         } else {
@@ -64,13 +67,14 @@ public class UserPools {
 
     public void save(MongoRepository repository){
 
-    	repository.deleteAll();
+    	//repository.deleteAll();
     	getAll().stream().forEach(u -> {
 
 			UserEntity userEntity = new UserEntity();
 			userEntity.setUserInfo(u.toString());
 			repository.save(userEntity);
 		});
+    	logger.debug("save user to db success");
     }
 
     public void clean(){
