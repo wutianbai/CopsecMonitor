@@ -19,7 +19,7 @@
     <properties>
         <java.version>1.8</java.version>
         <commons.fileupload.version>1.4</commons.fileupload.version>
-        <commons.io.version>2.2</commons.io.version>
+        <commons.io.version>2.7</commons.io.version>
         <zip.version>1.3.2</zip.version>
         <snmp.version>2.7.0</snmp.version>
     </properties>
